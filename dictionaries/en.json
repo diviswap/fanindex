@@ -1,0 +1,170 @@
+{
+  "navigation": {
+    "home": "Home",
+    "portfolio": "Portfolio",
+    "about": "About"
+  },
+  "connect_wallet": {
+    "connect": "Connect Wallet",
+    "disconnect": "Disconnect",
+    "loading": "Loading..."
+  },
+  "hero": {
+    "title": "Invest in Football Passion",
+    "subtitle": "FanIndex lets you invest in curated baskets of Fan Tokens, just like ETFs. Diversify your portfolio across leagues and teams with a single click.",
+    "explore_button": "Explore Indexes",
+    "learn_more_button": "Learn More"
+  },
+  "home": {
+    "explore_title": "Explore Indexes",
+    "explore_subtitle": "Invest in curated baskets of Fan Tokens from the world's top leagues and competitions."
+  },
+  "glass_card": {
+    "buy_now": "Buy Now"
+  },
+  "index_details": {
+    "back_link": "Back to all indexes",
+    "index_value": "Index Value",
+    "change_24h": "24h Change",
+    "market_cap": "Market Cap",
+    "volume_24h": "24h Volume",
+    "price_chart": "Price Chart",
+    "token_holdings": "Token Holdings",
+    "table": {
+      "token": "Token",
+      "price": "Price (CHZ)",
+      "change_24h": "24h %",
+      "weight": "Weight",
+      "market_cap": "Market Cap"
+    }
+  },
+  "invest_card": {
+    "invest_in": "Invest in {indexName}",
+    "connect_prompt": "Please connect your wallet to invest.",
+    "wrong_network_prompt": "Please switch to the Chiliz Mainnet to invest.",
+    "switch_network_button": "Switch to Chiliz Mainnet",
+    "unavailable_prompt": "This index is not available for investment at the moment.",
+    "amount_label": "Amount (CHZ)",
+    "buy_button": "Buy Index"
+  },
+  "transaction_modal": {
+    "awaiting_confirmation": "Awaiting Confirmation",
+    "confirm_in_wallet": "Please confirm the transaction in your wallet.",
+    "processing": "Processing Transaction",
+    "waiting_for_confirmation": "Waiting for blockchain confirmation...",
+    "may_take_moments": "This may take a few moments.",
+    "success_title": "Investment Successful!",
+    "success_message": "You've successfully invested {investedAmount} CHZ in the {indexName} index.",
+    "nft_minted": "An NFT representing your position has been minted to your wallet.",
+    "failed_title": "Transaction Failed",
+    "view_on_chiliscan": "View on Chiliscan",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "portfolio": {
+    "title": "My Portfolio",
+    "total_value": "Total Value",
+    "vs_24h": "vs 24h",
+    "overall_pl": "Overall P/L",
+    "total_invested": "Total Invested",
+    "initial_capital": "Initial capital",
+    "performance": "Portfolio Performance",
+    "holdings": "My Holdings ({count})",
+    "holdings_table": {
+      "index": "Index",
+      "current_value": "Current Value",
+      "invested": "Invested",
+      "pl": "P/L",
+      "change_24h": "24h Change",
+      "actions": "Actions",
+      "buy": "Buy"
+    },
+    "transactions": "Transaction History",
+    "transactions_table": {
+      "date": "Date",
+      "type": "Type",
+      "index": "Index",
+      "amount": "Amount (CHZ)",
+      "status": "Status",
+      "explorer": "Explorer"
+    },
+    "transaction_types": {
+      "buy": "Buy",
+      "sell": "Sell"
+    },
+    "transaction_statuses": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "failed": "Failed"
+    }
+  },
+  "about": {
+    "title": "Democratizing Fan Investment",
+    "subtitle": "FanIndex was born from a simple idea: what if every football fan could invest in the success of their favorite teams and leagues, just like a stock market professional? We are bridging the world of sports passion with the power of decentralized finance.",
+    "how_it_works": "How It Works",
+    "step1_title": "1. Explore Indexes",
+    "step1_desc": "Browse our curated baskets of Fan Tokens, from the Champions League to national teams. Each index represents a unique slice of the football world.",
+    "step2_title": "2. Connect & Invest",
+    "step2_desc": "Securely connect your Web3 wallet. Choose an index and invest any amount you wish with just a few clicks. It's that simple.",
+    "step3_title": "3. Track Your Portfolio",
+    "step3_desc": "Watch your investments grow. Your portfolio page gives you a clear overview of your holdings and their performance over time."
+  },
+  "footer": {
+    "newsletter_prompt": "Join our newsletter for the latest updates on new indexes and features.",
+    "email_placeholder": "Enter your email",
+    "subscribe": "Subscribe",
+    "quick_links": "Quick Links",
+    "home": "Home",
+    "indexes": "Indexes",
+    "portfolio": "Portfolio",
+    "about": "About Us",
+    "contact_us": "Contact Us",
+    "hq": "Decentralized HQ",
+    "blockchain": "The Sports Blockchain",
+    "email": "Email: contact@fanindex.pro",
+    "follow_us": "Follow Us",
+    "twitter_tooltip": "Follow us on Twitter",
+    "copyright": "© {year} FanIndex. All rights reserved.",
+    "privacy_policy": "Privacy Policy",
+    "terms_of_service": "Terms of Service"
+  },
+  "language_switcher": {
+    "change_language": "Change language",
+    "en": "English",
+    "es": "Spanish",
+    "pt": "Portuguese",
+    "fr": "French",
+    "it": "Italian",
+    "tr": "Turkish",
+    "ja": "Japanese"
+  },
+  "indexes": {
+    "champions_league": {
+      "name": "Champions League Index",
+      "description": "Top teams from the UEFA Champions League."
+    },
+    "libertadores": {
+      "name": "Copa Libertadores Index",
+      "description": "Leading clubs from CONMEBOL Libertadores."
+    },
+    "premier_league": {
+      "name": "Premier League Index",
+      "description": "Giants from the top tier of English football."
+    },
+    "serie_a": {
+      "name": "Serie A Index",
+      "description": "Iconic clubs from Italy's premier league."
+    },
+    "la_liga": {
+      "name": "LaLiga Index",
+      "description": "Top-tier clubs from Spanish football."
+    },
+    "super_lig": {
+      "name": "Süper Lig Index",
+      "description": "Leading clubs from Turkish football."
+    }
+  },
+  "common": {
+    "loading_data": "Fetching on-chain data"
+  }
+}

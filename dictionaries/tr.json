@@ -1,0 +1,170 @@
+{
+  "navigation": {
+    "home": "Ana Sayfa",
+    "portfolio": "Portföy",
+    "about": "Hakkında"
+  },
+  "connect_wallet": {
+    "connect": "Cüzdanı Bağla",
+    "disconnect": "Bağlantıyı Kes",
+    "loading": "Yükleniyor..."
+  },
+  "hero": {
+    "title": "Futbol Tutkusuna Yatırım Yapın",
+    "subtitle": "FanIndex, ETF'ler gibi seçilmiş Fan Token sepetlerine yatırım yapmanızı sağlar. Tek tıklamayla portföyünüzü ligler ve takımlar arasında çeşitlendirin.",
+    "explore_button": "Endeksleri Keşfet",
+    "learn_more_button": "Daha Fazla Bilgi Edinin"
+  },
+  "home": {
+    "explore_title": "Endeksleri Keşfet",
+    "explore_subtitle": "Dünyanın en iyi liglerinden ve müsabakalarından seçilmiş Fan Token sepetlerine yatırım yapın."
+  },
+  "glass_card": {
+    "buy_now": "Şimdi Satın Al"
+  },
+  "index_details": {
+    "back_link": "Tüm endekslere geri dön",
+    "index_value": "Endeks Değeri",
+    "change_24h": "24 Saatlik Değişim",
+    "market_cap": "Piyasa Değeri",
+    "volume_24h": "24 Saatlik Hacim",
+    "price_chart": "Fiyat Grafiği",
+    "token_holdings": "Token Varlıkları",
+    "table": {
+      "token": "Token",
+      "price": "Fiyat (CHZ)",
+      "change_24h": "24 Saatlik %",
+      "weight": "Ağırlık",
+      "market_cap": "Piyasa Değeri"
+    }
+  },
+  "invest_card": {
+    "invest_in": "{indexName} Endeksine Yatırım Yapın",
+    "connect_prompt": "Yatırım yapmak için lütfen cüzdanınızı bağlayın.",
+    "wrong_network_prompt": "Yatırım yapmak için lütfen Chiliz Ana Ağı'na geçin.",
+    "switch_network_button": "Chiliz Ana Ağı'na Geç",
+    "unavailable_prompt": "Bu endeks şu anda yatırım için uygun değil.",
+    "amount_label": "Miktar (CHZ)",
+    "buy_button": "Endeks Satın Al"
+  },
+  "transaction_modal": {
+    "awaiting_confirmation": "Onay Bekleniyor",
+    "confirm_in_wallet": "Lütfen işlemi cüzdanınızda onaylayın.",
+    "processing": "İşlem Devam Ediyor",
+    "waiting_for_confirmation": "Blockchain onayı bekleniyor...",
+    "may_take_moments": "Bu birkaç dakika sürebilir.",
+    "success_title": "Yatırım Başarılı!",
+    "success_message": "{investedAmount} CHZ'yi {indexName} endeksine başarıyla yatırdınız.",
+    "nft_minted": "Pozisyonunuzu temsil eden bir NFT cüzdanınıza basıldı.",
+    "failed_title": "İşlem Başarısız",
+    "view_on_chiliscan": "Chiliscan'da Görüntüle",
+    "close": "Kapat",
+    "cancel": "İptal"
+  },
+  "portfolio": {
+    "title": "Portföyüm",
+    "total_value": "Toplam Değer",
+    "vs_24h": "24 Saatlik Değişim",
+    "overall_pl": "Genel K/Z",
+    "total_invested": "Toplam Yatırım",
+    "initial_capital": "Başlangıç sermayesi",
+    "performance": "Portföy Performansı",
+    "holdings": "Varlıklarım ({count})",
+    "holdings_table": {
+      "index": "Endeks",
+      "current_value": "Mevcut Değer",
+      "invested": "Yatırılan",
+      "pl": "K/Z",
+      "change_24h": "24 Saatlik Değişim",
+      "actions": "Eylemler",
+      "buy": "Satın Al"
+    },
+    "transactions": "İşlem Geçmişi",
+    "transactions_table": {
+      "date": "Tarih",
+      "type": "Tür",
+      "index": "Endeks",
+      "amount": "Miktar (CHZ)",
+      "status": "Durum",
+      "explorer": "Gezgin"
+    },
+    "transaction_types": {
+      "buy": "Satın Alma",
+      "sell": "Satış"
+    },
+    "transaction_statuses": {
+      "completed": "Tamamlandı",
+      "pending": "Beklemede",
+      "failed": "Başarısız"
+    }
+  },
+  "about": {
+    "title": "Taraftar Yatırımını Demokratikleştirme",
+    "subtitle": "FanIndex basit bir fikirle doğdu: ya her futbol taraftarı, tıpkı bir borsa profesyoneli gibi, favori takımlarının ve liglerinin başarısına yatırım yapabilseydi? Spor tutkusu dünyasını merkezi olmayan finansın gücüyle birleştiriyoruz.",
+    "how_it_works": "Nasıl Çalışır",
+    "step1_title": "1. Endeksleri Keşfet",
+    "step1_desc": "Şampiyonlar Ligi'nden milli takımlara kadar seçilmiş Fan Token sepetlerimize göz atın. Her endeks, futbol dünyasının benzersiz bir dilimini temsil eder.",
+    "step2_title": "2. Bağlan ve Yatırım Yap",
+    "step2_desc": "Web3 cüzdanınızı güvenli bir şekilde bağlayın. Bir endeks seçin ve istediğiniz miktarı sadece birkaç tıklamayla yatırın. Bu kadar basit.",
+    "step3_title": "3. Portföyünüzü Takip Edin",
+    "step3_desc": "Yatırımlarınızın büyümesini izleyin. Portföy sayfanız, varlıklarınızın ve zaman içindeki performanslarının net bir genel görünümünü sunar."
+  },
+  "footer": {
+    "newsletter_prompt": "Yeni endeksler ve özellikler hakkında en son güncellemeler için bültenimize katılın.",
+    "email_placeholder": "E-postanızı girin",
+    "subscribe": "Abone Ol",
+    "quick_links": "Hızlı Bağlantılar",
+    "home": "Ana Sayfa",
+    "indexes": "Endeksler",
+    "portfolio": "Portföy",
+    "about": "Hakkımızda",
+    "contact_us": "Bize Ulaşın",
+    "hq": "Merkezi Olmayan Genel Merkez",
+    "blockchain": "Spor Blockchain'i",
+    "email": "E-posta: contact@fanindex.pro",
+    "follow_us": "Bizi Takip Edin",
+    "twitter_tooltip": "Bizi Twitter'da takip edin",
+    "copyright": "© {year} FanIndex. Tüm hakları saklıdır.",
+    "privacy_policy": "Gizlilik Politikası",
+    "terms_of_service": "Hizmet Şartları"
+  },
+  "language_switcher": {
+    "change_language": "Dili değiştir",
+    "en": "İngilizce",
+    "es": "İspanyolca",
+    "pt": "Portekizce",
+    "fr": "Fransızca",
+    "it": "İtalyanca",
+    "tr": "Türkçe",
+    "ja": "Japonca"
+  },
+  "indexes": {
+    "champions_league": {
+      "name": "Şampiyonlar Ligi Endeksi",
+      "description": "UEFA Şampiyonlar Ligi'nin en iyi takımları."
+    },
+    "libertadores": {
+      "name": "Copa Libertadores Endeksi",
+      "description": "CONMEBOL Libertadores'tan önde gelen kulüpler."
+    },
+    "premier_league": {
+      "name": "Premier Lig Endeksi",
+      "description": "İngiliz futbolunun en üst liginden devler."
+    },
+    "serie_a": {
+      "name": "Serie A Endeksi",
+      "description": "İtalya'nın önde gelen liginden ikonik kulüpler."
+    },
+    "la_liga": {
+      "name": "LaLiga Endeksi",
+      "description": "İspanyol futbolunun en üst düzey kulüpleri."
+    },
+    "super_lig": {
+      "name": "Süper Lig Endeksi",
+      "description": "Türk futbolunun önde gelen kulüpleri."
+    }
+  },
+  "common": {
+    "loading_data": "Zincir üstü veriler alınıyor"
+  }
+}

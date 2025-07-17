@@ -1,0 +1,170 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "portfolio": "Portafolio",
+    "about": "Acerca de"
+  },
+  "connect_wallet": {
+    "connect": "Conectar Billetera",
+    "disconnect": "Desconectar",
+    "loading": "Cargando..."
+  },
+  "hero": {
+    "title": "Invierte en la Pasión del Fútbol",
+    "subtitle": "FanIndex te permite invertir en cestas seleccionadas de Fan Tokens, como si fueran ETFs. Diversifica tu portafolio en ligas y equipos con un solo clic.",
+    "explore_button": "Explorar Índices",
+    "learn_more_button": "Saber Más"
+  },
+  "home": {
+    "explore_title": "Explorar Índices",
+    "explore_subtitle": "Invierte en cestas seleccionadas de Fan Tokens de las mejores ligas y competiciones del mundo."
+  },
+  "glass_card": {
+    "buy_now": "Comprar Ahora"
+  },
+  "index_details": {
+    "back_link": "Volver a todos los índices",
+    "index_value": "Valor del Índice",
+    "change_24h": "Cambio 24h",
+    "market_cap": "Cap. de Mercado",
+    "volume_24h": "Volumen 24h",
+    "price_chart": "Gráfico de Precios",
+    "token_holdings": "Tokens en Cartera",
+    "table": {
+      "token": "Token",
+      "price": "Precio (CHZ)",
+      "change_24h": "% 24h",
+      "weight": "Peso",
+      "market_cap": "Cap. de Mercado"
+    }
+  },
+  "invest_card": {
+    "invest_in": "Invertir en {indexName}",
+    "connect_prompt": "Por favor, conecta tu billetera para invertir.",
+    "wrong_network_prompt": "Por favor, cambia a la red principal de Chiliz para invertir.",
+    "switch_network_button": "Cambiar a Chiliz Mainnet",
+    "unavailable_prompt": "Este índice no está disponible para inversión en este momento.",
+    "amount_label": "Cantidad (CHZ)",
+    "buy_button": "Comprar Índice"
+  },
+  "transaction_modal": {
+    "awaiting_confirmation": "Esperando Confirmación",
+    "confirm_in_wallet": "Por favor, confirma la transacción en tu billetera.",
+    "processing": "Procesando Transacción",
+    "waiting_for_confirmation": "Esperando confirmación de la blockchain...",
+    "may_take_moments": "Esto puede tardar unos momentos.",
+    "success_title": "¡Inversión Exitosa!",
+    "success_message": "Has invertido exitosamente {investedAmount} CHZ en el índice {indexName}.",
+    "nft_minted": "Se ha acuñado un NFT que representa tu posición en tu billetera.",
+    "failed_title": "Transacción Fallida",
+    "view_on_chiliscan": "Ver en Chiliscan",
+    "close": "Cerrar",
+    "cancel": "Cancelar"
+  },
+  "portfolio": {
+    "title": "Mi Portafolio",
+    "total_value": "Valor Total",
+    "vs_24h": "vs 24h",
+    "overall_pl": "G/P General",
+    "total_invested": "Total Invertido",
+    "initial_capital": "Capital inicial",
+    "performance": "Rendimiento del Portafolio",
+    "holdings": "Mis Activos ({count})",
+    "holdings_table": {
+      "index": "Índice",
+      "current_value": "Valor Actual",
+      "invested": "Invertido",
+      "pl": "G/P",
+      "change_24h": "Cambio 24h",
+      "actions": "Acciones",
+      "buy": "Comprar"
+    },
+    "transactions": "Historial de Transacciones",
+    "transactions_table": {
+      "date": "Fecha",
+      "type": "Tipo",
+      "index": "Índice",
+      "amount": "Cantidad (CHZ)",
+      "status": "Estado",
+      "explorer": "Explorador"
+    },
+    "transaction_types": {
+      "buy": "Compra",
+      "sell": "Venta"
+    },
+    "transaction_statuses": {
+      "completed": "Completado",
+      "pending": "Pendiente",
+      "failed": "Fallido"
+    }
+  },
+  "about": {
+    "title": "Democratizando la Inversión de los Fans",
+    "subtitle": "FanIndex nació de una idea simple: ¿y si cada aficionado al fútbol pudiera invertir en el éxito de sus equipos y ligas favoritas, como un profesional del mercado de valores? Estamos uniendo el mundo de la pasión deportiva con el poder de las finanzas descentralizadas.",
+    "how_it_works": "Cómo Funciona",
+    "step1_title": "1. Explora los Índices",
+    "step1_desc": "Navega por nuestras cestas seleccionadas de Fan Tokens, desde la Champions League hasta selecciones nacionales. Cada índice representa una porción única del mundo del fútbol.",
+    "step2_title": "2. Conecta e Invierte",
+    "step2_desc": "Conecta de forma segura tu billetera Web3. Elige un índice e invierte la cantidad que desees con solo unos pocos clics. Es así de simple.",
+    "step3_title": "3. Sigue tu Portafolio",
+    "step3_desc": "Observa cómo crecen tus inversiones. Tu página de portafolio te ofrece una visión clara de tus activos y su rendimiento a lo largo del tiempo."
+  },
+  "footer": {
+    "newsletter_prompt": "Únete a nuestro boletín para recibir las últimas actualizaciones sobre nuevos índices y funciones.",
+    "email_placeholder": "Ingresa tu correo electrónico",
+    "subscribe": "Suscribirse",
+    "quick_links": "Enlaces Rápidos",
+    "home": "Inicio",
+    "indexes": "Índices",
+    "portfolio": "Portafolio",
+    "about": "Sobre Nosotros",
+    "contact_us": "Contáctanos",
+    "hq": "Sede Descentralizada",
+    "blockchain": "La Blockchain del Deporte",
+    "email": "Correo: contact@fanindex.pro",
+    "follow_us": "Síguenos",
+    "twitter_tooltip": "Síguenos en Twitter",
+    "copyright": "© {year} FanIndex. Todos los derechos reservados.",
+    "privacy_policy": "Política de Privacidad",
+    "terms_of_service": "Términos de Servicio"
+  },
+  "language_switcher": {
+    "change_language": "Cambiar idioma",
+    "en": "Inglés",
+    "es": "Español",
+    "pt": "Portugués",
+    "fr": "Francés",
+    "it": "Italiano",
+    "tr": "Turco",
+    "ja": "Japonés"
+  },
+  "indexes": {
+    "champions_league": {
+      "name": "Índice de la Liga de Campeones",
+      "description": "Los mejores equipos de la UEFA Champions League."
+    },
+    "libertadores": {
+      "name": "Índice de la Copa Libertadores",
+      "description": "Clubes líderes de la CONMEBOL Libertadores."
+    },
+    "premier_league": {
+      "name": "Índice de la Premier League",
+      "description": "Gigantes de la máxima categoría del fútbol inglés."
+    },
+    "serie_a": {
+      "name": "Índice de la Serie A",
+      "description": "Clubes icónicos de la liga principal de Italia."
+    },
+    "la_liga": {
+      "name": "Índice de LaLiga",
+      "description": "Clubes de primera división del fútbol español."
+    },
+    "super_lig": {
+      "name": "Índice de la Süper Lig",
+      "description": "Clubes líderes del fútbol turco."
+    }
+  },
+  "common": {
+    "loading_data": "Obteniendo datos on-chain"
+  }
+}

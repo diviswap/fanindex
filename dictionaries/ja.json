@@ -1,0 +1,170 @@
+{
+  "navigation": {
+    "home": "ホーム",
+    "portfolio": "ポートフォリオ",
+    "about": "概要"
+  },
+  "connect_wallet": {
+    "connect": "ウォレットを接続",
+    "disconnect": "切断する",
+    "loading": "読み込み中..."
+  },
+  "hero": {
+    "title": "サッカーへの情熱に投資する",
+    "subtitle": "FanIndexでは、ETFのように厳選されたファントークンのバスケットに投資できます。ワンクリックでリーグやチーム全体にポートフォリオを分散させましょう。",
+    "explore_button": "インデックスを探索",
+    "learn_more_button": "詳細を見る"
+  },
+  "home": {
+    "explore_title": "インデックスを探索",
+    "explore_subtitle": "世界のトップリーグや大会から厳選されたファントークンのバスケットに投資しましょう。"
+  },
+  "glass_card": {
+    "buy_now": "今すぐ購入"
+  },
+  "index_details": {
+    "back_link": "すべてのインデックスに戻る",
+    "index_value": "インデックス値",
+    "change_24h": "24時間変動",
+    "market_cap": "時価総額",
+    "volume_24h": "24時間取引量",
+    "price_chart": "価格チャート",
+    "token_holdings": "トークン保有",
+    "table": {
+      "token": "トークン",
+      "price": "価格 (CHZ)",
+      "change_24h": "24時間 %",
+      "weight": "比重",
+      "market_cap": "時価総額"
+    }
+  },
+  "invest_card": {
+    "invest_in": "{indexName}に投資する",
+    "connect_prompt": "投資するにはウォレットを接続してください。",
+    "wrong_network_prompt": "投資するにはChilizメインネットに切り替えてください。",
+    "switch_network_button": "Chilizメインネットに切り替える",
+    "unavailable_prompt": "このインデックスは現在投資できません。",
+    "amount_label": "金額 (CHZ)",
+    "buy_button": "インデックスを購入"
+  },
+  "transaction_modal": {
+    "awaiting_confirmation": "確認待ち",
+    "confirm_in_wallet": "ウォレットでトランザクションを確認してください。",
+    "processing": "トランザクション処理中",
+    "waiting_for_confirmation": "ブロックチェーンの確認を待っています...",
+    "may_take_moments": "これには数分かかる場合があります。",
+    "success_title": "投資成功！",
+    "success_message": "{indexName}インデックスに{investedAmount} CHZを正常に投資しました。",
+    "nft_minted": "あなたのポジションを表すNFTがウォレットにミントされました。",
+    "failed_title": "トランザクション失敗",
+    "view_on_chiliscan": "Chiliscanで表示",
+    "close": "閉じる",
+    "cancel": "キャンセル"
+  },
+  "portfolio": {
+    "title": "私のポートフォリオ",
+    "total_value": "合計価値",
+    "vs_24h": "24時間比",
+    "overall_pl": "全体損益",
+    "total_invested": "総投資額",
+    "initial_capital": "初期資本",
+    "performance": "ポートフォリオのパフォーマンス",
+    "holdings": "私の保有 ({count})",
+    "holdings_table": {
+      "index": "インデックス",
+      "current_value": "現在の価値",
+      "invested": "投資済み",
+      "pl": "損益",
+      "change_24h": "24時間変動",
+      "actions": "アクション",
+      "buy": "購入"
+    },
+    "transactions": "取引履歴",
+    "transactions_table": {
+      "date": "日付",
+      "type": "タイプ",
+      "index": "インデックス",
+      "amount": "金額 (CHZ)",
+      "status": "ステータス",
+      "explorer": "エクスプローラー"
+    },
+    "transaction_types": {
+      "buy": "購入",
+      "sell": "売却"
+    },
+    "transaction_statuses": {
+      "completed": "完了",
+      "pending": "保留中",
+      "failed": "失敗"
+    }
+  },
+  "about": {
+    "title": "ファン投資の民主化",
+    "subtitle": "FanIndexはシンプルなアイデアから生まれました。もしすべてのサッカーファンが、株式市場のプロのように、お気に入りのチームやリーグの成功に投資できたらどうでしょう？私たちはスポーツへの情熱の世界と分散型金融の力を結びつけています。",
+    "how_it_works": "仕組み",
+    "step1_title": "1. インデックスを探索",
+    "step1_desc": "チャンピオンズリーグから代表チームまで、厳選されたファントークンのバスケットを閲覧してください。各インデックスは、サッカー界のユニークな一面を表しています。",
+    "step2_title": "2. 接続して投資",
+    "step2_desc": "Web3ウォレットを安全に接続します。インデックスを選択し、数回クリックするだけで好きな金額を投資できます。とても簡単です。",
+    "step3_title": "3. ポートフォリオを追跡",
+    "step3_desc": "投資の成長を監視します。ポートフォリオページでは、保有資産とその時間の経過に伴うパフォーマンスの明確な概要が表示されます。"
+  },
+  "footer": {
+    "newsletter_prompt": "新しいインデックスや機能に関する最新情報については、ニュースレターにご登録ください。",
+    "email_placeholder": "メールアドレスを入力",
+    "subscribe": "購読",
+    "quick_links": "クイックリンク",
+    "home": "ホーム",
+    "indexes": "インデックス",
+    "portfolio": "ポートフォリオ",
+    "about": "会社概要",
+    "contact_us": "お問い合わせ",
+    "hq": "分散型本社",
+    "blockchain": "スポーツブロックチェーン",
+    "email": "メール: contact@fanindex.pro",
+    "follow_us": "フォローする",
+    "twitter_tooltip": "Twitterでフォローする",
+    "copyright": "© {year} FanIndex. 全著作権所有。",
+    "privacy_policy": "プライバシーポリシー",
+    "terms_of_service": "利用規約"
+  },
+  "language_switcher": {
+    "change_language": "言語を変更",
+    "en": "英語",
+    "es": "スペイン語",
+    "pt": "ポルトガル語",
+    "fr": "フランス語",
+    "it": "イタリア語",
+    "tr": "トルコ語",
+    "ja": "日本語"
+  },
+  "indexes": {
+    "champions_league": {
+      "name": "チャンピオンズリーグインデックス",
+      "description": "UEFAチャンピオンズリーグのトップチーム。"
+    },
+    "libertadores": {
+      "name": "コパ・リベルタドーレスインデックス",
+      "description": "CONMEBOLリベルタドーレスの主要クラブ。"
+    },
+    "premier_league": {
+      "name": "プレミアリーグインデックス",
+      "description": "イングランドサッカーのトップティアの巨人。"
+    },
+    "serie_a": {
+      "name": "セリエAインデックス",
+      "description": "イタリアの主要リーグの象徴的なクラブ。"
+    },
+    "la_liga": {
+      "name": "ラ・リーガインデックス",
+      "description": "スペインサッカーのトップティアクラブ。"
+    },
+    "super_lig": {
+      "name": "スュペル・リグインデックス",
+      "description": "トルコサッカーの主要クラブ。"
+    }
+  },
+  "common": {
+    "loading_data": "オンチェーンデータを取得中"
+  }
+}

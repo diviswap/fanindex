@@ -1,0 +1,195 @@
+"use client"
+
+import Link from "next/link"
+import { motion } from "framer-motion"
+import { getIndexesWithOnChainPrices } from "@/lib/onchain"
+import { generatePortfolioData } from "@/lib/portfolio-data"
+import { PortfolioClient } from "./client"
+import { formatNumber } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { ArrowRight, TrendingUp, DollarSign, Clock } from "lucide-react"
+import { IndexChart } from "@/components/index-chart"
+import { SiteFooter } from "@/components/site-footer"
+import { ConnectWallet } from "@/components/connect-wallet"
+import { ShieldCheck } from "lucide-react" // Import ShieldCheck
+
+export default async function PortfolioPage() {
+  const indexes = await getIndexesWithOnChainPrices()
+  const portfolio = generatePortfolioData(indexes)
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  }
+
+  return (
+    <div className="bg-black text-white min-h-screen font-sans">
+      <header className="sticky top-0 z-50 w-full border-b border-gray-800 bg-black/50 backdrop-blur-sm">
+        <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
+          <Link href="/" className="flex items-center gap-2">
+            <ShieldCheck className="h-7 w-7 text-green-400" />
+            <span className="text-xl font-bold">FanIndex</span>
+          </Link>
+          <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+            <Link href="/#indexes" className="transition-colors hover:text-green-400">
+              Indexes
+            </Link>
+            <Link href="/portfolio" className="text-green-400 font-semibold">
+              Portfolio
+            </Link>
+            <Link href="/about" className="transition-colors hover:text-green-400">
+              About
+            </Link>
+          </nav>
+          <ConnectWallet />
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 md:px-6 py-12">
+        <motion.div initial="hidden" animate="visible" variants={sectionVariants}>
+          <h1 className="text-4xl md:text-5xl font-bold mb-8">My Portfolio</h1>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="bg-black/30 backdrop-blur-xl border border-white/10">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">Total Value</CardTitle>
+                <DollarSign className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{formatNumber(portfolio.totalValue)}</div>
+                <p className={`text-xs ${portfolio.change24h >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  {portfolio.change24h.toFixed(2)}% vs 24h
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-black/30 backdrop-blur-xl border border-white/10">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">Overall P/L</CardTitle>
+                <TrendingUp className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className={`text-3xl font-bold ${portfolio.overallPnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  {formatNumber(portfolio.overallPnl)}
+                </div>
+                <p className={`text-xs ${portfolio.overallPnl >= 0 ? "text-green-400" : "text-red-400"}`}>
+                  ({portfolio.overallPnlPercentage.toFixed(2)}%)
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-black/30 backdrop-blur-xl border border-white/10">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-400">Total Invested</CardTitle>
+                <Clock className="h-4 w-4 text-gray-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{formatNumber(portfolio.totalInvested)}</div>
+                <p className="text-xs text-gray-500">Initial capital</p>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="mb-8"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={sectionVariants}
+        >
+          <Card className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl">
+            <CardHeader>
+              <CardTitle>Portfolio Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <IndexChart data={portfolio.chartData} change={portfolio.overallPnl} />
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={sectionVariants}
+        >
+          <Card className="bg-black/30 backdrop-blur-xl border border-white/10 rounded-2xl">
+            <CardHeader>
+              <CardTitle>My Holdings ({portfolio.holdings.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-white/10 hover:bg-white/5">
+                    <TableHead className="text-white">Index</TableHead>
+                    <TableHead className="text-right text-white">Current Value</TableHead>
+                    <TableHead className="text-right text-white">Invested</TableHead>
+                    <TableHead className="text-right text-white">P/L</TableHead>
+                    <TableHead className="text-right text-white">24h Change</TableHead>
+                    <TableHead className="text-right text-white">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {portfolio.holdings.map((holding) => (
+                    <TableRow key={holding.index.id} className="border-white/10 hover:bg-white/5">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-9 w-9">
+                            <AvatarImage
+                              src={holding.index.backgroundImageUrl || "/placeholder.svg"}
+                              alt={holding.index.name}
+                            />
+                            <AvatarFallback>{holding.index.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium">{holding.index.name}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right font-mono">{formatNumber(holding.currentValue)}</TableCell>
+                      <TableCell className="text-right font-mono text-gray-400">
+                        {formatNumber(holding.investedAmount)}
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${holding.pnl >= 0 ? "text-green-400" : "text-red-400"}`}
+                      >
+                        {holding.pnl >= 0 ? "+" : ""}
+                        {holding.pnlPercentage.toFixed(2)}%
+                      </TableCell>
+                      <TableCell
+                        className={`text-right font-medium ${
+                          holding.index.change >= 0 ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        {holding.index.change.toFixed(2)}%
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/index/${holding.index.id}`}>
+                            View <ArrowRight className="ml-2 h-4 w-4" />
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <PortfolioClient portfolio={portfolio} />
+      </main>
+      <SiteFooter />
+    </div>
+  )
+}
