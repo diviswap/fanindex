@@ -1,0 +1,429 @@
+"use client"
+
+import { useEffect, useState, useMemo } from "react"
+import { WebGLShader } from "@/components/ui/web-gl-shader"
+import { NavBar } from "@/components/ui/tubelight-navbar"
+import { Footer } from "@/components/ui/footer-section"
+import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
+import { FAN_TOKENS } from "@/lib/data/fan-tokens"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search, TrendingUp, TrendingDown, ArrowUpDown } from "lucide-react"
+import Image from "next/image"
+import { cn } from "@/lib/utils"
+import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
+
+type SortField = "rank" | "name" | "price" | "change24h" | "change7d" | "marketCap" | "volume" | "percentOfSupply"
+type SortOrder = "asc" | "desc"
+
+const CHZ_MARKET_CAP = 301580000 // $301.58M
+const CHZ_CIRCULATING_SUPPLY = 10106836844 // 10.1B CHZ
+const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY // ~$0.02984 per CHZ
+
+export default function FanTokensPage() {
+  const [searchQuery, setSearchQuery] = useState("")
+  const [categoryFilter, setCategoryFilter] = useState<string>("all")
+  const [sortField, setSortField] = useState<SortField>("marketCap")
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
+
+  const { data: pricesData, isLoading: isPricesLoading } = useCoinGeckoPrices()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  const categories = [
+    { id: "all", label: "All Tokens" },
+    { id: "football", label: "Football" },
+    { id: "esports", label: "Esports" },
+    { id: "motorsport", label: "Motorsport" },
+    { id: "combat", label: "Combat" },
+    { id: "rugby", label: "Rugby" },
+    { id: "other", label: "Other" },
+  ]
+
+  const tokensWithLivePrices = useMemo(() => {
+    return FAN_TOKENS.map((token) => {
+      // Find live price data from CoinGecko API
+      const livePrice = pricesData?.tokens?.find(
+        (p) =>
+          (token.cgId && p.cgId === token.cgId) ||
+          (token.wrapped && p.address?.toLowerCase() === token.wrapped?.toLowerCase()),
+      )
+
+      // If we have live price data, use it
+      if (livePrice && livePrice.priceUSD > 0) {
+        return {
+          ...token,
+          price: livePrice.priceUSD.toFixed(6),
+          priceInCHZ: livePrice.priceInCHZ,
+          change24h: livePrice.change24h.toFixed(2),
+          change7d: livePrice.change7d.toFixed(2),
+          marketCap: livePrice.marketCap.toFixed(0),
+          volume: livePrice.volume24h.toFixed(0),
+        }
+      }
+
+      // Otherwise, use static data
+      return token
+    })
+  }, [pricesData])
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc")
+    } else {
+      setSortField(field)
+      setSortOrder("asc")
+    }
+  }
+
+  // Filter and sort tokens
+  const filteredTokens = useMemo(() => {
+    const filtered = tokensWithLivePrices.filter((token) => {
+      const matchesSearch =
+        token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        token.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesCategory = categoryFilter === "all" || token.category === categoryFilter
+      return matchesSearch && matchesCategory
+    })
+
+    // Sort tokens
+    filtered.sort((a, b) => {
+      let comparison = 0
+      switch (sortField) {
+        case "rank":
+          comparison = a.rank - b.rank
+          break
+        case "name":
+          comparison = a.name.localeCompare(b.name)
+          break
+        case "price":
+          comparison = Number.parseFloat(a.price) - Number.parseFloat(b.price)
+          break
+        case "change24h":
+          comparison = Number.parseFloat(a.change24h) - Number.parseFloat(b.change24h)
+          break
+        case "change7d":
+          comparison = Number.parseFloat(a.change7d) - Number.parseFloat(b.change7d)
+          break
+        case "marketCap":
+          comparison =
+            Number.parseFloat(a.marketCap.replace(/,/g, "")) - Number.parseFloat(b.marketCap.replace(/,/g, ""))
+          break
+        case "volume":
+          comparison = Number.parseFloat(a.volume.replace(/,/g, "")) - Number.parseFloat(b.volume.replace(/,/g, ""))
+          break
+        case "percentOfSupply":
+          comparison = Number.parseFloat(a.percentOfSupply) - Number.parseFloat(b.percentOfSupply)
+          break
+      }
+      return sortOrder === "asc" ? comparison : -comparison
+    })
+
+    return filtered
+  }, [searchQuery, categoryFilter, sortField, sortOrder, tokensWithLivePrices])
+
+  const formatNumberInCHZ = (valueUSD: string | number) => {
+    const numUSD = typeof valueUSD === "string" ? Number.parseFloat(valueUSD.replace(/,/g, "")) : valueUSD
+    const numCHZ = numUSD / CHZ_PRICE_USD
+
+    if (numCHZ >= 1000000) {
+      return `${(numCHZ / 1000000).toFixed(2)}M`
+    } else if (numCHZ >= 1000) {
+      return `${(numCHZ / 1000).toFixed(2)}K`
+    }
+    return `${numCHZ.toFixed(2)}`
+  }
+
+  const totalFanTokenMcap = useMemo(() => {
+    return filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.marketCap.replace(/,/g, "")), 0)
+  }, [filteredTokens])
+
+  const totalFanTokenSupply = useMemo(() => {
+    return filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.circulatingSupply.replace(/,/g, "")), 0)
+  }, [filteredTokens])
+
+  return (
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
+      <DemoModeBanner />
+      <WebGLShader />
+      <NavBar />
+
+      <main className="relative z-10 w-full mx-auto max-w-7xl px-3 sm:px-4 lg:px-12 py-20 sm:py-24 md:py-32 mt-12 sm:mt-16 md:mt-0 pb-20 sm:pb-24">
+        {/* Header */}
+        <div className="text-center mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 text-success text-xs sm:text-sm font-medium mb-4 sm:mb-6">
+            <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span>Live Fan Token Statistics</span>
+          </div>
+          <h1 className="mb-3 sm:mb-4 text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-none text-balance">
+            Fan Token Market
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-pretty leading-relaxed px-4">
+            Real-time prices, market caps, and trading data for {FAN_TOKENS.length}+ fan tokens on Chiliz Chain
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search fan tokens..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-11 sm:h-12 bg-card border-border text-sm sm:text-base"
+            />
+          </div>
+
+          <div className="overflow-x-auto -mx-3 sm:mx-0 px-3 sm:px-0 pb-2 sm:pb-0">
+            <div className="flex gap-2 min-w-max sm:min-w-0 sm:flex-wrap">
+              {categories.map((category) => (
+                <Button
+                  key={category.id}
+                  variant={categoryFilter === category.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCategoryFilter(category.id)}
+                  className={cn(
+                    "transition-all text-xs sm:text-sm whitespace-nowrap",
+                    categoryFilter === category.id && "bg-success hover:bg-success/90 text-success-foreground border-0",
+                  )}
+                >
+                  {category.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          <div className="p-3 sm:p-4 lg:p-6 rounded-xl bg-card/50 border border-border backdrop-blur">
+            <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">Total Tokens</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">{filteredTokens.length}</div>
+          </div>
+          <div className="p-3 sm:p-4 lg:p-6 rounded-xl bg-card/50 border border-border backdrop-blur">
+            <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">Total Market Cap</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
+              {formatNumberInCHZ(totalFanTokenMcap)} CHZ
+            </div>
+          </div>
+          <div className="p-3 sm:p-4 lg:p-6 rounded-xl bg-card/50 border border-border backdrop-blur">
+            <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">24h Volume</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground">
+              {formatNumberInCHZ(
+                filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.volume.replace(/,/g, "")), 0),
+              )}{" "}
+              CHZ
+            </div>
+          </div>
+          <div className="p-3 sm:p-4 lg:p-6 rounded-xl bg-card/50 border border-border backdrop-blur">
+            <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">% CHZ Supply</div>
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-success">
+              {((totalFanTokenMcap / CHZ_MARKET_CAP) * 100).toFixed(2)}%
+            </div>
+          </div>
+        </div>
+
+        {/* Tokens Table */}
+        <div className="rounded-xl border border-border bg-card/50 backdrop-blur overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px]">
+              <thead>
+                <tr className="border-b border-border bg-muted/50">
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-left">
+                    <button
+                      onClick={() => handleSort("rank")}
+                      className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      #
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-left sticky left-0 bg-muted/50 z-10">
+                    <button
+                      onClick={() => handleSort("name")}
+                      className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      Token
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("price")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      Price
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("change24h")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      24h
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("change7d")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      7d
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("marketCap")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      Market Cap
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("volume")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
+                    >
+                      Volume
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                  <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                    <button
+                      onClick={() => handleSort("percentOfSupply")}
+                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider whitespace-nowrap"
+                    >
+                      % CHZ Supply
+                      <ArrowUpDown className="h-3 w-3" />
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTokens.map((token, index) => (
+                  <tr
+                    key={token.rank}
+                    className={cn(
+                      "border-b border-border hover:bg-muted/30 transition-colors active:bg-muted/50",
+                      index % 2 === 0 && "bg-muted/5",
+                    )}
+                  >
+                    <td className="px-2 sm:px-4 py-3 sm:py-4">
+                      <div className="text-xs sm:text-sm font-medium text-muted-foreground">{index + 1}</div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 sticky left-0 bg-card/95 backdrop-blur-sm z-10">
+                      <div className="flex items-center gap-2 sm:gap-3">
+                        {token.icon ? (
+                          <div className="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                            <Image
+                              src={token.icon || "/placeholder.svg"}
+                              alt={token.name}
+                              width={32}
+                              height={32}
+                              className="object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = "none"
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-[10px] sm:text-xs font-bold text-success">
+                              {token.symbol.slice(0, 2)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <div className="text-xs sm:text-sm font-semibold text-foreground whitespace-nowrap">
+                            {token.symbol}
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block whitespace-nowrap">
+                            {token.name}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div className="text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
+                        {"priceInCHZ" in token && token.priceInCHZ
+                          ? token.priceInCHZ.toFixed(2)
+                          : (Number.parseFloat(token.price) / CHZ_PRICE_USD).toFixed(2)}
+                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-1">CHZ</span>
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div
+                        className={cn(
+                          "inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap",
+                          Number.parseFloat(token.change24h) >= 0
+                            ? "text-success bg-success/10"
+                            : "text-red-500 bg-red-500/10",
+                        )}
+                      >
+                        {Number.parseFloat(token.change24h) >= 0 ? (
+                          <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        ) : (
+                          <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        )}
+                        {Math.abs(Number.parseFloat(token.change24h)).toFixed(1)}%
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div
+                        className={cn(
+                          "inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap",
+                          Number.parseFloat(token.change7d) >= 0
+                            ? "text-success bg-success/10"
+                            : "text-red-500 bg-red-500/10",
+                        )}
+                      >
+                        {Number.parseFloat(token.change7d) >= 0 ? (
+                          <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        ) : (
+                          <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                        )}
+                        {Math.abs(Number.parseFloat(token.change7d)).toFixed(1)}%
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div className="text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
+                        {formatNumberInCHZ(token.marketCap)}
+                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-1">CHZ</span>
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div className="text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
+                        {formatNumberInCHZ(token.volume)}
+                        <span className="text-[10px] sm:text-xs text-muted-foreground ml-1">CHZ</span>
+                      </div>
+                    </td>
+                    <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
+                      <div className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
+                        {((Number.parseFloat(token.marketCap.replace(/,/g, "")) / CHZ_MARKET_CAP) * 100).toFixed(4)}%
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {filteredTokens.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-sm sm:text-base">No tokens found matching your criteria.</p>
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
+  )
+}
