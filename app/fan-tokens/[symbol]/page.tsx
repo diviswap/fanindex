@@ -17,7 +17,6 @@ import {
   Check
 } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { useState } from "react"
@@ -389,13 +388,6 @@ export default function FanTokenDetailPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Image 
-                      src="https://www.coingecko.com/favicon.ico" 
-                      alt="CoinGecko" 
-                      width={16} 
-                      height={16} 
-                      className="mr-2"
-                    />
                     CoinGecko
                     <ExternalLink className="h-3 w-3 ml-2 opacity-50" />
                   </a>
