@@ -215,6 +215,10 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
           </motion.div>
         )}
       </nav>
+
+      {/* Spacer to prevent content overlap */}
+      <div className="h-16 md:block hidden" />
+      <div className="h-14 md:hidden" />
     </>
   )
 }
