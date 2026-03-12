@@ -8,8 +8,9 @@ import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
 import { FAN_TOKENS } from "@/lib/data/fan-tokens"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, TrendingUp, TrendingDown, ArrowUpDown } from "lucide-react"
+import { Search, TrendingUp, TrendingDown, ArrowUpDown, ChevronRight } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 
@@ -304,6 +305,7 @@ export default function FanTokensPage() {
                       <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
+                  <th className="w-8"></th>
                 </tr>
               </thead>
               <tbody>
@@ -311,9 +313,10 @@ export default function FanTokensPage() {
                   <tr
                     key={token.rank}
                     className={cn(
-                      "border-b border-border hover:bg-muted/30 transition-colors active:bg-muted/50",
+                      "border-b border-border hover:bg-muted/30 transition-colors active:bg-muted/50 cursor-pointer group",
                       index % 2 === 0 && "bg-muted/5",
                     )}
+                    onClick={() => window.location.href = `/fan-tokens/${token.symbol.toLowerCase()}`}
                   >
                     <td className="px-2 sm:px-4 py-3 sm:py-4">
                       <div className="text-xs sm:text-sm font-medium text-muted-foreground">{index + 1}</div>
@@ -408,6 +411,9 @@ export default function FanTokensPage() {
                       <div className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
                         {((Number.parseFloat(token.marketCap.replace(/,/g, "")) / CHZ_MARKET_CAP) * 100).toFixed(4)}%
                       </div>
+                    </td>
+                    <td className="px-2 py-3 sm:py-4">
+                      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                     </td>
                   </tr>
                 ))}

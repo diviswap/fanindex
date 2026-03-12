@@ -96,93 +96,19 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   return (
     <>
       {/* Desktop Navbar */}
-      <div
-        className={cn(
-          "hidden md:flex fixed top-0 left-1/2 -translate-x-1/2 z-50 mt-6 pt-6 pointer-events-none",
-          className,
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-3 bg-background/5 border border-border backdrop-blur-lg py-1 px-1 rounded-full shadow-lg pointer-events-auto">
-            {items.map((item) => {
-              const Icon = item.icon
-              const isActive = activeTab === item.name
+      <nav className="hidden md:flex fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-md border-b border-border/30 z-50">
+        <div className="w-full px-6 flex items-center justify-between">
+          {/* Left Section: Logo + Navigation */}
+          <div className="flex items-center gap-8">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+              <Image src="/images/fi-logo.png" alt="FanIndex Logo" width={36} height={36} className="rounded-lg" />
+              <span className="text-foreground font-bold text-lg hidden sm:inline">FanIndex</span>
+            </Link>
 
-              return (
-                <Link
-                  key={item.name}
-                  href={item.url}
-                  onClick={(e) => handleClick(e, item)}
-                  className={cn(
-                    "relative cursor-pointer text-sm font-semibold px-6 py-2 rounded-full transition-colors whitespace-nowrap",
-                    "text-foreground/80 hover:text-success",
-                    isActive && "bg-muted text-success",
-                  )}
-                >
-                  {item.name}
-                  {isActive && (
-                    <motion.div
-                      layoutId="lamp"
-                      className="absolute inset-0 w-full bg-success/5 rounded-full -z-10"
-                      initial={false}
-                      transition={{
-                        type: "spring",
-                        stiffness: 300,
-                        damping: 30,
-                      }}
-                    >
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-success rounded-t-full">
-                        <div className="absolute w-12 h-6 bg-success/20 rounded-full blur-md -top-2 -left-2" />
-                        <div className="absolute w-8 h-6 bg-success/20 rounded-full blur-md -top-1" />
-                        <div className="absolute w-4 h-4 bg-success/20 rounded-full blur-sm top-0 left-2" />
-                      </div>
-                    </motion.div>
-                  )}
-                </Link>
-              )
-            })}
-          </div>
-          <div className="flex items-center gap-2 pointer-events-auto">
-            <ThemeToggle />
-            <ConnectWallet />
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navbar */}
-      <div
-        className="md:hidden fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-lg border-b border-border shadow-sm"
-        ref={mobileMenuRef}
-      >
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/images/fi-logo.png" alt="FanIndex Logo" width={32} height={32} className="rounded-lg" />
-            <span className="text-foreground font-bold text-lg">FanIndex</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <ConnectWallet />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="hover:bg-accent"
-            >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="border-t border-border bg-card/98 backdrop-blur-lg shadow-lg"
-          >
-            <div className="px-4 py-4 space-y-2">
+            {/* Navigation Items */}
+            <div className="flex items-center gap-1">
               {items.map((item) => {
-                const Icon = item.icon
                 const isActive = activeTab === item.name
 
                 return (
@@ -191,27 +117,108 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
                     href={item.url}
                     onClick={(e) => handleClick(e, item)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl transition-all",
-                      "text-foreground/80 hover:text-success hover:bg-accent/50",
-                      isActive && "bg-success/10 text-success font-semibold shadow-sm",
+                      "relative px-4 py-2 text-sm font-medium transition-colors",
+                      "text-foreground/70 hover:text-foreground",
+                      isActive && "text-foreground",
                     )}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.name}</span>
+                    {item.name}
+                    {isActive && (
+                      <motion.div
+                        layoutId="navIndicator"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-success"
+                        transition={{
+                          type: "spring",
+                          stiffness: 400,
+                          damping: 40,
+                        }}
+                      />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Right Section: Theme + Connect */}
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <ConnectWallet />
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Navbar */}
+      <nav className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-md border-b border-border/30 z-50" ref={mobileMenuRef}>
+        <div className="w-full h-full px-4 flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 shrink-0">
+            <Image src="/images/fi-logo.png" alt="FanIndex Logo" width={32} height={32} className="rounded-lg" />
+            <span className="text-foreground font-bold text-base">FanIndex</span>
+          </Link>
+
+          {/* Right Controls */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="hover:bg-accent/50"
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="absolute top-14 left-0 right-0 bg-background/98 backdrop-blur-md border-b border-border/30 shadow-lg"
+          >
+            <div className="px-4 py-4 space-y-1">
+              {items.map((item) => {
+                const isActive = activeTab === item.name
+
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.url}
+                    onClick={(e) => handleClick(e, item)}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-medium",
+                      "text-foreground/70 hover:text-foreground hover:bg-accent/30",
+                      isActive && "text-success bg-success/10",
+                    )}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.name}</span>
                   </Link>
                 )
               })}
 
-              <div className="pt-3 mt-3 border-t border-border space-y-2">
-                <div className="flex items-center justify-between px-4 py-2">
-                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
-                  <ThemeToggle />
+              <div className="pt-3 mt-3 border-t border-border/30">
+                <div className="flex items-center justify-between px-4 py-2.5">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Theme</span>
+                  <div className="ml-auto">
+                    <ThemeToggle />
+                  </div>
+                </div>
+                <div className="flex items-center justify-stretch pt-2">
+                  <ConnectWallet />
                 </div>
               </div>
             </div>
           </motion.div>
         )}
-      </div>
+      </nav>
+
+      {/* Spacer to prevent content overlap */}
+      <div className="h-16 md:block hidden" />
+      <div className="h-14 md:hidden" />
     </>
   )
 }
