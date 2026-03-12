@@ -33,9 +33,9 @@ export default function FanIndexLanding() {
 
       <NavBar />
 
-      <main className="relative z-10 w-full pt-16 md:pt-16">
+      <main className="relative z-10 w-full">
         {/* Hero Section - Inspired by Alpaca/Moment */}
-        <section className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 pb-12 sm:pb-20 md:pb-28">
+        <section className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 pt-20 pb-12 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
             {/* Left Column - Text Content */}
             <div>
