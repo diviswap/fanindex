@@ -38,6 +38,8 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState(items[0].name)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   const { isDemoMode, toggleDemoMode } = useDemoMode()
@@ -55,6 +57,25 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
       setActiveTab("Whitepaper")
     }
   }, [pathname])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY < 100) {
+        setIsVisible(true)
+      } else if (currentScrollY > lastScrollY) {
+        setIsVisible(false)
+      } else {
+        setIsVisible(true)
+      }
+
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [lastScrollY])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,7 +117,12 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   return (
     <>
       {/* Desktop Navbar */}
-      <nav className="hidden md:flex fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-md border-b border-border/30 z-50">
+      <motion.nav 
+        className="hidden md:flex fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur-md border-b border-border/30 z-50"
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : -100 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="w-full px-6 flex items-center justify-between">
           {/* Left Section: Logo + Navigation */}
           <div className="flex items-center gap-8">
@@ -146,10 +172,16 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
             <ConnectWallet />
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Mobile Navbar */}
-      <nav className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-md border-b border-border/30 z-50" ref={mobileMenuRef}>
+      <motion.nav 
+        className="md:hidden fixed top-0 left-0 right-0 h-14 bg-background/95 backdrop-blur-md border-b border-border/30 z-50"
+        ref={mobileMenuRef}
+        initial={{ y: 0 }}
+        animate={{ y: isVisible ? 0 : -60 }}
+        transition={{ duration: 0.3 }}
+      >
         <div className="w-full h-full px-4 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
@@ -214,11 +246,7 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
             </div>
           </motion.div>
         )}
-      </nav>
-
-      {/* Spacer to prevent content overlap */}
-      <div className="h-16 md:block hidden" />
-      <div className="h-14 md:hidden" />
+      </motion.nav>
     </>
   )
 }
