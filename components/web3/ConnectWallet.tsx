@@ -283,7 +283,13 @@ export function ConnectWallet() {
 
           {/* Wallet Options */}
           <div className="p-3 space-y-1.5">
-            {connectors.map((connector) => {
+            {connectors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                <span className="text-xs">Loading wallets...</span>
+              </div>
+            ) : (
+              connectors.map((connector) => {
               const { name, logo, description, popular } = getWalletInfo(connector.id)
               const isConnecting = connectingWallet === connector.id
               
@@ -340,6 +346,7 @@ export function ConnectWallet() {
                 </button>
               )
             })}
+            )}
           </div>
 
           {/* Footer */}

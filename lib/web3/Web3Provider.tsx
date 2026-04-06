@@ -5,31 +5,52 @@ import { chiliz } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useState, useEffect, type ReactNode } from "react"
 
-// Create a minimal SSR-safe config without connectors that use indexedDB
+// Minimal SSR-safe config — zero connectors, never touches indexedDB or AsyncStorage
 const ssrSafeConfig = createConfig({
   chains: [chiliz],
   connectors: [],
-  transports: {
-    [chiliz.id]: http(),
-  },
+  transports: { [chiliz.id]: http() },
   ssr: true,
 })
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
-  const [mounted, setMounted] = useState(false)
   const [config, setConfig] = useState(ssrSafeConfig)
 
   useEffect(() => {
-    // Dynamically import full config with connectors only on client side
-    import("./config").then((module) => {
-      setConfig(module.createWagmiConfig())
-      setMounted(true)
+    // Dynamically import wagmi/connectors ONLY after hydration.
+    // This keeps @metamask/sdk, WalletConnect, pino, and react-native deps
+    // completely out of the SSR/static bundle.
+    const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
+
+    import("wagmi/connectors").then(({ injected, walletConnect }) => {
+      const connectors: any[] = [
+        injected({ shimDisconnect: true }),
+      ]
+
+      if (projectId) {
+        connectors.push(
+          walletConnect({
+            projectId,
+            metadata: {
+              name: "FanIndex",
+              description: "Fan Token Investment Platform",
+              url: "https://fanindex.app",
+              icons: ["https://fanindex.app/logo.png"],
+            },
+            showQrModal: true,
+          }),
+        )
+      }
+
+      import("./config").then(({ createWagmiConfig }) => {
+        setConfig(createWagmiConfig(connectors))
+      })
     })
   }, [])
 
   return (
-    <WagmiProvider config={config}>
+    <WagmiProvider config={config} reconnectOnMount>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   )
