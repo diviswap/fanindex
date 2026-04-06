@@ -116,11 +116,14 @@ export function RedeemDialog({
 
     try {
       if (redemptionType === "chz") {
+        // The new ABI expects: redeemAllToCHZNative(uint256 tokenId, uint8 pct, uint256 minOutputAmount)
+        // We pass 0n for minOutputAmount to accept any output (no slippage protection)
+        // In production, you may want to calculate proper minOutputAmount based on quotes
         writeContract({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
-          args: [BigInt(nftId), redemptionPercentage],
+          args: [BigInt(nftId), redemptionPercentage, BigInt(0)], // tokenId, percentage, minOutputAmount
         })
       } else {
         writeContract({

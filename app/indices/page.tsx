@@ -15,7 +15,7 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  const deployedIndices = INDICES.filter((index) => ["2", "3", "4"].includes(index.id))
+  const deployedIndices = INDICES.filter((index) => ["1", "2", "3", "4"].includes(index.id))
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">

@@ -35,11 +35,11 @@ export function calculateIndexPrice(
 export const INDICES: IndexData[] = [
   {
     id: "1",
-    name: "Elite Football Index",
-    description: "Top-tier European football clubs with highest market capitalization and liquidity",
-    type: "weighted",
-    tokens: ["PSG", "ASR", "BAR", "JUV", "CITY", "ATM", "GAL", "ACM"],
-    price: calculateIndexPrice(["PSG", "ASR", "BAR", "JUV", "CITY", "ATM", "GAL", "ACM"]).toFixed(2),
+    name: "FanIndex Global ETF",
+    description: "50% OG Esports + 50% Valencia CF — live on Chiliz Mainnet",
+    type: "equal",
+    tokens: ["OG", "VCF"],
+    price: calculateIndexPrice(["OG", "VCF"]).toFixed(2),
     apy: "14.2%",
     totalValue: "2.8M",
     holders: 456,

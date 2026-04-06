@@ -24,7 +24,8 @@ const CHART_COLORS = {
   managed: "#10b981",
 }
 
-const DEPLOYED_INDICES = ["2", "3", "4"] // Premier League, Serie A, La Liga
+// All indices now use mainnet contracts
+const DEPLOYED_INDICES = ["1", "2", "3", "4"] // Global ETF, Premier League, Serie A, La Liga
 
 export function PortfolioView() {
   const { address, isConnected } = useAccount()

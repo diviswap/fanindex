@@ -100,12 +100,19 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     })
 
     try {
+      // Send exactly the user-entered amount as msg.value.
+      // The contract deducts its 1% fee internally from that value.
+      // minOuts array must match the number of tokens in the vault (2 for OG/VCF)
+      // Passing [0n, 0n] means no minimum output (no slippage protection)
+      const minOuts = [BigInt(0), BigInt(0)] // 2 tokens in the vault: OG, VCF
+      
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
-        args: [address],
+        args: [address, minOuts],
         value: parseEther(amount),
+        gas: BigInt(800_000), // Reasonable gas limit for swap operations
       })
     } catch (err) {
       console.error("[v0] Error buying index:", err)
@@ -126,8 +133,10 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     router.push("/portfolio")
   }
 
+  // The user sends `amount` CHZ. The contract deducts 1% fee internally.
+  // Net investment = amount * 0.99, fee = amount * 0.01
   const entryFee = amount ? Number.parseFloat(amount) * 0.01 : 0
-  const total = amount ? Number.parseFloat(amount) + entryFee : 0
+  const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
   const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(index.price) : 0
 
   const displayBalance = isDemoMode ? demoBalance : undefined
@@ -183,9 +192,16 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Entry Fee (1%)</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">Protocol Fee (1%)</span>
                     <span className="text-sm sm:text-base font-semibold text-foreground">
-                      {purchaseDetails.fee.toFixed(4)} CHZ
+                      - {purchaseDetails.fee.toFixed(4)} CHZ
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs sm:text-sm text-muted-foreground">Net Investment</span>
+                    <span className="text-sm sm:text-base font-semibold text-success">
+                      {(Number.parseFloat(purchaseDetails.amount) - purchaseDetails.fee).toFixed(4)} CHZ
                     </span>
                   </div>
 
@@ -195,9 +211,9 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
                   </div>
 
                   <div className="pt-2 sm:pt-3 border-t border-border flex justify-between items-center">
-                    <span className="text-sm sm:text-base font-bold">Total Cost</span>
+                    <span className="text-sm sm:text-base font-bold">Total Sent</span>
                     <span className="text-base sm:text-lg font-bold text-success">
-                      {(Number.parseFloat(purchaseDetails.amount) + purchaseDetails.fee).toFixed(4)} CHZ
+                      {Number.parseFloat(purchaseDetails.amount).toFixed(4)} CHZ
                     </span>
                   </div>
                 </div>
@@ -265,16 +281,7 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This index is not yet deployed on Chiliz Spicy Testnet. Use Demo Mode to try it out.
-                  </p>
-                </div>
-              )}
-
-              {!isDemoMode && hasContracts && (
-                <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
-                  <Info className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400 flex-shrink-0" />
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Connected to Chiliz Spicy Testnet. Real transactions will be executed.
+                    This index is not yet deployed on Chiliz Mainnet. Use Demo Mode to try it out.
                   </p>
                 </div>
               )}
@@ -311,16 +318,22 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
                     <span className="font-semibold">{index.price} CHZ</span>
                   </div>
                   <div className="flex justify-between text-xs sm:text-sm">
-                    <span className="text-muted-foreground">Entry fee (1%)</span>
-                    <span className="font-semibold">{entryFee.toFixed(4)} CHZ</span>
+                    <span className="text-muted-foreground">Protocol fee (1%)</span>
+                    <span className="font-semibold">- {entryFee.toFixed(4)} CHZ</span>
+                  </div>
+                  <div className="flex justify-between text-xs sm:text-sm">
+                    <span className="text-muted-foreground">Net investment</span>
+                    <span className="font-semibold text-success">{netInvestment.toFixed(4)} CHZ</span>
                   </div>
                   <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-muted-foreground">Expected APY</span>
                     <span className="text-success font-semibold">{index.apy}</span>
                   </div>
                   <div className="border-t pt-2 sm:pt-2.5 flex justify-between items-center">
-                    <span className="text-sm sm:text-base font-bold">Total Cost</span>
-                    <span className="text-success font-bold text-base sm:text-lg">{total.toFixed(4)} CHZ</span>
+                    <span className="text-sm sm:text-base font-bold">You send</span>
+                    <span className="text-success font-bold text-base sm:text-lg">
+                      {amount ? Number.parseFloat(amount).toFixed(4) : "0.0000"} CHZ
+                    </span>
                   </div>
                 </div>
               </div>
