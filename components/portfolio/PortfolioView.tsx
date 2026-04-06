@@ -83,22 +83,11 @@ export function PortfolioView() {
     })
   }, [address, isDemoMode, isConnected])
 
-  const { data: tokenIdsData, isLoading: isLoadingTokens, error: tokenIdsError } = useReadContracts({
+  const { data: tokenIdsData, isLoading: isLoadingTokens } = useReadContracts({
     contracts: nftContracts,
     query: {
       enabled: nftContracts.length > 0,
     },
-  })
-
-  // Debug logging
-  console.log("[v0] Portfolio Debug:", {
-    address,
-    isConnected,
-    isDemoMode,
-    nftContracts,
-    tokenIdsData,
-    tokenIdsError,
-    isLoadingTokens,
   })
 
   const indexTokenIds = useMemo(() => {

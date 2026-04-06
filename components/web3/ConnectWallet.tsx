@@ -73,35 +73,20 @@ export function ConnectWallet() {
   }
 
   const getWalletInfo = (connectorId: string) => {
-    if (connectorId.includes("metaMask")) {
-      return {
-        name: "MetaMask",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-        description: "Connect using browser extension",
-        popular: true,
-      }
-    }
-    if (connectorId.includes("coinbase")) {
-      return {
-        name: "Coinbase Wallet",
-        logo: "https://avatars.githubusercontent.com/u/18060234?s=200&v=4",
-        description: "Connect using Coinbase Wallet",
-        popular: true,
-      }
-    }
-    if (connectorId.includes("walletConnect")) {
+    if (connectorId === "walletConnect" || connectorId.includes("walletConnect")) {
       return {
         name: "WalletConnect",
         logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        description: "Scan with mobile wallet",
+        description: "Scan with any mobile wallet",
         popular: true,
       }
     }
+    // injected covers MetaMask, Coinbase Wallet, and any EIP-1193 browser wallet
     return {
       name: "Browser Wallet",
-      logo: "https://cdn-icons-png.flaticon.com/512/2965/2965358.png",
-      description: "Connect using browser wallet",
-      popular: false,
+      logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+      description: "MetaMask, Coinbase, or any browser wallet",
+      popular: true,
     }
   }
 
