@@ -35,8 +35,8 @@ export function calculateIndexPrice(
 export const INDICES: IndexData[] = [
   {
     id: "1",
-    name: "Elite Football Index",
-    description: "Top-tier European football clubs with highest market capitalization and liquidity",
+    name: "FanIndex Global ETF",
+    description: "Top-tier European football clubs with highest market capitalization and liquidity - Mainnet",
     type: "weighted",
     tokens: ["PSG", "ASR", "BAR", "JUV", "CITY", "ATM", "GAL", "ACM"],
     price: calculateIndexPrice(["PSG", "ASR", "BAR", "JUV", "CITY", "ATM", "GAL", "ACM"]).toFixed(2),
