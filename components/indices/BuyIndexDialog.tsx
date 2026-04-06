@@ -102,12 +102,14 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     try {
       // Send exactly the user-entered amount as msg.value.
       // The contract deducts its 1% fee internally from that value.
+      // We set a reasonable gas limit to prevent MetaMask from over-estimating.
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
         args: [address, [] as bigint[]],
         value: parseEther(amount),
+        gas: BigInt(500_000), // Fixed gas limit ~0.5-1 CHZ at normal gas prices
       })
     } catch (err) {
       console.error("[v0] Error buying index:", err)
