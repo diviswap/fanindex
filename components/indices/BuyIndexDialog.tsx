@@ -100,11 +100,14 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     })
 
     try {
+      // The new ABI expects: buyNative(address user, uint256[] minOuts)
+      // We pass an empty array for minOuts to accept any output (no slippage protection)
+      // In production, you may want to calculate proper minOuts based on quotes
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
-        args: [address],
+        args: [address, [] as bigint[]], // user address and empty minOuts array
         value: parseEther(amount),
       })
     } catch (err) {
