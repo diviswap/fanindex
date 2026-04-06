@@ -1,17 +1,32 @@
 import { http, createConfig, type Config } from "wagmi"
 import { chiliz } from "wagmi/chains"
-import { injected } from "wagmi/connectors"
+import { walletConnect, injected } from "wagmi/connectors"
+
+// Get WalletConnect project ID from environment
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
 
 // Factory function to create config only on client side
-// Using only injected() connector to avoid problematic dependencies
-// from walletConnect and metaMask SDK (pino-pretty, async-storage, etc.)
+// This avoids indexedDB errors during SSR
 export function createWagmiConfig(): Config {
   return createConfig({
     chains: [chiliz],
     connectors: [
-      // Generic injected connector works with MetaMask, Coinbase Wallet,
-      // and any other browser extension wallet
-      injected(),
+      injected({
+        target: "metaMask",
+      }),
+      injected({
+        target: "coinbaseWallet",
+      }),
+      injected(), // Generic injected for other browser wallets
+      walletConnect({
+        projectId,
+        metadata: {
+          name: "FanIndex",
+          description: "Fan Token Investment Platform",
+          url: "https://fanindex.app",
+          icons: ["https://fanindex.app/logo.png"],
+        },
+      }),
     ],
     transports: {
       [chiliz.id]: http(),
