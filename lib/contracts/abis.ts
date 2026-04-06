@@ -3,23 +3,33 @@ import SimplePositionsNFTABI from "./SimplePositionsNFT.json"
 
 export { EtfVaultABI, SimplePositionsNFTABI }
 
+// Chiliz Mainnet contract addresses (single deployment shared across all indices)
+export const MAINNET_CONTRACTS = {
+  vault:       "0x0bDe1d6a9d4dF032B7e7f0615dac6EB7fe74D52f" as `0x${string}`,
+  batchBuyer:  "0x0078cE480C41B058ed8a5Ca0d814F810550dbA8C" as `0x${string}`,
+  nft:         "0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9" as `0x${string}`,
+} as const
+
 export const ETF_CONTRACTS = {
   // La Liga Elite (id: "4") -> Spain ETF
   "4": {
-    vault: "0xC8b9b6C9403946bb394DC0ab8296688b56C47c41" as `0x${string}`,
-    nft: "0x5F449a7DB81AaD36F0C2EFc2B39D8d8656d727D8" as `0x${string}`,
+    vault:      MAINNET_CONTRACTS.vault,
+    batchBuyer: MAINNET_CONTRACTS.batchBuyer,
+    nft:        MAINNET_CONTRACTS.nft,
     name: "FanIndex SPAIN ETF",
   },
   // Serie A Champions (id: "3") -> Italy ETF
   "3": {
-    vault: "0x27F2d8a60B153fc5EBD1c17F3d2dC4C233631869" as `0x${string}`,
-    nft: "0x37626A4148B60fF9A7F6b518CB656875D2dE1B95" as `0x${string}`,
+    vault:      MAINNET_CONTRACTS.vault,
+    batchBuyer: MAINNET_CONTRACTS.batchBuyer,
+    nft:        MAINNET_CONTRACTS.nft,
     name: "FanIndex ITALY ETF",
   },
   // Premier League Index (id: "2") -> England ETF
   "2": {
-    vault: "0x2b3268E8d57677e97655FFaae570222aD0e124a7" as `0x${string}`,
-    nft: "0x7c8cECAA6bF34ABf52dAEd430581Af07dF10A0e0" as `0x${string}`,
+    vault:      MAINNET_CONTRACTS.vault,
+    batchBuyer: MAINNET_CONTRACTS.batchBuyer,
+    nft:        MAINNET_CONTRACTS.nft,
     name: "FanIndex ENGLAND ETF",
   },
 } as const
@@ -36,6 +46,7 @@ export const CompetitionVaultABI = EtfVaultABI
 export const CompetitionNFTABI = SimplePositionsNFTABI
 
 export const CONTRACT_ADDRESSES = {
-  competitionVault: ETF_CONTRACTS["2"].vault,
-  competitionNFT: ETF_CONTRACTS["2"].nft,
+  competitionVault: MAINNET_CONTRACTS.vault,
+  competitionNFT:   MAINNET_CONTRACTS.nft,
+  batchBuyer:       MAINNET_CONTRACTS.batchBuyer,
 } as const
