@@ -24,7 +24,7 @@ const CHART_COLORS = {
   managed: "#10b981",
 }
 
-const DEPLOYED_INDICES = ["2", "3", "4"] // Premier League, Serie A, La Liga
+const DEPLOYED_INDICES = ["2"] // FanIndex ETF (Chiliz mainnet)
 
 export function PortfolioView() {
   const { address, isConnected } = useAccount()
@@ -355,7 +355,7 @@ export function PortfolioView() {
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Active Positions</div>
               <div className="text-3xl md:text-4xl font-bold text-foreground mb-2">{totalPositions}</div>
-              <div className="text-sm text-muted-foreground">{INDICES.length} indices available</div>
+              <div className="text-sm text-muted-foreground">1 index available</div>
             </div>
             <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
               <PieChart className="h-6 w-6 text-blue-400" />
