@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { parseEther } from "viem"
-import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
+import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
 import { Loader2, CheckCircle2, XCircle, TrendingUp, Wallet, Info, Sparkles, ExternalLink, Trophy } from "lucide-react"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
@@ -102,9 +102,11 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     try {
       // Send exactly the user-entered amount as msg.value.
       // The contract deducts its 1% fee internally from that value.
-      // minOuts array must match the number of tokens in the vault (2 for OG/VCF)
-      // Passing [0n, 0n] means no minimum output (no slippage protection)
-      const minOuts = [BigInt(0), BigInt(0)] // 2 tokens in the vault: OG, VCF
+      // minOuts array must match the number of tokens in the vault
+      // Get the token count from contract config, default to 2
+      const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
+      const tokenCount = contractConfig?.tokens || 2
+      const minOuts = Array(tokenCount).fill(BigInt(0)) // No slippage protection
       
       writeContract({
         address: contracts.vault,
@@ -115,7 +117,7 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
         gas: BigInt(800_000), // Reasonable gas limit for swap operations
       })
     } catch (err) {
-      console.error("[v0] Error buying index:", err)
+      // Error is handled by wagmi's error state
     }
   }
 

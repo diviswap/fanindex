@@ -15,7 +15,8 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  const deployedIndices = INDICES.filter((index) => ["1", "2", "3", "4"].includes(index.id))
+  // Only index "1" (FanIndex Global ETF) is deployed on mainnet
+  const deployedIndices = INDICES.filter((index) => ["1"].includes(index.id))
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">

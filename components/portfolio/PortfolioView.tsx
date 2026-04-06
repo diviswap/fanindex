@@ -24,8 +24,8 @@ const CHART_COLORS = {
   managed: "#10b981",
 }
 
-// All indices now use mainnet contracts
-const DEPLOYED_INDICES = ["1", "2", "3", "4"] // Global ETF, Premier League, Serie A, La Liga
+// Only the Global ETF is deployed on mainnet currently
+const DEPLOYED_INDICES = ["1"] // FanIndex Global ETF (OG/VCF)
 
 export function PortfolioView() {
   const { address, isConnected } = useAccount()
@@ -167,7 +167,6 @@ export function PortfolioView() {
         }
       })
     })
-    console.log("[v0] Extracted token addresses from positions:", Array.from(addresses))
     return Array.from(addresses)
   }, [blockchainPositions])
 
@@ -177,7 +176,6 @@ export function PortfolioView() {
     const map = new Map<string, number>()
     tokenPrices.forEach(tp => {
       map.set(tp.address.toLowerCase(), tp.priceInCHZ)
-      console.log("[v0] Price map entry:", tp.address, "->", tp.priceInCHZ, "CHZ")
     })
     return map
   }, [tokenPrices])
@@ -219,8 +217,7 @@ export function PortfolioView() {
               }
             })
           }
-          console.log("[v0] Position value (live):", p.name, positionValue, "CHZ")
-          return sum + positionValue
+              return sum + positionValue
         }, 0)
 
     const avgAPY =
@@ -230,8 +227,6 @@ export function PortfolioView() {
         : 0
 
     const nftCount = userPositions.reduce((sum, p) => sum + p.balance, 0)
-
-    console.log("[v0] Portfolio stats:", { totalPositions, totalValue, avgAPY, nftCount })
 
     return { totalPositions, totalValue, avgAPY, nftCount }
   }, [userPositions, isDemoMode, blockchainPositions, priceMap, liveTokenPrices])

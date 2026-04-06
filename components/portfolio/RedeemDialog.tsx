@@ -134,7 +134,7 @@ export function RedeemDialog({
         })
       }
     } catch (err) {
-      console.error("[v0] Error redeeming position:", err)
+      // Error is handled by wagmi's error state
     }
   }
 
@@ -308,7 +308,7 @@ export function RedeemDialog({
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This index is not yet deployed on Chiliz Spicy Testnet. Use Demo Mode to try it out.
+                    This index is not yet deployed on Chiliz Mainnet. Use Demo Mode to try it out.
                   </p>
                 </div>
               )}
