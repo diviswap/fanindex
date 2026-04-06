@@ -5,9 +5,8 @@ import { IndexDetailView } from "@/components/indices/IndexDetailView"
 import { notFound } from "next/navigation"
 import { INDICES } from "@/lib/data/indices"
 
-export default async function IndexDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const index = INDICES.find((i) => i.id === id)
+export default function IndexDetailPage({ params }: { params: { id: string } }) {
+  const index = INDICES.find((i) => i.id === params.id)
 
   if (!index) {
     notFound()

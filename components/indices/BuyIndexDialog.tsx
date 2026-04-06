@@ -100,16 +100,11 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
     })
 
     try {
-      // Generate minOuts array with 0 for each token (no slippage protection for simplicity)
-      // In production, you would calculate proper minOuts based on expected token amounts
-      const tokenCount = index.tokens.length
-      const minOuts = Array(tokenCount).fill(BigInt(0))
-      
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
-        args: [address, minOuts],
+        args: [address],
         value: parseEther(amount),
       })
     } catch (err) {

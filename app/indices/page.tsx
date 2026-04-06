@@ -15,7 +15,7 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  const deployedIndices = INDICES
+  const deployedIndices = INDICES.filter((index) => ["2", "3", "4"].includes(index.id))
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
@@ -38,11 +38,9 @@ export default function IndicesPage() {
           </p>
         </div>
 
-        <div className="flex justify-center mb-16 sm:mb-20 md:mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch mb-16 sm:mb-20 md:mb-24">
           {deployedIndices.map((index) => (
-            <div key={index.id} className="w-full max-w-md">
-              <IndexCard index={index} />
-            </div>
+            <IndexCard key={index.id} index={index} />
           ))}
         </div>
 

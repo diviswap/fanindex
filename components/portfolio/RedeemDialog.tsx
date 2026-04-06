@@ -116,15 +116,11 @@ export function RedeemDialog({
 
     try {
       if (redemptionType === "chz") {
-        // minOutputAmount set to 0 for no slippage protection
-        // In production, calculate proper minOutputAmount based on expected CHZ output
-        const minOutputAmount = BigInt(0)
-        
         writeContract({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
-          args: [BigInt(nftId), redemptionPercentage, minOutputAmount],
+          args: [BigInt(nftId), redemptionPercentage],
         })
       } else {
         writeContract({
