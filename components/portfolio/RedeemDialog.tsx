@@ -2,9 +2,10 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi"
+import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
-import { XCircle, ArrowDownToLine, AlertTriangle, Info, Sparkles, ExternalLink, Coins } from "lucide-react"
+import { XCircle, ArrowDownToLine, AlertTriangle, Info, Sparkles, ExternalLink, Coins, Loader2 } from "lucide-react"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -12,6 +13,8 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
+
+const CHILIZ_MAINNET_ID = chiliz.id // 88888
 
 interface RedeemDialogProps {
   nftId: string
@@ -35,10 +38,14 @@ export function RedeemDialog({
   onSuccess,
 }: RedeemDialogProps) {
   const { address, isConnected } = useAccount()
+  const chainId = useChainId()
+  const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
   const { isDemoMode, sellIndex: demoSellIndex } = useDemoMode()
+
+  const isWrongChain = isConnected && !isDemoMode && chainId !== CHILIZ_MAINNET_ID
   const [demoSuccess, setDemoSuccess] = useState(false)
   const [demoError, setDemoError] = useState<string | null>(null)
   const [demoLoading, setDemoLoading] = useState(false)
@@ -97,6 +104,11 @@ export function RedeemDialog({
 
     if (!isConnected || !address) {
       setDemoError("Please connect your wallet first")
+      return
+    }
+
+    if (isWrongChain) {
+      setDemoError("Please switch to Chiliz Mainnet first")
       return
     }
 
@@ -304,6 +316,29 @@ export function RedeemDialog({
                 </div>
               )}
 
+              {isWrongChain && (
+                <div className="flex flex-col gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/40">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
+                    <p className="text-xs font-medium text-yellow-500">
+                      Your wallet is on the wrong network. Redemptions require Chiliz Mainnet (chain 88888).
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-xs h-8 w-full"
+                    onClick={() => switchChain({ chainId: CHILIZ_MAINNET_ID })}
+                    disabled={isSwitching}
+                  >
+                    {isSwitching ? (
+                      <><Loader2 className="h-3 w-3 animate-spin mr-1" />Switching...</>
+                    ) : (
+                      "Switch to Chiliz Mainnet"
+                    )}
+                  </Button>
+                </div>
+              )}
+
               {!isDemoMode && !hasContracts && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
@@ -507,6 +542,7 @@ export function RedeemDialog({
                   isConfirming ||
                   demoLoading ||
                   (!isDemoMode && !isConnected) ||
+                  (!isDemoMode && isWrongChain) ||
                   (!isDemoMode && !hasContracts)
                 }
                 className="flex-1 bg-destructive hover:bg-destructive/90 text-white font-bold h-9 sm:h-11 text-sm sm:text-base"
