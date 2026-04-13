@@ -14,6 +14,5 @@ export function createWagmiConfig(connectors: any[] = []): Config {
     // Persist the session in localStorage so the wallet stays connected
     // across page navigations and SSR → client config swaps.
     storage: createStorage({ storage: typeof window !== "undefined" ? window.localStorage : undefined }),
-    reconnectOnMount: true,
   })
 }
