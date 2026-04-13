@@ -102,7 +102,7 @@ export function PortfolioView() {
     const addrs = new Set<`0x${string}`>()
     holdings.forEach((h) =>
       h.tokenAddresses.forEach((a) => {
-        if (a && a !== "0x0000000000000000000000000000000000000000")
+        if (a && typeof a === "string" && a !== "0x0000000000000000000000000000000000000000")
           addrs.add(a)
       })
     )
@@ -115,10 +115,13 @@ export function PortfolioView() {
   // Build a lookup map: address → best available price
   const priceMap = useMemo(() => {
     const map = new Map<string, number>()
-    tokenPrices.forEach((tp) => map.set(tp.address.toLowerCase(), tp.priceInCHZ))
+    tokenPrices.forEach((tp) => {
+      if (tp.address && typeof tp.address === "string")
+        map.set(tp.address.toLowerCase(), tp.priceInCHZ)
+    })
     // Prefer live CoinGecko prices where available
     liveTokenPrices?.forEach((lp) => {
-      if (!lp.error && lp.priceInCHZ > 0)
+      if (!lp.error && lp.priceInCHZ > 0 && lp.address && typeof lp.address === "string")
         map.set(lp.address.toLowerCase(), lp.priceInCHZ)
     })
     return map
@@ -146,6 +149,7 @@ export function PortfolioView() {
 
     const totalValue = holdings.reduce((sum, h) => {
       const posVal = h.tokenAddresses.reduce((s, addr, i) => {
+        if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
         const price = priceMap.get(addr.toLowerCase()) ?? 0
         return s + amt * price
@@ -177,6 +181,7 @@ export function PortfolioView() {
     }
     return holdings.map((h) => {
       const val = h.tokenAddresses.reduce((s, addr, i) => {
+        if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
         const price = priceMap.get(addr.toLowerCase()) ?? 0
         return s + amt * price

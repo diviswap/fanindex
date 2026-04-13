@@ -47,8 +47,10 @@ const FALLBACK_PRICES: Record<string, number> = {
 
 export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
   const addressMap = tokenAddresses
-    .filter(addr => 
-      addr !== "0x0000000000000000000000000000000000000000" && 
+    .filter((addr): addr is `0x${string}` =>
+      !!addr &&
+      typeof addr === "string" &&
+      addr !== "0x0000000000000000000000000000000000000000" &&
       addr.toLowerCase() !== FANX_CONTRACTS.WCHZ.toLowerCase()
     )
     .map(wrappedAddress => {
@@ -56,7 +58,7 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
       const unwrappedAddress = token?.unwrapped || wrappedAddress
       return {
         original: wrappedAddress,
-        unwrapped: unwrappedAddress,
+        unwrapped: unwrappedAddress as `0x${string}`,
       }
     })
 
@@ -81,12 +83,15 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     const result = data?.[index]
     
     if (!result || result.status === "failure") {
-      const price = FALLBACK_PRICES[unwrapped.toLowerCase()] || FALLBACK_PRICES[unwrapped] || 0
+      const price =
+        (unwrapped ? FALLBACK_PRICES[unwrapped.toLowerCase()] : 0) ||
+        (unwrapped ? FALLBACK_PRICES[unwrapped] : 0) ||
+        0
       return {
         address: original,
         priceInCHZ: price,
         isLoading: false,
-        error: price === 0
+        error: price === 0,
       }
     }
 

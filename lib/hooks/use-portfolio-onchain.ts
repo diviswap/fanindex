@@ -118,10 +118,16 @@ export function usePortfolioOnchain(
         let rawTotalWei = BigInt(0)
 
         if (holdingResult?.status === "success") {
-          const [addrs, amounts] = holdingResult.result as [string[], bigint[]]
-          tokenAddresses = addrs as `0x${string}`[]
-          tokenAmounts = amounts
-          rawTotalWei = amounts.reduce((sum, a) => sum + a, BigInt(0))
+          const raw = holdingResult.result as [string[], bigint[]] | undefined
+          if (Array.isArray(raw) && raw.length === 2) {
+            const [addrs, amounts] = raw
+            tokenAddresses = (addrs ?? []).filter(
+              (a): a is `0x${string}` =>
+                !!a && typeof a === "string" && a !== "0x0000000000000000000000000000000000000000"
+            )
+            tokenAmounts = (amounts ?? []).filter((a): a is bigint => a !== undefined)
+            rawTotalWei = tokenAmounts.reduce((sum, a) => sum + a, BigInt(0))
+          }
         }
 
         // Skip empty / burned positions
