@@ -51,6 +51,7 @@ export async function GET(request: Request) {
         symbol: token.symbol,
         address: token.wrapped,
         cgId: token.cgId,
+        icon: token.icon ?? null,
         priceUSD: priceData?.usd || Number.parseFloat(token.price),
         priceInCHZ: priceData?.usd ? priceData.usd / chzPrice : Number.parseFloat(token.price) / chzPrice,
         change24h: priceData?.usd_24h_change || Number.parseFloat(token.change24h),

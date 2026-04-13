@@ -6,6 +6,7 @@ export interface TokenPrice {
   symbol: string
   address: string
   cgId?: string
+  icon?: string | null
   priceUSD: number
   priceInCHZ: number
   change24h: number
