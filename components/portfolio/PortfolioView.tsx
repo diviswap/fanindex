@@ -20,6 +20,7 @@ import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legen
 import { TransactionHistory } from "./TransactionHistory"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { INDICES } from "@/lib/data/indices"
+import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
@@ -79,6 +80,15 @@ export function PortfolioView() {
     indexName: string
     units: number
     price: number
+    tokenRows: {
+      symbol: string
+      name: string
+      icon?: string
+      amount: number
+      priceInCHZ: number
+      valueInCHZ: number
+    }[]
+    totalValueCHZ: number
   } | null>(null)
   const [selectedIndexToBuy, setSelectedIndexToBuy] = useState<IndexData | null>(null)
   const [recentTxs, setRecentTxs] = useState<{
@@ -194,12 +204,28 @@ export function PortfolioView() {
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleSell = (holding: NFTHolding) => {
     const idx = INDICES.find((i) => i.id === holding.indexId)
+    const tokenRows = holding.tokenAddresses.map((addr, i) => {
+      const token = getTokenByAddress(addr)
+      const amount = holding.tokenAmounts[i] ? Number(formatUnits(holding.tokenAmounts[i], 18)) : 0
+      const priceInCHZ = priceMap.get(addr.toLowerCase()) ?? 0
+      return {
+        symbol: token?.symbol ?? addr.slice(0, 6) + "...",
+        name: token?.name ?? "Unknown Token",
+        icon: token?.icon,
+        amount,
+        priceInCHZ,
+        valueInCHZ: amount * priceInCHZ,
+      }
+    })
+    const totalValueCHZ = tokenRows.reduce((s, r) => s + r.valueInCHZ, 0)
     setSelectedPosition({
       nftId: holding.tokenId.toString(),
       indexId: holding.indexId,
       indexName: holding.indexName,
       units: 1,
       price: Number.parseFloat(idx?.price ?? "0"),
+      tokenRows,
+      totalValueCHZ,
     })
   }
 
@@ -615,11 +641,14 @@ export function PortfolioView() {
       )}
 
       {selectedPosition && (
-        <RedeemDialog
+          <RedeemDialog
           nftId={selectedPosition.nftId}
           indexId={selectedPosition.indexId}
           indexName={selectedPosition.indexName}
+          tokenRows={selectedPosition.tokenRows}
+          totalValueCHZ={selectedPosition.totalValueCHZ}
           open={!!selectedPosition}
+
           onOpenChange={() => setSelectedPosition(null)}
           demoUnits={selectedPosition.units}
           demoPrice={selectedPosition.price}
