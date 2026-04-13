@@ -1,5 +1,3 @@
-"use client"
-
 import { useMemo, useCallback } from "react"
 import { useReadContracts } from "wagmi"
 import { formatUnits } from "viem"

@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi"
 import { parseEther } from "viem"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
@@ -17,9 +17,10 @@ interface BuyIndexDialogProps {
   index: IndexData
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSuccess?: () => void
 }
 
-export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProps) {
+export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyIndexDialogProps) {
   const [amount, setAmount] = useState("")
   const { address, isConnected } = useAccount()
   const { writeContract, data: hash, isPending, error } = useWriteContract()
@@ -32,6 +33,12 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
+
+  useEffect(() => {
+    if (isSuccess && onSuccess) {
+      onSuccess()
+    }
+  }, [isSuccess, onSuccess])
 
   const [purchaseDetails, setPurchaseDetails] = useState<{
     amount: string
@@ -72,6 +79,7 @@ export function BuyIndexDialog({ index, open, onOpenChange }: BuyIndexDialogProp
 
         if (success) {
           setDemoSuccess(true)
+          onSuccess?.()
           setTimeout(() => {
             handleClose()
           }, 3000)

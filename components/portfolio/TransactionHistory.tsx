@@ -1,12 +1,12 @@
 "use client"
 
-import { ArrowDownRight, ArrowUpRight, ExternalLink, RefreshCw, History } from "lucide-react"
+import { ArrowDownRight, ArrowUpRight, ExternalLink, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { useAccount, useWatchContractEvent } from "wagmi"
 import { EtfVaultABI, MAINNET_CONTRACTS } from "@/lib/contracts/abis"
 import { formatUnits } from "viem"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 interface OnChainTx {
   id: string

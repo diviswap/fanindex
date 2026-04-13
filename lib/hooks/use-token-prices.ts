@@ -70,7 +70,7 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     ],
   }))
 
-  const { data, isError, isLoading } = useReadContracts({
+  const { data } = useReadContracts({
     contracts: contracts as any,
     query: {
       enabled: addressMap.length > 0,
