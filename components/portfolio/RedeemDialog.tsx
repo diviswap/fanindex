@@ -150,7 +150,8 @@ export function RedeemDialog({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
-          args: [BigInt(nftId), redemptionPercentage, BigInt(0)], // tokenId, percentage, minOutputAmount
+          args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
+          chainId: CHILIZ_MAINNET_ID,
         })
       } else {
         writeContract({
@@ -158,6 +159,7 @@ export function RedeemDialog({
           abi: EtfVaultABI.abi,
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
+          chainId: CHILIZ_MAINNET_ID,
         })
       }
     } catch (err) {

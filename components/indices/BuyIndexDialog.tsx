@@ -129,6 +129,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
         args: [address, minOuts],
         value: parseEther(amount),
         gas: BigInt(800_000),
+        chainId: CHILIZ_MAINNET_ID,
       })
     } catch (err) {
       // handled by wagmi error state
