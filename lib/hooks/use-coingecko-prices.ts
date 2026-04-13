@@ -5,6 +5,7 @@ import useSWR from 'swr'
 export interface TokenPrice {
   symbol: string
   address: string
+  cgId?: string
   priceUSD: number
   priceInCHZ: number
   change24h: number
