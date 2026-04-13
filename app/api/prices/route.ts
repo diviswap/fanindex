@@ -24,12 +24,14 @@ export async function GET(request: Request) {
     const tokensWithId = tokensToFetch.filter((t) => t.cgId)
     const tokensWithAddressOnly = tokensToFetch.filter((t) => !t.cgId && t.wrapped)
 
+    type PriceMap = Record<string, { usd?: number; usd_24h_change?: number; usd_7d_change?: number; usd_market_cap?: number; usd_24h_vol?: number }>
+
     // Fetch data in parallel
     const [pricesById, pricesByAddress] = await Promise.all([
-      tokensWithId.length > 0 ? fetchPricesByIds(tokensWithId.map((t) => t.cgId!)) : Promise.resolve({}),
+      tokensWithId.length > 0 ? fetchPricesByIds(tokensWithId.map((t) => t.cgId!)) : Promise.resolve({} as PriceMap),
       tokensWithAddressOnly.length > 0
         ? fetchTokenPrices(tokensWithAddressOnly.map((t) => t.wrapped!.toLowerCase()))
-        : Promise.resolve({}),
+        : Promise.resolve({} as PriceMap),
     ])
 
     // Map results back to tokens
