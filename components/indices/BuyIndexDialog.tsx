@@ -97,7 +97,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
     }
 
     if (!hasContracts || !contracts) {
-      setDemoError("This index is not yet deployed on testnet. Please use Demo Mode.")
+      setDemoError("This index is not yet deployed on Chiliz Mainnet. Use Demo Mode to try it out.")
       return
     }
 
