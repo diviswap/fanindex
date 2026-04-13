@@ -26,8 +26,24 @@ export function TickerTape() {
     return (
       <div
         key={`${token.symbol}-${index}`}
-        className="flex items-center gap-2 sm:gap-3 px-4 sm:px-6 whitespace-nowrap"
+        className="flex items-center gap-2 sm:gap-2.5 px-4 sm:px-6 whitespace-nowrap"
       >
+        {/* Token logo */}
+        {token.icon ? (
+          <img
+            src={token.icon}
+            alt={token.symbol}
+            width={18}
+            height={18}
+            className="rounded-full object-contain shrink-0 w-[18px] h-[18px] sm:w-[20px] sm:h-[20px]"
+          />
+        ) : (
+          <div className="w-[18px] h-[18px] sm:w-[20px] sm:h-[20px] rounded-full bg-muted border border-border shrink-0 flex items-center justify-center">
+            <span className="text-[7px] font-bold text-muted-foreground leading-none">
+              {token.symbol.slice(0, 2)}
+            </span>
+          </div>
+        )}
         <span className="font-semibold text-foreground text-xs sm:text-sm">{token.symbol}</span>
         <span className="text-muted-foreground text-xs sm:text-sm">{token.priceInCHZ.toFixed(2)} CHZ</span>
         <span
@@ -42,6 +58,8 @@ export function TickerTape() {
           )}
           {Math.abs(token.change24h).toFixed(2)}%
         </span>
+        {/* Separator dot */}
+        <span className="text-border text-xs select-none">·</span>
       </div>
     )
   })

@@ -3,9 +3,9 @@
 import { useReadContracts } from "wagmi"
 import { FanXRouterABI, FANX_CONTRACTS } from "@/lib/contracts/fanx-router-abi"
 import { formatUnits, parseUnits } from "viem"
-import { getTokenByAddress, FAN_TOKENS } from "@/lib/data/fan-tokens"
+import { getTokenByAddress } from "@/lib/data/fan-tokens"
 
-interface TokenPrice {
+export interface TokenPrice {
   address: string
   priceInCHZ: number
   isLoading: boolean
@@ -47,8 +47,10 @@ const FALLBACK_PRICES: Record<string, number> = {
 
 export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
   const addressMap = tokenAddresses
-    .filter(addr => 
-      addr !== "0x0000000000000000000000000000000000000000" && 
+    .filter((addr): addr is `0x${string}` =>
+      !!addr &&
+      typeof addr === "string" &&
+      addr !== "0x0000000000000000000000000000000000000000" &&
       addr.toLowerCase() !== FANX_CONTRACTS.WCHZ.toLowerCase()
     )
     .map(wrappedAddress => {
@@ -56,25 +58,24 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
       const unwrappedAddress = token?.unwrapped || wrappedAddress
       return {
         original: wrappedAddress,
-        unwrapped: unwrappedAddress,
+        unwrapped: unwrappedAddress as `0x${string}`,
       }
     })
 
   const contracts = addressMap.map(({ unwrapped }) => ({
-    address: FANX_CONTRACTS.ROUTER,
-    abi: FanXRouterABI,
-    functionName: "getAmountsOut",
-    args: [
-      parseUnits("100", 18), // 100 tokens instead of 1 for better liquidity
-      [unwrapped, FANX_CONTRACTS.WCHZ], // path: unwrapped token -> wCHZ
-    ],
+    address: FANX_CONTRACTS.ROUTER as `0x${string}`,
+    abi: FanXRouterABI as readonly unknown[],
+    functionName: "getAmountsOut" as const,
+    args: [parseUnits("100", 18), [unwrapped, FANX_CONTRACTS.WCHZ]] as const,
   }))
 
-  const { data, isError, isLoading } = useReadContracts({
-    contracts: contracts as any,
+  // Always pass the contracts array (even if empty) — never conditionally change
+  // the number of hooks called. Use the `enabled` query flag instead.
+  const { data } = useReadContracts({
+    contracts: (contracts.length > 0 ? contracts : []) as any,
     query: {
-      enabled: addressMap.length > 0,
-      refetchInterval: 30000, // Refetch every 30 seconds
+      enabled: contracts.length > 0,
+      refetchInterval: 30000,
     },
   })
 
@@ -82,12 +83,15 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     const result = data?.[index]
     
     if (!result || result.status === "failure") {
-      const price = FALLBACK_PRICES[unwrapped.toLowerCase()] || FALLBACK_PRICES[unwrapped] || 0
+      const price =
+        (unwrapped ? FALLBACK_PRICES[unwrapped.toLowerCase()] : 0) ||
+        (unwrapped ? FALLBACK_PRICES[unwrapped] : 0) ||
+        0
       return {
         address: original,
         priceInCHZ: price,
         isLoading: false,
-        error: price === 0
+        error: price === 0,
       }
     }
 

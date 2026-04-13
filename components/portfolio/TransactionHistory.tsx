@@ -1,12 +1,9 @@
 "use client"
 
-import { ArrowDownRight, ArrowUpRight, ExternalLink, RefreshCw, History } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { ArrowDownRight, ArrowUpRight, ExternalLink, History } from "lucide-react"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
-import { useAccount, useWatchContractEvent } from "wagmi"
-import { EtfVaultABI, MAINNET_CONTRACTS } from "@/lib/contracts/abis"
-import { formatUnits } from "viem"
-import { useState, useEffect, useCallback } from "react"
+import { useAccount } from "wagmi"
+
 
 interface OnChainTx {
   id: string
@@ -15,7 +12,6 @@ interface OnChainTx {
   amountCHZ: number
   txHash: `0x${string}` | null
   blockNumber: bigint | null
-  /** Address of the user involved */
   user: string
 }
 
@@ -33,135 +29,15 @@ interface DisplayTransaction {
 interface TransactionHistoryProps {
   /** Called after a transaction to re-read portfolio state */
   refetchPortfolio?: () => void
+  /** Externally injected on-chain transactions (from parent after buy/sell) */
+  onChainTxs?: OnChainTx[]
 }
 
-export function TransactionHistory({ refetchPortfolio }: TransactionHistoryProps) {
+export function TransactionHistory({ refetchPortfolio, onChainTxs = [] }: TransactionHistoryProps) {
   const { isDemoMode, demoTransactions } = useDemoMode()
   const { address, isConnected } = useAccount()
 
-  const [onChainTxs, setOnChainTxs] = useState<OnChainTx[]>([])
-  const [isWatching, setIsWatching] = useState(false)
 
-  // Watch for Purchased events directed to this wallet
-  useWatchContractEvent({
-    address: MAINNET_CONTRACTS.ETF_VAULT,
-    abi: EtfVaultABI.abi as any,
-    eventName: "Purchased",
-    enabled: isConnected && !isDemoMode && !!address,
-    onLogs(logs) {
-      logs.forEach((log: any) => {
-        const buyer = log.args?.buyer as string | undefined
-        if (!buyer || !address) return
-        if (buyer.toLowerCase() !== address.toLowerCase()) return
-
-        const tokenId = (log.args?.tokenId as bigint | undefined)?.toString() ?? "?"
-        const nativeSpent = log.args?.nativeSpent as bigint | undefined
-        const amountCHZ = nativeSpent ? Number(formatUnits(nativeSpent, 18)) : 0
-
-        setOnChainTxs((prev) => {
-          const key = `${log.transactionHash}-buy`
-          if (prev.some((t) => t.id === key)) return prev
-          return [
-            {
-              id: key,
-              type: "buy",
-              tokenId,
-              amountCHZ,
-              txHash: log.transactionHash as `0x${string}` | null,
-              blockNumber: log.blockNumber ?? null,
-              user: buyer,
-            },
-            ...prev,
-          ]
-        })
-
-        // After a buy, refresh portfolio
-        refetchPortfolio?.()
-        setIsWatching(true)
-      })
-    },
-  })
-
-  // Watch for RedeemedToNative events directed to this wallet
-  useWatchContractEvent({
-    address: MAINNET_CONTRACTS.ETF_VAULT,
-    abi: EtfVaultABI.abi as any,
-    eventName: "RedeemedToNative",
-    enabled: isConnected && !isDemoMode && !!address,
-    onLogs(logs) {
-      logs.forEach((log: any) => {
-        const user = log.args?.user as string | undefined
-        if (!user || !address) return
-        if (user.toLowerCase() !== address.toLowerCase()) return
-
-        const tokenId = (log.args?.tokenId as bigint | undefined)?.toString() ?? "?"
-        const nativeOut = log.args?.nativeOut as bigint | undefined
-        const amountCHZ = nativeOut ? Number(formatUnits(nativeOut, 18)) : 0
-
-        setOnChainTxs((prev) => {
-          const key = `${log.transactionHash}-sell`
-          if (prev.some((t) => t.id === key)) return prev
-          return [
-            {
-              id: key,
-              type: "sell",
-              tokenId,
-              amountCHZ,
-              txHash: log.transactionHash as `0x${string}` | null,
-              blockNumber: log.blockNumber ?? null,
-              user,
-            },
-            ...prev,
-          ]
-        })
-
-        refetchPortfolio?.()
-        setIsWatching(true)
-      })
-    },
-  })
-
-  // Watch for WithdrawnTokens (token withdrawal — also a sell variant)
-  useWatchContractEvent({
-    address: MAINNET_CONTRACTS.ETF_VAULT,
-    abi: EtfVaultABI.abi as any,
-    eventName: "WithdrawnTokens",
-    enabled: isConnected && !isDemoMode && !!address,
-    onLogs(logs) {
-      logs.forEach((log: any) => {
-        const to = log.args?.to as string | undefined
-        if (!to || !address) return
-        if (to.toLowerCase() !== address.toLowerCase()) return
-
-        const tokenId = (log.args?.tokenId as bigint | undefined)?.toString() ?? "?"
-
-        setOnChainTxs((prev) => {
-          const key = `${log.transactionHash}-withdraw`
-          if (prev.some((t) => t.id === key)) return prev
-          return [
-            {
-              id: key,
-              type: "withdraw",
-              tokenId,
-              amountCHZ: 0, // underlying tokens, no CHZ amount
-              txHash: log.transactionHash as `0x${string}` | null,
-              blockNumber: log.blockNumber ?? null,
-              user: to,
-            },
-            ...prev,
-          ]
-        })
-
-        refetchPortfolio?.()
-      })
-    },
-  })
-
-  // Clear on-chain history when wallet changes
-  useEffect(() => {
-    setOnChainTxs([])
-    setIsWatching(false)
-  }, [address])
 
   const formatDate = (date: Date | null) => {
     if (!date) return "Just now"
@@ -192,7 +68,7 @@ export function TransactionHistory({ refetchPortfolio }: TransactionHistoryProps
       }))
     : onChainTxs.map((tx) => ({
         id: tx.id,
-        type: tx.type === "buy" ? "buy" : "sell",
+        type: (tx.type === "buy" ? "buy" : "sell") as "buy" | "sell",
         indexName: `NFT Position #${tx.tokenId}`,
         amount: 1,
         total: tx.amountCHZ,
@@ -212,9 +88,7 @@ export function TransactionHistory({ refetchPortfolio }: TransactionHistoryProps
             {displayTransactions.length > 0
               ? `${displayTransactions.length} transaction${displayTransactions.length !== 1 ? "s" : ""}`
               : isConnected && !isDemoMode
-              ? isWatching
-                ? "Monitoring for new transactions..."
-                : "Listening for on-chain events"
+              ? "Transactions will appear here after you buy or sell"
               : "No transactions yet"}
           </p>
         </div>
@@ -237,12 +111,12 @@ export function TransactionHistory({ refetchPortfolio }: TransactionHistoryProps
             </div>
             <div className="text-base text-muted-foreground mb-2 font-medium">
               {isConnected && !isDemoMode
-                ? "No transactions detected yet"
+                ? "No transactions yet"
                 : "No transactions yet"}
             </div>
             <div className="text-sm text-muted-foreground/70">
               {isConnected && !isDemoMode
-                ? "Transactions will appear here in real-time as they occur on-chain"
+                ? "Buy or sell a position to see your transaction history"
                 : "Start trading to see your transaction history"}
             </div>
           </div>

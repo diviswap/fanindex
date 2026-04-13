@@ -1,15 +1,15 @@
 import type { IndexData } from "@/components/indices/IndexCard"
 import { FAN_TOKENS, getTokenBySymbol } from "@/lib/data/fan-tokens"
 
-export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: string; priceInChz: number }>): number {
+export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: string; priceInCHZ: number }>): number {
   const token = getTokenBySymbol(symbol)
   if (!token) return 0
   
   // Try to get live price from CoinGecko
   if (livePrices) {
     const livePrice = livePrices.find(p => p.symbol === symbol)
-    if (livePrice && livePrice.priceInChz > 0) {
-      return livePrice.priceInChz
+    if (livePrice && livePrice.priceInCHZ > 0) {
+      return livePrice.priceInCHZ
     }
   }
   
@@ -20,7 +20,7 @@ export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: strin
 
 export function calculateIndexPrice(
   tokenSymbols: string[], 
-  livePrices?: Array<{ symbol: string; priceInChz: number }>
+  livePrices?: Array<{ symbol: string; priceInCHZ: number }>
 ): number {
   if (tokenSymbols.length === 0) return 0
   

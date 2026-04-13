@@ -1,12 +1,12 @@
 "use client"
 
-import { WagmiProvider, createConfig, http } from "wagmi"
+import { WagmiProvider, createConfig, http, type Config } from "wagmi"
 import { chiliz } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useState, useEffect, type ReactNode } from "react"
 
 // Minimal SSR-safe config — zero connectors, never touches indexedDB or AsyncStorage
-const ssrSafeConfig = createConfig({
+const ssrSafeConfig: Config = createConfig({
   chains: [chiliz],
   connectors: [],
   transports: { [chiliz.id]: http() },
@@ -15,7 +15,7 @@ const ssrSafeConfig = createConfig({
 
 export function Web3Provider({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient())
-  const [config, setConfig] = useState(ssrSafeConfig)
+  const [config, setConfig] = useState<Config>(ssrSafeConfig)
 
   useEffect(() => {
     // Dynamically import wagmi/connectors ONLY after hydration.
@@ -50,7 +50,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <WagmiProvider config={config} reconnectOnMount>
+    <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </WagmiProvider>
   )

@@ -44,15 +44,15 @@ export function usePortfolioOnchain(
 ): PortfolioOnchainResult {
   // ── Step 1: read tokenIds for every deployed index ────────────────────
   const nftContracts = useMemo(() => {
-    if (!address || !enabled) return []
+    if (!address || !enabled) return [] as const
     return DEPLOYED_INDICES.map((indexId) => {
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return {
-        address: c.nft,
-        abi: SimplePositionsNFTABI.abi,
-        functionName: "tokensOf",
-        args: [address],
-      } as const
+        address: c.nft as `0x${string}`,
+        abi: SimplePositionsNFTABI.abi as readonly unknown[],
+        functionName: "tokensOf" as const,
+        args: [address] as const,
+      }
     })
   }, [address, enabled])
 
@@ -61,7 +61,7 @@ export function usePortfolioOnchain(
     isLoading: isLoadingTokens,
     refetch: refetchTokens,
   } = useReadContracts({
-    contracts: nftContracts,
+    contracts: nftContracts as any,
     query: { enabled: nftContracts.length > 0 },
   })
 
@@ -78,14 +78,14 @@ export function usePortfolioOnchain(
 
   // ── Step 3: read getAllHoldings for each tokenId ──────────────────────
   const holdingsContracts = useMemo(() => {
-    if (indexTokenIds.length === 0) return []
+    if (indexTokenIds.length === 0) return [] as const
     return indexTokenIds.flatMap(({ indexId, tokenIds }) => {
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return tokenIds.map((tokenId) => ({
-        address: c.vault,
-        abi: EtfVaultABI.abi,
-        functionName: "getAllHoldings",
-        args: [tokenId],
+        address: c.vault as `0x${string}`,
+        abi: EtfVaultABI.abi as readonly unknown[],
+        functionName: "getAllHoldings" as const,
+        args: [tokenId] as const,
       }))
     })
   }, [indexTokenIds])
@@ -118,10 +118,16 @@ export function usePortfolioOnchain(
         let rawTotalWei = BigInt(0)
 
         if (holdingResult?.status === "success") {
-          const [addrs, amounts] = holdingResult.result as [string[], bigint[]]
-          tokenAddresses = addrs as `0x${string}`[]
-          tokenAmounts = amounts
-          rawTotalWei = amounts.reduce((sum, a) => sum + a, BigInt(0))
+          const raw = holdingResult.result as [string[], bigint[]] | undefined
+          if (Array.isArray(raw) && raw.length === 2) {
+            const [addrs, amounts] = raw
+            tokenAddresses = (addrs ?? []).filter(
+              (a): a is `0x${string}` =>
+                !!a && typeof a === "string" && a !== "0x0000000000000000000000000000000000000000"
+            )
+            tokenAmounts = (amounts ?? []).filter((a): a is bigint => a !== undefined)
+            rawTotalWei = tokenAmounts.reduce((sum, a) => sum + a, BigInt(0))
+          }
         }
 
         // Skip empty / burned positions

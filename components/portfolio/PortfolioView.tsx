@@ -20,6 +20,7 @@ import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legen
 import { TransactionHistory } from "./TransactionHistory"
 import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { INDICES } from "@/lib/data/indices"
+import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
@@ -47,21 +48,6 @@ const typeLabels: Record<string, string> = {
 }
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
-
-function SkeletonCard() {
-  return (
-    <div className="border border-border bg-card rounded-2xl p-5 space-y-4 animate-pulse">
-      <div className="flex justify-between">
-        <div className="space-y-2">
-          <div className="h-3 w-20 bg-muted rounded" />
-          <div className="h-5 w-32 bg-muted rounded" />
-        </div>
-        <div className="h-8 w-8 bg-muted rounded-full" />
-      </div>
-      <div className="h-4 w-24 bg-muted rounded" />
-    </div>
-  )
-}
 
 function NFTCardSkeleton() {
   return (
@@ -94,8 +80,26 @@ export function PortfolioView() {
     indexName: string
     units: number
     price: number
+    tokenRows: {
+      symbol: string
+      name: string
+      icon?: string
+      amount: number
+      priceInCHZ: number
+      valueInCHZ: number
+    }[]
+    totalValueCHZ: number
   } | null>(null)
   const [selectedIndexToBuy, setSelectedIndexToBuy] = useState<IndexData | null>(null)
+  const [recentTxs, setRecentTxs] = useState<{
+    id: string
+    type: "buy" | "sell" | "withdraw"
+    tokenId: string
+    amountCHZ: number
+    txHash: `0x${string}` | null
+    blockNumber: bigint | null
+    user: string
+  }[]>([])
 
   // ── On-chain reads (real mode only) ──────────────────────────────────────
   const { holdings, isLoading: isLoadingOnChain, refetch } = usePortfolioOnchain(
@@ -108,7 +112,7 @@ export function PortfolioView() {
     const addrs = new Set<`0x${string}`>()
     holdings.forEach((h) =>
       h.tokenAddresses.forEach((a) => {
-        if (a && a !== "0x0000000000000000000000000000000000000000")
+        if (a && typeof a === "string" && a !== "0x0000000000000000000000000000000000000000")
           addrs.add(a)
       })
     )
@@ -121,10 +125,13 @@ export function PortfolioView() {
   // Build a lookup map: address → best available price
   const priceMap = useMemo(() => {
     const map = new Map<string, number>()
-    tokenPrices.forEach((tp) => map.set(tp.address.toLowerCase(), tp.priceInCHZ))
+    tokenPrices.forEach((tp) => {
+      if (tp.address && typeof tp.address === "string")
+        map.set(tp.address.toLowerCase(), tp.priceInCHZ)
+    })
     // Prefer live CoinGecko prices where available
     liveTokenPrices?.forEach((lp) => {
-      if (!lp.error && lp.priceInCHZ > 0)
+      if (!lp.error && lp.priceInCHZ > 0 && lp.address && typeof lp.address === "string")
         map.set(lp.address.toLowerCase(), lp.priceInCHZ)
     })
     return map
@@ -152,6 +159,7 @@ export function PortfolioView() {
 
     const totalValue = holdings.reduce((sum, h) => {
       const posVal = h.tokenAddresses.reduce((s, addr, i) => {
+        if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
         const price = priceMap.get(addr.toLowerCase()) ?? 0
         return s + amt * price
@@ -183,6 +191,7 @@ export function PortfolioView() {
     }
     return holdings.map((h) => {
       const val = h.tokenAddresses.reduce((s, addr, i) => {
+        if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
         const price = priceMap.get(addr.toLowerCase()) ?? 0
         return s + amt * price
@@ -195,17 +204,45 @@ export function PortfolioView() {
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleSell = (holding: NFTHolding) => {
     const idx = INDICES.find((i) => i.id === holding.indexId)
+    const tokenRows = holding.tokenAddresses.map((addr, i) => {
+      const token = getTokenByAddress(addr)
+      const amount = holding.tokenAmounts[i] ? Number(formatUnits(holding.tokenAmounts[i], 18)) : 0
+      const priceInCHZ = priceMap.get(addr.toLowerCase()) ?? 0
+      return {
+        symbol: token?.symbol ?? addr.slice(0, 6) + "...",
+        name: token?.name ?? "Unknown Token",
+        icon: token?.icon,
+        amount,
+        priceInCHZ,
+        valueInCHZ: amount * priceInCHZ,
+      }
+    })
+    const totalValueCHZ = tokenRows.reduce((s, r) => s + r.valueInCHZ, 0)
     setSelectedPosition({
       nftId: holding.tokenId.toString(),
       indexId: holding.indexId,
       indexName: holding.indexName,
       units: 1,
       price: Number.parseFloat(idx?.price ?? "0"),
+      tokenRows,
+      totalValueCHZ,
     })
   }
 
-  const handleTransactionSuccess = () => {
+  const handleTransactionSuccess = (type: "buy" | "sell" = "buy", tokenId?: string, amountCHZ?: number) => {
     refetch()
+    setRecentTxs((prev) => [
+      {
+        id: `${Date.now()}-${type}`,
+        type,
+        tokenId: tokenId ?? "?",
+        amountCHZ: amountCHZ ?? 0,
+        txHash: null,
+        blockNumber: null,
+        user: address ?? "",
+      },
+      ...prev,
+    ])
   }
 
   // ── Not connected ────────────────────────────────────────────────────────
@@ -427,12 +464,15 @@ export function PortfolioView() {
                     </div>
                     <Button
                       onClick={() => {
+                        const demoValue = pos.units * Number.parseFloat(idx.price)
                         setSelectedPosition({
                           nftId: idx.id,
                           indexId: idx.id,
                           indexName: idx.name,
                           units: pos.units,
                           price: Number.parseFloat(idx.price),
+                          tokenRows: [],
+                          totalValueCHZ: demoValue,
                         })
                       }}
                       variant="outline"
@@ -510,7 +550,7 @@ export function PortfolioView() {
       )}
 
       {/* Transaction History */}
-      <TransactionHistory refetchPortfolio={refetch} />
+      <TransactionHistory refetchPortfolio={refetch} onChainTxs={recentTxs} />
 
       {/* Available Indices — only deployed ones */}
       <div>
@@ -599,20 +639,23 @@ export function PortfolioView() {
           index={selectedIndexToBuy}
           open={!!selectedIndexToBuy}
           onOpenChange={() => setSelectedIndexToBuy(null)}
-          onSuccess={handleTransactionSuccess}
+          onSuccess={() => handleTransactionSuccess("buy")}
         />
       )}
 
       {selectedPosition && (
-        <RedeemDialog
+          <RedeemDialog
           nftId={selectedPosition.nftId}
           indexId={selectedPosition.indexId}
           indexName={selectedPosition.indexName}
+          tokenRows={selectedPosition.tokenRows}
+          totalValueCHZ={selectedPosition.totalValueCHZ}
           open={!!selectedPosition}
+
           onOpenChange={() => setSelectedPosition(null)}
           demoUnits={selectedPosition.units}
           demoPrice={selectedPosition.price}
-          onSuccess={handleTransactionSuccess}
+          onSuccess={() => handleTransactionSuccess("sell", selectedPosition?.nftId)}
         />
       )}
     </div>

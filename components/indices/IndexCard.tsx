@@ -35,9 +35,9 @@ export function IndexCard({ index }: IndexCardProps) {
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
       const price = calculateIndexPrice(index.tokens, liveTokenPrices)
-      return typeof price === "number" ? price.toFixed(2) : Number.parseFloat(price).toFixed(2)
+      return price.toFixed(2)
     }
-    return typeof index.price === "number" ? index.price.toFixed(2) : Number.parseFloat(index.price).toFixed(2)
+    return Number.parseFloat(index.price).toFixed(2)
   }, [liveTokenPrices, index.tokens, index.price])
 
   const contracts = getContractAddresses(index.id)

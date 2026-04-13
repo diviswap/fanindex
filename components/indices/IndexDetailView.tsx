@@ -111,7 +111,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         const priceData = liveTokenPrices.find((p) => p.symbol === tokenSymbol)
         return {
           tokenSymbol,
-          price: priceData?.priceInChz || null,
+          price: priceData?.priceInCHZ || null,
         }
       })
       .filter((t) => t.price !== null)
@@ -123,7 +123,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       return index.tokens.map((tokenSymbol) => ({
         tokenSymbol,
         weight: equalWeight,
-        price: liveTokenPrices.find((p) => p.symbol === tokenSymbol)?.priceInChz || null,
+        price: liveTokenPrices.find((p) => p.symbol === tokenSymbol)?.priceInCHZ || null,
       }))
     }
 
