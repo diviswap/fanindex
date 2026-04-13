@@ -46,8 +46,6 @@ const FALLBACK_PRICES: Record<string, number> = {
 }
 
 export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
-  console.log("[v0] useTokenPrices - using mainnet for", tokenAddresses.length, "tokens")
-  
   const addressMap = tokenAddresses
     .filter(addr => 
       addr !== "0x0000000000000000000000000000000000000000" && 
@@ -61,14 +59,6 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
         unwrapped: unwrappedAddress,
       }
     })
-
-  console.log("[v0] useTokenPrices - address mapping:", JSON.stringify({
-    mappings: addressMap.map(m => ({
-      original: m.original,
-      unwrapped: m.unwrapped,
-      found: !!getTokenByAddress(m.original),
-    })),
-  }, null, 2))
 
   const contracts = addressMap.map(({ unwrapped }) => ({
     address: FANX_CONTRACTS.ROUTER,
@@ -88,33 +78,11 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     },
   })
 
-  console.log("[v0] useTokenPrices - results:", JSON.stringify({
-    tokenCount: addressMap.length,
-    isLoading,
-    isError,
-    hasData: !!data,
-  }, null, 2))
-
   const prices = addressMap.map(({ original, unwrapped }, index) => {
     const result = data?.[index]
     
     if (!result || result.status === "failure") {
-      console.log("[v0] Token price error:", JSON.stringify({
-        address: original,
-        status: result?.status,
-        errorMessage: result?.error?.message || "Unknown error",
-      }, null, 2))
-      // Lookup price by unwrapped address
       const price = FALLBACK_PRICES[unwrapped.toLowerCase()] || FALLBACK_PRICES[unwrapped] || 0
-      
-      console.log("[v0] Token price lookup:", {
-        originalAddress: original,
-        unwrappedAddress: unwrapped,
-        symbol: getTokenByAddress(original)?.symbol,
-        priceInCHZ: price,
-        found: price > 0
-      })
-      
       return {
         address: original,
         priceInCHZ: price,
@@ -125,11 +93,6 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
 
     const amounts = result.result as bigint[]
     const priceInCHZ = amounts && amounts.length > 1 ? Number(formatUnits(amounts[1], 18)) / 100 : 0
-
-    console.log("[v0] Token price success:", JSON.stringify({
-      address: original,
-      priceInCHZ,
-    }, null, 2))
 
     return {
       address: original,
