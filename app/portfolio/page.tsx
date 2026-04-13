@@ -5,8 +5,6 @@ import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { Footer } from "@/components/ui/footer-section"
 import { PortfolioView } from "@/components/portfolio/PortfolioView"
-import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
-
 class PortfolioErrorBoundary extends Component<
   { children: ReactNode },
   { hasError: boolean; error: Error | null }
@@ -60,7 +58,6 @@ export default function PortfolioPage() {
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
-      <DemoModeBanner />
       <WebGLShader />
       <NavBar />
 

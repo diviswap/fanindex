@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { Footer } from "@/components/ui/footer-section"
-import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
 import { FAN_TOKENS } from "@/lib/data/fan-tokens"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -147,7 +146,6 @@ export default function FanTokensPage() {
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
-      <DemoModeBanner />
       <WebGLShader />
       <NavBar />
 

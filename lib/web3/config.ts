@@ -1,4 +1,4 @@
-import { http, createConfig, type Config } from "wagmi"
+import { http, createConfig, createStorage, type Config } from "wagmi"
 import { chiliz } from "wagmi/chains"
 
 // Base config factory — no connectors here.
@@ -11,5 +11,9 @@ export function createWagmiConfig(connectors: any[] = []): Config {
     transports: {
       [chiliz.id]: http(),
     },
+    // Persist the session in localStorage so the wallet stays connected
+    // across page navigations and SSR → client config swaps.
+    storage: createStorage({ storage: typeof window !== "undefined" ? window.localStorage : undefined }),
+    reconnectOnMount: true,
   })
 }

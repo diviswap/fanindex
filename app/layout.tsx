@@ -6,7 +6,6 @@ import { Suspense } from "react"
 import { Web3Provider } from "@/lib/web3/Web3Provider"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
-import { DemoModeProvider } from "@/lib/demo/DemoModeContext"
 import { TickerTape } from "@/components/TickerTape"
 import "./globals.css"
 
@@ -71,11 +70,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Web3Provider>
-            <DemoModeProvider>
-              <Suspense fallback={null}>{children}</Suspense>
-              <Toaster />
-              <TickerTape />
-            </DemoModeProvider>
+            <Suspense fallback={null}>{children}</Suspense>
+            <Toaster />
+            <TickerTape />
           </Web3Provider>
         </ThemeProvider>
         <Analytics />

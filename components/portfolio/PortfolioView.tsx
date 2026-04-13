@@ -8,7 +8,6 @@ import {
   ShoppingCart,
   PieChart,
   Wallet,
-  Sparkles,
   Layers,
   Hash,
 } from "lucide-react"
@@ -18,7 +17,6 @@ import { BuyIndexDialog } from "@/components/indices/BuyIndexDialog"
 import type { IndexData } from "@/components/indices/IndexCard"
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { TransactionHistory } from "./TransactionHistory"
-import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { INDICES } from "@/lib/data/indices"
 import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
@@ -72,14 +70,11 @@ function NFTCardSkeleton() {
 
 export function PortfolioView() {
   const { address, isConnected } = useAccount()
-  const { isDemoMode, demoPositions, demoBalance } = useDemoMode()
 
   const [selectedPosition, setSelectedPosition] = useState<{
     nftId: string
     indexId: string
     indexName: string
-    units: number
-    price: number
     tokenRows: {
       symbol: string
       name: string
@@ -101,13 +96,13 @@ export function PortfolioView() {
     user: string
   }[]>([])
 
-  // ── On-chain reads (real mode only) ──────────────────────────────────────
+  // ── On-chain reads ────────────────────────────────────────────────────────
   const { holdings, isLoading: isLoadingOnChain, refetch } = usePortfolioOnchain(
     address,
-    isConnected && !isDemoMode
+    isConnected
   )
 
-  // ── Token prices for real holdings ───────────────────────────────────────
+  // ── Token prices ──────────────────────────────────────────────────────────
   const allTokenAddresses = useMemo(() => {
     const addrs = new Set<`0x${string}`>()
     holdings.forEach((h) =>
@@ -129,7 +124,6 @@ export function PortfolioView() {
       if (tp.address && typeof tp.address === "string")
         map.set(tp.address.toLowerCase(), tp.priceInCHZ)
     })
-    // Prefer live CoinGecko prices where available
     liveTokenPrices?.forEach((lp) => {
       if (!lp.error && lp.priceInCHZ > 0 && lp.address && typeof lp.address === "string")
         map.set(lp.address.toLowerCase(), lp.priceInCHZ)
@@ -137,26 +131,8 @@ export function PortfolioView() {
     return map
   }, [tokenPrices, liveTokenPrices])
 
-  // ── Stats ────────────────────────────────────────────────────────────────
+  // ── Stats ─────────────────────────────────────────────────────────────────
   const portfolioStats = useMemo(() => {
-    if (isDemoMode) {
-      const deployedPositions = INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id)).map((i) => {
-        const pos = demoPositions.find((p) => p.indexId === i.id)
-        return { ...i, balance: pos ? pos.units : 0 }
-      })
-      const activePositions = deployedPositions.filter((p) => p.balance > 0)
-      const totalValue = activePositions.reduce(
-        (sum, p) => sum + p.balance * Number.parseFloat(p.price),
-        0
-      )
-      const avgAPY =
-        activePositions.length > 0
-          ? activePositions.reduce((s, p) => s + Number.parseFloat(p.apy), 0) /
-            activePositions.length
-          : 0
-      return { totalValue, activeNFTs: activePositions.length, avgAPY, totalPositions: activePositions.length }
-    }
-
     const totalValue = holdings.reduce((sum, h) => {
       const posVal = h.tokenAddresses.reduce((s, addr, i) => {
         if (!addr || typeof addr !== "string") return s
@@ -170,25 +146,12 @@ export function PortfolioView() {
     return {
       totalValue,
       activeNFTs: holdings.length,
-      avgAPY: 0,
       totalPositions: holdings.length,
     }
-  }, [isDemoMode, demoPositions, holdings, priceMap])
+  }, [holdings, priceMap])
 
-  // ── Chart data ───────────────────────────────────────────────────────────
+  // ── Chart data ────────────────────────────────────────────────────────────
   const chartData = useMemo(() => {
-    if (isDemoMode) {
-      return INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id))
-        .map((i) => {
-          const pos = demoPositions.find((p) => p.indexId === i.id)
-          return {
-            name: i.name,
-            value: pos ? pos.units * Number.parseFloat(i.price) : 0,
-            type: i.type,
-          }
-        })
-        .filter((d) => d.value > 0)
-    }
     return holdings.map((h) => {
       const val = h.tokenAddresses.reduce((s, addr, i) => {
         if (!addr || typeof addr !== "string") return s
@@ -199,9 +162,9 @@ export function PortfolioView() {
       const idx = INDICES.find((idx) => idx.id === h.indexId)
       return { name: h.indexName, value: val, type: idx?.type ?? "equal" }
     })
-  }, [isDemoMode, demoPositions, holdings, priceMap])
+  }, [holdings, priceMap])
 
-  // ── Handlers ─────────────────────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────────────────────────────────
   const handleSell = (holding: NFTHolding) => {
     const idx = INDICES.find((i) => i.id === holding.indexId)
     const tokenRows = holding.tokenAddresses.map((addr, i) => {
@@ -222,8 +185,6 @@ export function PortfolioView() {
       nftId: holding.tokenId.toString(),
       indexId: holding.indexId,
       indexName: holding.indexName,
-      units: 1,
-      price: Number.parseFloat(idx?.price ?? "0"),
       tokenRows,
       totalValueCHZ,
     })
@@ -245,8 +206,8 @@ export function PortfolioView() {
     ])
   }
 
-  // ── Not connected ────────────────────────────────────────────────────────
-  if (!isConnected && !isDemoMode) {
+  // ── Not connected ─────────────────────────────────────────────────────────
+  if (!isConnected) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="max-w-md w-full mx-auto text-center space-y-6 p-8">
@@ -258,37 +219,16 @@ export function PortfolioView() {
             Connect your wallet to view your portfolio, track your positions, and manage your fan
             token investments.
           </p>
-          <p className="text-sm text-muted-foreground">
-            {"Don't have a wallet yet? Try demo mode to explore the platform."}
-          </p>
         </div>
       </div>
     )
   }
 
-  const { totalValue, activeNFTs, avgAPY } = portfolioStats
-  const hasPositions = isDemoMode
-    ? demoPositions.some((p) => p.units > 0)
-    : holdings.length > 0
+  const { totalValue, activeNFTs } = portfolioStats
+  const hasPositions = holdings.length > 0
 
   return (
     <div className="space-y-8 md:space-y-12">
-      {/* Demo mode banner */}
-      {isDemoMode && (
-        <div className="p-4 rounded-xl bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30">
-          <div className="flex items-center gap-3">
-            <Sparkles className="h-5 w-5 text-purple-400 shrink-0" />
-            <div>
-              <h4 className="font-semibold text-foreground">Demo Mode Active</h4>
-              <p className="text-sm text-muted-foreground">
-                {"You're viewing a simulated portfolio. Balance: "}
-                <span className="font-bold text-foreground">{demoBalance.toFixed(2)} CHZ</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {/* Total Value */}
@@ -296,7 +236,7 @@ export function PortfolioView() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Total Value</div>
-              {isLoadingOnChain && !isDemoMode ? (
+              {isLoadingOnChain ? (
                 <div className="h-9 w-28 bg-muted rounded animate-pulse mb-2" />
               ) : (
                 <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
@@ -316,7 +256,7 @@ export function PortfolioView() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Active NFTs</div>
-              {isLoadingOnChain && !isDemoMode ? (
+              {isLoadingOnChain ? (
                 <div className="h-9 w-16 bg-muted rounded animate-pulse mb-2" />
               ) : (
                 <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
@@ -354,15 +294,13 @@ export function PortfolioView() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Chain Status</div>
-              <div className="text-2xl font-bold text-success mb-1">
-                {isDemoMode ? "Demo" : "Chiliz"}
-              </div>
+              <div className="text-2xl font-bold text-success mb-1">Chiliz</div>
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
                 <span className="relative flex h-1.5 w-1.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
                 </span>
-                {isDemoMode ? "Simulation" : "Chain ID 88888"}
+                Chain ID 88888
               </div>
             </div>
             <div className="p-3 rounded-xl bg-success/10 border border-success/20">
@@ -378,36 +316,31 @@ export function PortfolioView() {
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">My NFT Positions</h2>
             <p className="text-muted-foreground text-sm mt-1">
-              {isDemoMode
-                ? "Demo positions — simulated on-chain state"
-                : isLoadingOnChain
+              {isLoadingOnChain
                 ? "Reading from Chiliz Mainnet..."
                 : `${holdings.length} position${holdings.length !== 1 ? "s" : ""} found on-chain`}
             </p>
           </div>
-          {/* Refresh button (live mode only) */}
-          {!isDemoMode && isConnected && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={refetch}
-              className="border-border bg-card text-muted-foreground hover:text-foreground"
-            >
-              Refresh
-            </Button>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={refetch}
+            className="border-border bg-card text-muted-foreground hover:text-foreground"
+          >
+            Refresh
+          </Button>
         </div>
 
         {/* Loading skeletons */}
-        {isLoadingOnChain && !isDemoMode && (
+        {isLoadingOnChain && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <NFTCardSkeleton />
             <NFTCardSkeleton />
           </div>
         )}
 
-        {/* Real holdings (live mode) */}
-        {!isDemoMode && !isLoadingOnChain && holdings.length > 0 && (
+        {/* Real holdings */}
+        {!isLoadingOnChain && holdings.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {holdings.map((h) => (
               <NFTPositionCard
@@ -420,74 +353,6 @@ export function PortfolioView() {
           </div>
         )}
 
-        {/* Demo positions */}
-        {isDemoMode && hasPositions && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id)).map((idx) => {
-              const pos = demoPositions.find((p) => p.indexId === idx.id)
-              if (!pos || pos.units <= 0) return null
-              return (
-                <div
-                  key={idx.id}
-                  className="relative border border-border bg-card rounded-2xl overflow-hidden shadow-sm"
-                >
-                  <div className="absolute inset-0 opacity-20 dark:opacity-15 pointer-events-none">
-                    <video autoPlay loop muted playsInline className="w-full h-full object-cover"
-                      src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
-                    />
-                    <div className="absolute inset-0 bg-background/60" />
-                  </div>
-                  <div className="relative z-10 p-5 space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded-md border border-border">
-                            Demo
-                          </span>
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-xs font-semibold text-purple-400">
-                            <Sparkles className="h-3 w-3" />
-                            Simulated
-                          </span>
-                        </div>
-                        <h3 className="text-base font-bold text-foreground">{idx.name}</h3>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-xs text-muted-foreground">Value</div>
-                        <div className="text-xl font-bold text-success tabular-nums">
-                          {(pos.units * Number.parseFloat(idx.price)).toFixed(2)} CHZ
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground border-t border-border pt-3">
-                      <span>{pos.units.toFixed(4)} units</span>
-                      <span>{idx.price} CHZ/unit</span>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        const demoValue = pos.units * Number.parseFloat(idx.price)
-                        setSelectedPosition({
-                          nftId: idx.id,
-                          indexId: idx.id,
-                          indexName: idx.name,
-                          units: pos.units,
-                          price: Number.parseFloat(idx.price),
-                          tokenRows: [],
-                          totalValueCHZ: demoValue,
-                        })
-                      }}
-                      variant="outline"
-                      size="sm"
-                      className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive font-semibold h-9"
-                    >
-                      Sell Position
-                    </Button>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
         {/* Empty state */}
         {!isLoadingOnChain && !hasPositions && (
           <div className="border border-border border-dashed bg-card/50 rounded-2xl p-12 text-center">
@@ -496,9 +361,7 @@ export function PortfolioView() {
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No positions yet</h3>
             <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-              {isDemoMode
-                ? "Use demo balance below to buy your first index position."
-                : "Buy your first FanIndex NFT below to start tracking your on-chain portfolio."}
+              Buy your first FanIndex NFT below to start tracking your on-chain portfolio.
             </p>
           </div>
         )}
@@ -552,7 +415,7 @@ export function PortfolioView() {
       {/* Transaction History */}
       <TransactionHistory refetchPortfolio={refetch} onChainTxs={recentTxs} />
 
-      {/* Available Indices — only deployed ones */}
+      {/* Available Indices */}
       <div>
         <div className="mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Available Indices</h2>
@@ -644,17 +507,14 @@ export function PortfolioView() {
       )}
 
       {selectedPosition && (
-          <RedeemDialog
+        <RedeemDialog
           nftId={selectedPosition.nftId}
           indexId={selectedPosition.indexId}
           indexName={selectedPosition.indexName}
           tokenRows={selectedPosition.tokenRows}
           totalValueCHZ={selectedPosition.totalValueCHZ}
           open={!!selectedPosition}
-
           onOpenChange={() => setSelectedPosition(null)}
-          demoUnits={selectedPosition.units}
-          demoPrice={selectedPosition.price}
           onSuccess={() => handleTransactionSuccess("sell", selectedPosition?.nftId)}
         />
       )}
