@@ -3,9 +3,9 @@
 import { useReadContracts } from "wagmi"
 import { FanXRouterABI, FANX_CONTRACTS } from "@/lib/contracts/fanx-router-abi"
 import { formatUnits, parseUnits } from "viem"
-import { getTokenByAddress, FAN_TOKENS } from "@/lib/data/fan-tokens"
+import { getTokenByAddress } from "@/lib/data/fan-tokens"
 
-interface TokenPrice {
+export interface TokenPrice {
   address: string
   priceInCHZ: number
   isLoading: boolean
@@ -61,20 +61,19 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     })
 
   const contracts = addressMap.map(({ unwrapped }) => ({
-    address: FANX_CONTRACTS.ROUTER,
-    abi: FanXRouterABI,
-    functionName: "getAmountsOut",
-    args: [
-      parseUnits("100", 18), // 100 tokens instead of 1 for better liquidity
-      [unwrapped, FANX_CONTRACTS.WCHZ], // path: unwrapped token -> wCHZ
-    ],
+    address: FANX_CONTRACTS.ROUTER as `0x${string}`,
+    abi: FanXRouterABI as readonly unknown[],
+    functionName: "getAmountsOut" as const,
+    args: [parseUnits("100", 18), [unwrapped, FANX_CONTRACTS.WCHZ]] as const,
   }))
 
+  // Always pass the contracts array (even if empty) — never conditionally change
+  // the number of hooks called. Use the `enabled` query flag instead.
   const { data } = useReadContracts({
-    contracts: contracts as any,
+    contracts: (contracts.length > 0 ? contracts : []) as any,
     query: {
-      enabled: addressMap.length > 0,
-      refetchInterval: 30000, // Refetch every 30 seconds
+      enabled: contracts.length > 0,
+      refetchInterval: 30000,
     },
   })
 

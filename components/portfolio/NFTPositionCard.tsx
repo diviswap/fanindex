@@ -6,13 +6,7 @@ import { TrendingDown, Coins, ExternalLink } from "lucide-react"
 import { OnChainBadge } from "./OnChainBadge"
 import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
-
-interface TokenPrice {
-  address: string
-  priceInCHZ: number
-  isLoading: boolean
-  error: boolean
-}
+import type { TokenPrice } from "@/lib/hooks/use-token-prices"
 
 interface NFTPositionCardProps {
   holding: NFTHolding

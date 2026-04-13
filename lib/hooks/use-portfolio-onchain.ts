@@ -1,3 +1,5 @@
+"use client"
+
 import { useMemo, useCallback } from "react"
 import { useReadContracts } from "wagmi"
 import { formatUnits } from "viem"
@@ -42,15 +44,15 @@ export function usePortfolioOnchain(
 ): PortfolioOnchainResult {
   // ── Step 1: read tokenIds for every deployed index ────────────────────
   const nftContracts = useMemo(() => {
-    if (!address || !enabled) return []
+    if (!address || !enabled) return [] as const
     return DEPLOYED_INDICES.map((indexId) => {
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return {
-        address: c.nft,
-        abi: SimplePositionsNFTABI.abi,
-        functionName: "tokensOf",
-        args: [address],
-      } as const
+        address: c.nft as `0x${string}`,
+        abi: SimplePositionsNFTABI.abi as readonly unknown[],
+        functionName: "tokensOf" as const,
+        args: [address] as const,
+      }
     })
   }, [address, enabled])
 
@@ -59,7 +61,7 @@ export function usePortfolioOnchain(
     isLoading: isLoadingTokens,
     refetch: refetchTokens,
   } = useReadContracts({
-    contracts: nftContracts,
+    contracts: nftContracts as any,
     query: { enabled: nftContracts.length > 0 },
   })
 
@@ -76,14 +78,14 @@ export function usePortfolioOnchain(
 
   // ── Step 3: read getAllHoldings for each tokenId ──────────────────────
   const holdingsContracts = useMemo(() => {
-    if (indexTokenIds.length === 0) return []
+    if (indexTokenIds.length === 0) return [] as const
     return indexTokenIds.flatMap(({ indexId, tokenIds }) => {
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return tokenIds.map((tokenId) => ({
-        address: c.vault,
-        abi: EtfVaultABI.abi,
-        functionName: "getAllHoldings",
-        args: [tokenId],
+        address: c.vault as `0x${string}`,
+        abi: EtfVaultABI.abi as readonly unknown[],
+        functionName: "getAllHoldings" as const,
+        args: [tokenId] as const,
       }))
     })
   }, [indexTokenIds])
