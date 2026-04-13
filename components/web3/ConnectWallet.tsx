@@ -20,7 +20,6 @@ import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, Che
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"
-import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export function ConnectWallet() {
@@ -130,7 +129,8 @@ export function ConnectWallet() {
             <div className="relative flex items-center gap-3">
               <div className="relative">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-background to-muted flex items-center justify-center border border-success/30">
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={walletInfo.logo}
                     alt={walletInfo.name}
                     width={24}
@@ -295,7 +295,8 @@ export function ConnectWallet() {
                   >
                     <div className="relative">
                       <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
-                        <Image src={logo} alt={name} width={24} height={24} className="rounded" />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
                       </div>
                       {popular && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
