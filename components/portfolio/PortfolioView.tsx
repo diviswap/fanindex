@@ -81,6 +81,15 @@ export function PortfolioView() {
     price: number
   } | null>(null)
   const [selectedIndexToBuy, setSelectedIndexToBuy] = useState<IndexData | null>(null)
+  const [recentTxs, setRecentTxs] = useState<{
+    id: string
+    type: "buy" | "sell" | "withdraw"
+    tokenId: string
+    amountCHZ: number
+    txHash: `0x${string}` | null
+    blockNumber: bigint | null
+    user: string
+  }[]>([])
 
   // ── On-chain reads (real mode only) ──────────────────────────────────────
   const { holdings, isLoading: isLoadingOnChain, refetch } = usePortfolioOnchain(
@@ -189,8 +198,20 @@ export function PortfolioView() {
     })
   }
 
-  const handleTransactionSuccess = () => {
+  const handleTransactionSuccess = (type: "buy" | "sell" = "buy", tokenId?: string, amountCHZ?: number) => {
     refetch()
+    setRecentTxs((prev) => [
+      {
+        id: `${Date.now()}-${type}`,
+        type,
+        tokenId: tokenId ?? "?",
+        amountCHZ: amountCHZ ?? 0,
+        txHash: null,
+        blockNumber: null,
+        user: address ?? "",
+      },
+      ...prev,
+    ])
   }
 
   // ── Not connected ────────────────────────────────────────────────────────
@@ -495,7 +516,7 @@ export function PortfolioView() {
       )}
 
       {/* Transaction History */}
-      <TransactionHistory refetchPortfolio={refetch} />
+      <TransactionHistory refetchPortfolio={refetch} onChainTxs={recentTxs} />
 
       {/* Available Indices — only deployed ones */}
       <div>
@@ -584,7 +605,7 @@ export function PortfolioView() {
           index={selectedIndexToBuy}
           open={!!selectedIndexToBuy}
           onOpenChange={() => setSelectedIndexToBuy(null)}
-          onSuccess={handleTransactionSuccess}
+          onSuccess={() => handleTransactionSuccess("buy")}
         />
       )}
 
@@ -597,7 +618,7 @@ export function PortfolioView() {
           onOpenChange={() => setSelectedPosition(null)}
           demoUnits={selectedPosition.units}
           demoPrice={selectedPosition.price}
-          onSuccess={handleTransactionSuccess}
+          onSuccess={() => handleTransactionSuccess("sell", selectedPosition?.nftId)}
         />
       )}
     </div>
