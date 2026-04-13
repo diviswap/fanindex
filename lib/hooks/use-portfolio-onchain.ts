@@ -95,7 +95,7 @@ export function usePortfolioOnchain(
     isLoading: isLoadingHoldings,
     refetch: refetchHoldings,
   } = useReadContracts({
-    contracts: holdingsContracts,
+    contracts: holdingsContracts as any,
     query: { enabled: holdingsContracts.length > 0 },
   })
 
