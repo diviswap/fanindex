@@ -464,12 +464,15 @@ export function PortfolioView() {
                     </div>
                     <Button
                       onClick={() => {
+                        const demoValue = pos.units * Number.parseFloat(idx.price)
                         setSelectedPosition({
                           nftId: idx.id,
                           indexId: idx.id,
                           indexName: idx.name,
                           units: pos.units,
                           price: Number.parseFloat(idx.price),
+                          tokenRows: [],
+                          totalValueCHZ: demoValue,
                         })
                       }}
                       variant="outline"
