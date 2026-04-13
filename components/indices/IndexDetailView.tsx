@@ -2,52 +2,92 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, Users, BarChart3, ArrowLeft, PieChart, Activity } from 'lucide-react'
-import { useState, useMemo, useEffect } from "react"
+import { TrendingUp, TrendingDown, Users, BarChart3, ArrowLeft, PieChart, Activity, Loader2 } from 'lucide-react'
+import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import Link from "next/link"
 import type { IndexData } from "./IndexCard"
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { getTokenBySymbol, getTokenByAddress } from "@/lib/data/fan-tokens"
-import { useReadContract } from "wagmi"
-import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
-import { formatUnits } from "viem"
-import { useTokenPrices } from "@/lib/hooks/use-token-prices"
-import { FANX_CONTRACTS } from "@/lib/contracts/fanx-router-abi"
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { calculateIndexPrice } from "@/lib/data/indices"
+import useSWR from "swr"
 
 interface IndexDetailViewProps {
   index: IndexData
 }
 
-const generateHistoricalData = (basePrice: string) => {
-  const price = Number.parseFloat(basePrice)
-  const data = []
-  const days = 90
+interface HistoricalDataPoint {
+  timestamp: number
+  date: string
+  price: number
+  volume: number
+}
 
-  for (let i = days; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(date.getDate() - i)
-    const variance = (Math.random() - 0.5) * 0.1
-    const dayPrice = price * (1 + variance - (i / days) * 0.2)
+interface HistoryResponse {
+  tokens: string[]
+  days: number
+  data: HistoricalDataPoint[]
+}
 
-    data.push({
-      date: date.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      price: Number.parseFloat(dayPrice.toFixed(2)),
-      volume: Math.floor(Math.random() * 50000 + 10000),
-    })
-  }
+const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-  return data
+// Helper to calculate return percentage from historical data
+function calculateReturn(data: HistoricalDataPoint[] | undefined, daysBack: number): number | null {
+  if (!data || data.length < 2) return null
+  
+  const now = Date.now()
+  const targetTime = now - daysBack * 24 * 60 * 60 * 1000
+  
+  // Find closest data point to target time
+  const startPoint = data.find((d, i) => {
+    const nextPoint = data[i + 1]
+    if (!nextPoint) return true
+    return d.timestamp <= targetTime && nextPoint.timestamp > targetTime
+  }) || data[0]
+  
+  const endPoint = data[data.length - 1]
+  
+  if (!startPoint || !endPoint || startPoint.price === 0) return null
+  
+  return ((endPoint.price - startPoint.price) / startPoint.price) * 100
 }
 
 export function IndexDetailView({ index }: IndexDetailViewProps) {
   const [showBuyDialog, setShowBuyDialog] = useState(false)
-  const [timePeriod, setTimePeriod] = useState<"24h" | "7d" | "30d" | "90d">("90d")
+  const [timePeriod, setTimePeriod] = useState<"24h" | "7d" | "30d" | "90d">("30d")
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
+
+  // Map time period to days for API
+  const periodDays = {
+    "24h": 1,
+    "7d": 7,
+    "30d": 30,
+    "90d": 90,
+  }
+
+  // Fetch historical price data from CoinGecko for the selected period
+  const { data: historyData, isLoading: historyLoading } = useSWR<HistoryResponse>(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=${periodDays[timePeriod]}`,
+    fetcher,
+    {
+      refreshInterval: 300000,
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+    }
+  )
+
+  // Fetch 90-day data for returns calculation
+  const { data: returns90d } = useSWR<HistoryResponse>(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    fetcher,
+    {
+      refreshInterval: 600000,
+      revalidateOnFocus: false,
+      dedupingInterval: 120000,
+    }
+  )
 
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
@@ -57,27 +97,30 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     return index.price
   }, [liveTokenPrices, index.tokens, index.price])
 
-  const historicalData = useMemo(() => {
-    return generateHistoricalData(displayPrice)
-  }, [displayPrice])
-
-  const getFilteredData = () => {
-    const periodDays = {
-      "24h": 1,
-      "7d": 7,
-      "30d": 30,
-      "90d": 90,
+  const filteredData = useMemo(() => {
+    if (historyData?.data && historyData.data.length > 0) {
+      return historyData.data
     }
-    const days = periodDays[timePeriod]
-    return historicalData.slice(-days - 1) // +1 to include current day
-  }
+    return []
+  }, [historyData])
 
-  const filteredData = getFilteredData()
+  // Calculate returns for different periods
+  const returns = useMemo(() => {
+    const data = returns90d?.data
+    return {
+      "24h": calculateReturn(data, 1),
+      "7d": calculateReturn(data, 7),
+      "30d": calculateReturn(data, 30),
+      "90d": data && data.length >= 2 
+        ? ((data[data.length - 1].price - data[0].price) / data[0].price) * 100 
+        : null,
+    }
+  }, [returns90d])
 
   const firstPrice = filteredData[0]?.price || 0
   const lastPrice = filteredData[filteredData.length - 1]?.price || 0
-  const priceChange = ((lastPrice - firstPrice) / firstPrice) * 100
-  const isPositive = priceChange >= 0
+  const priceChange = firstPrice > 0 ? ((lastPrice - firstPrice) / firstPrice) * 100 : 0
+  const isPositive = priceChange >= 0 || Number.isNaN(priceChange)
   const chartColor = isPositive ? "#22c55e" : "#ef4444" 
   const TrendIcon = isPositive ? TrendingUp : TrendingDown
   const trendColorClass = isPositive ? "text-success" : "text-destructive"
@@ -96,7 +139,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
   const tokensWithWeights = useMemo(() => {
     if (!liveTokenPrices || liveTokenPrices.length === 0) {
-      // Fallback to equal weight
       const equalWeight = 100 / index.tokens.length
       return index.tokens.map((tokenSymbol) => ({
         tokenSymbol,
@@ -105,7 +147,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       }))
     }
 
-    // Calculate weights based on actual token prices from CoinGecko
     const tokensData = index.tokens
       .map((tokenSymbol) => {
         const priceData = liveTokenPrices.find((p) => p.symbol === tokenSymbol)
@@ -127,7 +168,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       }))
     }
 
-    // For equal weight indices, distribute equally
     if (index.type === "equal") {
       const equalWeight = 100 / tokensData.length
       return tokensData.map((t) => ({
@@ -136,7 +176,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       }))
     }
 
-    // For weighted indices, weight by market cap/price
     return tokensData
       .map((t) => ({
         ...t,
@@ -144,6 +183,31 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       }))
       .sort((a, b) => b.weight - a.weight)
   }, [liveTokenPrices, index.tokens, index.type])
+
+  // Helper to render return value
+  const renderReturn = (value: number | null, label: string) => {
+    if (value === null) {
+      return (
+        <div className="flex justify-between items-center">
+          <div className="text-xs sm:text-sm text-muted-foreground font-medium">{label}</div>
+          <div className="text-xs text-muted-foreground">--</div>
+        </div>
+      )
+    }
+    const isPos = value >= 0
+    const Icon = isPos ? TrendingUp : TrendingDown
+    const colorClass = isPos ? "text-success" : "text-destructive"
+    
+    return (
+      <div className="flex justify-between items-center">
+        <div className="text-xs sm:text-sm text-muted-foreground font-medium">{label}</div>
+        <div className={`flex items-center gap-1 text-sm sm:text-base font-bold ${colorClass}`}>
+          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          {isPos ? "+" : ""}{value.toFixed(1)}%
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -176,7 +240,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
                 <TrendIcon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span>
                   {isPositive ? "+" : ""}
-                  {priceChange.toFixed(1)}%
+                  {Number.isNaN(priceChange) ? "0.0" : priceChange.toFixed(1)}%
                 </span>
                 <span className="text-muted-foreground text-xs sm:text-sm font-normal">{timePeriod}</span>
               </div>
@@ -193,10 +257,15 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
       </div>
 
-      <Card className="border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6 mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-foreground">Price Performance</h2>
-          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 sm:pb-0">
+      <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-6 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+          <div className="flex items-center justify-between sm:justify-start gap-2">
+            <h2 className="text-base sm:text-xl font-bold text-foreground">Price Performance</h2>
+            {historyLoading && (
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            )}
+          </div>
+          <div className="flex gap-1 sm:gap-2">
             {(["24h", "7d", "30d", "90d"] as const).map((period) => (
               <Button
                 key={period}
@@ -205,8 +274,8 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
                 onClick={() => setTimePeriod(period)}
                 className={
                   timePeriod === period
-                    ? "bg-success text-black hover:bg-success/90 text-xs sm:text-sm px-3 sm:px-4"
-                    : "text-muted-foreground hover:text-foreground text-xs sm:text-sm px-3 sm:px-4"
+                    ? "bg-success text-black hover:bg-success/90 text-xs px-2 sm:px-4 h-8"
+                    : "text-muted-foreground hover:text-foreground text-xs px-2 sm:px-4 h-8"
                 }
               >
                 {period}
@@ -215,43 +284,83 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           </div>
         </div>
 
-        <ChartContainer
-          config={{
-            price: {
-              label: "Price (CHZ)",
-              color: chartColor,
-            },
-          }}
-          className="h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px]"
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={filteredData}>
-              <defs>
-                <linearGradient id={`colorPrice-${isPositive ? "positive" : "negative"}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
-                  <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-              <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={10} tickLine={false} />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={10}
-                tickLine={false}
-                tickFormatter={(value) => `${value}`}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Area
-                type="monotone"
-                dataKey="price"
-                stroke={chartColor}
-                strokeWidth={2}
-                fillOpacity={1}
-                fill={`url(#colorPrice-${isPositive ? "positive" : "negative"})`}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+        <div className="h-[200px] sm:h-[280px] md:h-[350px] lg:h-[400px] w-full -ml-2 sm:ml-0">
+          {historyLoading && filteredData.length === 0 ? (
+            <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <span className="text-sm">Loading chart data...</span>
+              </div>
+            </div>
+          ) : filteredData.length === 0 ? (
+            <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
+              <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Activity className="h-8 w-8" />
+                <span className="text-sm">No data available</span>
+              </div>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart 
+                data={filteredData}
+                margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id={`colorPrice-${index.id}-${isPositive ? "pos" : "neg"}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
+                    <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
+                <XAxis 
+                  dataKey="date" 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={9} 
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  interval="preserveStartEnd"
+                  minTickGap={40}
+                />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={9}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  tickFormatter={(value) => value.toFixed(1)}
+                  width={40}
+                  domain={['dataMin', 'dataMax']}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: 'hsl(var(--card))',
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '8px',
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600, marginBottom: '4px' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
+                  formatter={(value: number) => [`${value.toFixed(4)} CHZ`, 'Price']}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="price"
+                  stroke={chartColor}
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill={`url(#colorPrice-${index.id}-${isPositive ? "pos" : "neg"})`}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+        
+        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+          <span>Data from CoinGecko</span>
+          <span>Updated every 5 min</span>
+        </div>
       </Card>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12">
@@ -284,7 +393,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-        {/* Token Composition */}
         <Card className="lg:col-span-2 border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <PieChart className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
@@ -342,43 +450,19 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           </div>
         </Card>
 
-        {/* Performance & Info */}
         <div className="space-y-4 sm:space-y-6">
           <Card className="border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
               <h2 className="text-lg sm:text-xl font-bold text-foreground">Returns</h2>
+              <span className="ml-auto text-xs text-muted-foreground">Live</span>
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="text-xs sm:text-sm text-muted-foreground font-medium">24h</div>
-                <div className="flex items-center gap-1 text-base sm:text-lg font-bold text-success">
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  +5.2%
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="text-xs sm:text-sm text-muted-foreground font-medium">7d</div>
-                <div className="flex items-center gap-1 text-base sm:text-lg font-bold text-success">
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  +12.8%
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="text-xs sm:text-sm text-muted-foreground font-medium">30d</div>
-                <div className="flex items-center gap-1 text-base sm:text-lg font-bold text-success">
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  +28.4%
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="text-xs sm:text-sm text-muted-foreground font-medium">YTD</div>
-                <div className="flex items-center gap-1 text-base sm:text-lg font-bold text-success">
-                  <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  +142.7%
-                </div>
-              </div>
+              {renderReturn(returns["24h"], "24h")}
+              {renderReturn(returns["7d"], "7d")}
+              {renderReturn(returns["30d"], "30d")}
+              {renderReturn(returns["90d"], "90d")}
             </div>
           </Card>
 
