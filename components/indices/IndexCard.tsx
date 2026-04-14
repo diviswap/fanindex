@@ -10,6 +10,7 @@ import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
+import { useNFTSupply } from "@/lib/hooks/use-nft-supply"
 import { calculateIndexPrice } from "@/lib/data/indices"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import Image from "next/image"
@@ -38,6 +39,7 @@ export function IndexCard({ index }: IndexCardProps) {
   const [showShareModal, setShowShareModal] = useState(false)
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
+  const { totalSupply } = useNFTSupply()
 
   // 24h fetch — used for current price and 24h return on the card.
   const { data: history24h } = useSWR(
@@ -139,7 +141,7 @@ export function IndexCard({ index }: IndexCardProps) {
                     </div>
                     <div className="flex items-center gap-1.5 text-xl font-bold text-foreground">
                       <Users className="h-5 w-5" />
-                      {index.holders}
+                      {totalSupply}
                     </div>
                   </div>
                 </div>
