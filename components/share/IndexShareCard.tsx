@@ -34,7 +34,7 @@ export function IndexShareCard({
 
   return (
     <div
-      ref={cardRef}
+      ref={cardRef as React.RefObject<HTMLDivElement>}
       data-share-card
       style={{
         width: 1080,
