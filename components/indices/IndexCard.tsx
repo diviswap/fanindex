@@ -207,7 +207,7 @@ export function IndexCard({ index }: IndexCardProps) {
       <ShareCardModal
         open={showShareModal}
         onOpenChange={setShowShareModal}
-        data={{ type: "index", index, livePrice: displayPrice, liveAPY: displayAPY }}
+        data={{ type: "index", index, livePrice: displayPrice }}
       />
     </>
   )
