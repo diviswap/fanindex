@@ -250,14 +250,14 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
-        {/* Off-screen capture target — full 1080x1350, invisible, not scaled */}
+        {/* Off-screen capture target — full 1080x1080, invisible, not scaled */}
         <div
           style={{
             position: "fixed",
             top: -9999,
             left: -9999,
             width: 1080,
-            height: 1350,
+            height: 1080,
             pointerEvents: "none",
             zIndex: -1,
             overflow: "hidden",
@@ -279,7 +279,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
           {/* Card preview — scaled-down visual only, no ref */}
           <div
             className="relative w-full rounded-xl overflow-hidden border border-border/40"
-            style={{ paddingBottom: "calc(1350 / 1080 * 100%)", background: "#080808" }}
+            style={{ paddingBottom: "100%", background: "#080808" }}
           >
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
               <div

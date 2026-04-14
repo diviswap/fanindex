@@ -13,6 +13,21 @@ export interface UseShareCardReturn {
   reset: () => void
 }
 
+/**
+ * Convert base64 dataURL to Blob for clipboard operations
+ */
+function dataUrlToBlob(dataUrl: string): Blob {
+  const arr = dataUrl.split(",")
+  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png"
+  const bstr = atob(arr[1])
+  const n = bstr.length
+  const u8arr = new Uint8Array(n)
+  for (let i = 0; i < n; i++) {
+    u8arr[i] = bstr.charCodeAt(i)
+  }
+  return new Blob([u8arr], { type: mime })
+}
+
 export function useShareCard(): UseShareCardReturn {
   const cardRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<ShareCardStatus>("idle")
@@ -38,7 +53,11 @@ export function useShareCard(): UseShareCardReturn {
         height: cardRef.current.offsetHeight,
         onclone: (doc) => {
           const el = doc.querySelector("[data-share-card]") as HTMLElement | null
-          if (el) el.style.fontFamily = "inherit"
+          if (el) {
+            el.style.fontFamily = "inherit"
+            el.style.width = "1080px"
+            el.style.height = "1080px"
+          }
         },
       })
       const url = canvas.toDataURL("image/png", 1.0)
@@ -71,8 +90,7 @@ export function useShareCard(): UseShareCardReturn {
     if (!url) return false
 
     try {
-      const res = await fetch(url)
-      const blob = await res.blob()
+      const blob = dataUrlToBlob(url)
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": blob }),
       ])

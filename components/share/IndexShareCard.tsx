@@ -41,7 +41,7 @@ export function IndexShareCard({
       data-share-card
       style={{
         width: 1080,
-        height: 1350,
+        height: 1080,
         background: "linear-gradient(135deg, #0c0c0c 0%, #0f0f0f 100%)",
         borderRadius: 32,
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
@@ -76,28 +76,28 @@ export function IndexShareCard({
         pointerEvents: "none",
       }} />
 
-      <div style={{ padding: "48px 56px", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "48px 56px", position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         {/* Header: logo + type badge */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
           {/* Brand section */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/fi-logo.png"
               alt="FanIndex"
-              style={{ width: 48, height: 48, borderRadius: 12, objectFit: "contain", flexShrink: 0 }}
+              style={{ width: 40, height: 40, borderRadius: 8, objectFit: "contain", flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.5 }}>FanIndex</div>
-              <div style={{ fontSize: 12, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.3 }}>FanIndex</div>
+              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
             </div>
           </div>
           {/* Type badge */}
           <div style={{
-            fontSize: 13, fontWeight: 700, letterSpacing: 0.8,
+            fontSize: 11, fontWeight: 700, letterSpacing: 0.8,
             color: accent, background: `${accent}15`,
             border: `1.5px solid ${accent}40`,
-            borderRadius: 20, padding: "8px 20px",
+            borderRadius: 16, padding: "6px 14px",
             textTransform: "uppercase",
           }}>
             {typeLabels[index.type] ?? "Index"}
@@ -105,64 +105,64 @@ export function IndexShareCard({
         </div>
 
         {/* Index name - prominent */}
-        <div style={{ fontSize: 56, fontWeight: 800, color: "#f9fafb", letterSpacing: -2, lineHeight: 1.1, marginBottom: 16 }}>
+        <div style={{ fontSize: 44, fontWeight: 800, color: "#f9fafb", letterSpacing: -1.5, lineHeight: 1.1, marginBottom: 12 }}>
           {index.name}
         </div>
 
         {/* Description */}
-        <div style={{ fontSize: 16, color: "#6b7280", lineHeight: 1.6, maxWidth: 800, marginBottom: 48 }}>
+        <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.5, maxWidth: 800, marginBottom: 28 }}>
           {index.description}
         </div>
 
         {/* Key metrics grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, marginBottom: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 28 }}>
           {showPrice && (
-            <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>
-              <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Current Price</div>
-              <div style={{ fontSize: 40, fontWeight: 800, color: "#10b981", letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>
+            <div style={{ paddingBottom: 16, borderBottom: "1px solid #1f2937" }}>
+              <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Current Price</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "#10b981", letterSpacing: -0.8, fontVariantNumeric: "tabular-nums" }}>
                 {Number(price).toFixed(4)}
               </div>
-              <div style={{ fontSize: 16, color: "#4b5563", fontWeight: 600, marginTop: 4 }}>CHZ</div>
+              <div style={{ fontSize: 12, color: "#4b5563", fontWeight: 600, marginTop: 3 }}>CHZ</div>
             </div>
           )}
           {showApy && (
-            <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>
-              <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Annual APY</div>
-              <div style={{ fontSize: 40, fontWeight: 800, color: "#10b981", letterSpacing: -1 }}>{apy}</div>
+            <div style={{ paddingBottom: 16, borderBottom: "1px solid #1f2937" }}>
+              <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Annual APY</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "#10b981", letterSpacing: -0.8 }}>{apy}</div>
             </div>
           )}
-          <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>
-            <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Total Holders</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: "#f9fafb", letterSpacing: -1 }}>{index.holders}</div>
+          <div style={{ paddingBottom: 16, borderBottom: "1px solid #1f2937" }}>
+            <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Total Holders</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: "#f9fafb", letterSpacing: -0.8 }}>{index.holders}</div>
           </div>
-          <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>
-            <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Composition</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: "#f9fafb", letterSpacing: -1 }}>{index.tokens.length}</div>
-            <div style={{ fontSize: 16, color: "#4b5563", fontWeight: 600, marginTop: 4 }}>Tokens</div>
+          <div style={{ paddingBottom: 16, borderBottom: "1px solid #1f2937" }}>
+            <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Composition</div>
+            <div style={{ fontSize: 32, fontWeight: 800, color: "#f9fafb", letterSpacing: -0.8 }}>{index.tokens.length}</div>
+            <div style={{ fontSize: 12, color: "#4b5563", fontWeight: 600, marginTop: 3 }}>Tokens</div>
           </div>
         </div>
 
         {/* Token pills section */}
         {showTokens && index.tokens.length > 0 && (
-          <div>
-            <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 16 }}>Index Composition</div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              {index.tokens.slice(0, 10).map((t) => (
+          <div style={{ marginTop: "auto" }}>
+            <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>Index Composition</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {index.tokens.slice(0, 8).map((t) => (
                 <span key={t} style={{
-                  fontSize: 13, fontWeight: 700, color: "#9ca3af",
+                  fontSize: 12, fontWeight: 700, color: "#9ca3af",
                   background: "#161616", border: "1.5px solid #252525",
-                  borderRadius: 12, padding: "8px 16px", letterSpacing: 0.3,
+                  borderRadius: 10, padding: "6px 12px", letterSpacing: 0.2,
                 }}>
                   {t}
                 </span>
               ))}
-              {index.tokens.length > 10 && (
+              {index.tokens.length > 8 && (
                 <span style={{
-                  fontSize: 13, fontWeight: 700, color: "#6b7280",
+                  fontSize: 12, fontWeight: 700, color: "#6b7280",
                   background: "#161616", border: "1.5px solid #252525",
-                  borderRadius: 12, padding: "8px 16px",
+                  borderRadius: 10, padding: "6px 12px",
                 }}>
-                  +{index.tokens.length - 10} more
+                  +{index.tokens.length - 8}
                 </span>
               )}
             </div>
