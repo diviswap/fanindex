@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import {
   Dialog,
   DialogContent,
@@ -14,12 +14,12 @@ import {
   Twitter,
   Check,
   Loader2,
-  LayoutGrid,
-  Eye,
   Wallet,
+  BarChart3,
   Tag,
   TrendingUp,
-  BarChart3,
+  Layers,
+  X,
 } from "lucide-react"
 import { useShareCard } from "@/lib/hooks/use-share-card"
 import { IndexShareCard } from "./IndexShareCard"
@@ -68,7 +68,7 @@ interface ShareCardModalProps {
   walletAddress?: string
 }
 
-// ── Toggle option helper ───────────────────────────────────────────────────────
+// ── Small toggle pill ─────────────────────────────────────────────────────────
 
 function Toggle({
   label,
@@ -84,36 +84,35 @@ function Toggle({
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-semibold transition-all ${
         checked
-          ? "border-success/60 bg-success/10 text-success"
-          : "border-border bg-card/50 text-muted-foreground hover:text-foreground hover:border-border/80"
+          ? "border-success/50 bg-success/10 text-success"
+          : "border-border bg-card text-muted-foreground hover:text-foreground hover:border-border/80"
       }`}
     >
-      <Icon className="h-3.5 w-3.5 shrink-0" />
+      <Icon className="h-3 w-3 shrink-0" />
       {label}
     </button>
   )
 }
 
-// ── Tweet text builders ────────────────────────────────────────────────────────
+// ── Tweet text ────────────────────────────────────────────────────────────────
 
 function buildTweetText(data: ShareData): string {
   if (data.type === "index") {
-    return `Discover ${data.index.name} on FanIndex — ${data.index.apy} APY with ${data.index.tokens.length} fan tokens. #Chiliz #FanTokens #DeFi`
+    return `Discover the ${data.index.name} on @FanIndex — ${data.index.apy} APY with ${data.index.tokens.length} fan tokens on Chiliz.\n\n#Chiliz #FanTokens #DeFi\nfanindex.xyz`
   }
   if (data.type === "position") {
     const val = data.totalValueCHZ > 0 ? `${data.totalValueCHZ.toFixed(2)} CHZ` : "–"
-    return `My ${data.indexName} position is worth ${val} on FanIndex. #Chiliz #FanTokens #DeFi`
+    return `My ${data.indexName} position is worth ${val} on @FanIndex.\n\n#Chiliz #FanTokens\nfanindex.xyz`
   }
   const val = data.totalValue > 0 ? `${data.totalValue.toFixed(2)} CHZ` : "–"
-  return `My FanIndex portfolio is worth ${val} across ${data.positionsCount} positions. #Chiliz #FanTokens #DeFi`
+  return `My @FanIndex portfolio is worth ${val} across ${data.positionsCount} positions.\n\n#Chiliz #FanTokens #DeFi\nfanindex.xyz`
 }
 
 // ── Main modal ────────────────────────────────────────────────────────────────
 
 export function ShareCardModal({ open, onOpenChange, data, walletAddress }: ShareCardModalProps) {
-  // Customization toggles (applicable fields vary by card type)
   const [showPrice, setShowPrice] = useState(true)
   const [showTokens, setShowTokens] = useState(true)
   const [showApy, setShowApy] = useState(true)
@@ -150,7 +149,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
     const ok = await copyToClipboard()
     if (ok) {
       setCopyDone(true)
-      setTimeout(() => setCopyDone(false), 2000)
+      setTimeout(() => setCopyDone(false), 2500)
     }
   }, [copyToClipboard])
 
@@ -158,33 +157,32 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
     shareToX(buildTweetText(data))
   }, [shareToX, data])
 
-  // Reset preview whenever modal opens
   const handleOpenChange = (v: boolean) => {
     if (!v) reset()
     onOpenChange(v)
   }
 
-  // ── Toggles per card type ─────────────────────────────────────────────────
-  const toggles =
+  // ── Toggles per type ─────────────────────────────────────────────────────
+  const toggleRow =
     data.type === "index" ? (
       <div className="flex flex-wrap gap-2">
         <Toggle label="Price" icon={Tag} checked={showPrice} onChange={setShowPrice} />
         <Toggle label="APY" icon={TrendingUp} checked={showApy} onChange={setShowApy} />
-        <Toggle label="Tokens" icon={LayoutGrid} checked={showTokens} onChange={setShowTokens} />
+        <Toggle label="Tokens" icon={Layers} checked={showTokens} onChange={setShowTokens} />
       </div>
     ) : data.type === "position" ? (
       <div className="flex flex-wrap gap-2">
-        <Toggle label="Composition" icon={LayoutGrid} checked={showComposition} onChange={setShowComposition} />
-        <Toggle label="Wallet" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
+        <Toggle label="Composition" icon={BarChart3} checked={showComposition} onChange={setShowComposition} />
+        <Toggle label="Wallet address" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
       </div>
     ) : (
       <div className="flex flex-wrap gap-2">
         <Toggle label="Breakdown" icon={BarChart3} checked={showBreakdown} onChange={setShowBreakdown} />
-        <Toggle label="Wallet" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
+        <Toggle label="Wallet address" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
       </div>
     )
 
-  // ── Card renderer (renders off-screen reference + visible preview) ─────────
+  // ── Card node (shared between preview + hidden capture target) ───────────
   const cardNode =
     data.type === "index" ? (
       <IndexShareCard
@@ -222,75 +220,80 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-border">
-          <DialogTitle className="text-lg font-bold text-foreground flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-success/10 border border-success/20 flex items-center justify-center">
-              <Twitter className="h-3.5 w-3.5 text-success" />
+      <DialogContent className="max-w-xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
+        {/* Header */}
+        <DialogHeader className="flex-row items-center justify-between px-5 pt-5 pb-4 border-b border-border">
+          <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-[#1d9bf0]/10 border border-[#1d9bf0]/20 flex items-center justify-center">
+              <Twitter className="h-3.5 w-3.5 text-[#1d9bf0]" />
             </div>
             Share Card
           </DialogTitle>
         </DialogHeader>
 
-        <div className="p-6 space-y-6">
-          {/* Card preview — scales to fit container */}
-          <div className="relative w-full overflow-hidden rounded-xl bg-[#050505] border border-border/60">
-            <div
-              className="mx-auto"
-              style={{
-                // Scale 600px card to fit ~90% of dialog width
-                width: "min(600px, 100%)",
-                transformOrigin: "top center",
-              }}
-            >
-              {/* Actual card rendered at full size but visually shown */}
-              <div className="overflow-x-auto">
-                <div style={{ minWidth: 600 }}>
-                  {cardNode}
-                </div>
-              </div>
-            </div>
+        <div className="p-5 space-y-5">
 
-            {/* Capturing overlay */}
+          {/* Card preview — scales down to fit dialog width */}
+          <div className="relative w-full rounded-xl overflow-hidden bg-[#080808] border border-border/40" style={{ aspectRatio: "640 / 340" }}>
+            <div
+              style={{
+                position: "absolute",
+                top: 0, left: 0,
+                width: 640,
+                transformOrigin: "top left",
+                // Scale to fill container: containerWidth / cardWidth
+              }}
+              className="card-scale-wrapper"
+            >
+              {cardNode}
+            </div>
+            <style>{`
+              .card-scale-wrapper {
+                transform: scale(var(--card-preview-scale, 1));
+              }
+              @media (min-width: 0px) {
+                .card-scale-wrapper { --card-preview-scale: calc((min(100vw - 80px, 544px)) / 640); }
+              }
+            `}</style>
+
+            {/* Capture overlay */}
             {isCapturing && (
-              <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-xl">
-                <div className="flex items-center gap-2 text-foreground text-sm font-medium">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin text-success" />
                   Generating image...
                 </div>
               </div>
             )}
           </div>
 
-          {/* Preview result if captured */}
+          {/* Generated preview */}
           {dataUrl && (
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Eye className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium text-muted-foreground">Generated Preview</span>
-                <span className="ml-auto text-xs text-success font-medium">Ready to share</span>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Preview</p>
+                <span className="text-xs font-semibold text-success">Ready to share</span>
               </div>
-              <div className="overflow-hidden rounded-xl border border-success/20">
+              <div className="rounded-xl overflow-hidden border border-success/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={dataUrl} alt="Share card preview" className="w-full h-auto" />
+                <img src={dataUrl} alt="Share card preview" className="w-full h-auto block" />
               </div>
             </div>
           )}
 
-          {/* Customization toggles */}
-          <div>
-            <p className="text-sm font-semibold text-foreground mb-3">Customize</p>
-            {toggles}
+          {/* Customization */}
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customize</p>
+            {toggleRow}
           </div>
 
-          {/* Actions */}
-          <div className="space-y-3 pt-2 border-t border-border">
-            {/* Capture button */}
-            {!dataUrl && (
+          {/* Action buttons */}
+          <div className="space-y-3 pt-1 border-t border-border">
+            {!dataUrl ? (
               <Button
                 onClick={handleCapture}
                 disabled={isCapturing}
-                className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-11 rounded-xl"
+                className="w-full bg-success hover:bg-success/90 text-black font-bold h-11 rounded-xl mt-3"
               >
                 {isCapturing ? (
                   <>
@@ -301,58 +304,56 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
                   "Generate Image"
                 )}
               </Button>
-            )}
-
-            {/* Share / download / copy — shown after capture */}
-            {dataUrl && (
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleShareX}
-                  className="flex-1 bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white font-semibold h-11 rounded-xl"
+            ) : (
+              <>
+                <div className="flex gap-2 mt-3">
+                  {/* Share on X */}
+                  <Button
+                    onClick={handleShareX}
+                    className="flex-1 bg-[#0f0f0f] hover:bg-[#1a1a1a] text-white border border-[#2a2a2a] font-bold h-11 rounded-xl"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Share on X
+                  </Button>
+                  {/* Copy to clipboard */}
+                  <Button
+                    onClick={handleCopy}
+                    variant="outline"
+                    className="flex-1 border-border bg-card/50 h-11 rounded-xl font-semibold"
+                  >
+                    {copyDone ? (
+                      <>
+                        <Check className="h-4 w-4 mr-2 text-success" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy Image
+                      </>
+                    )}
+                  </Button>
+                  {/* Download */}
+                  <Button
+                    onClick={handleDownload}
+                    variant="outline"
+                    title="Download PNG"
+                    className="border-border bg-card/50 h-11 w-11 p-0 rounded-xl shrink-0"
+                  >
+                    {downloadDone ? (
+                      <Check className="h-4 w-4 text-success" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                <button
+                  onClick={() => reset()}
+                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-1"
                 >
-                  <Twitter className="h-4 w-4 mr-2" />
-                  Share on X
-                </Button>
-                <Button
-                  onClick={handleCopy}
-                  variant="outline"
-                  className="flex-1 border-border bg-card/50 h-11 rounded-xl font-semibold"
-                >
-                  {copyDone ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2 text-success" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy Image
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={handleDownload}
-                  variant="outline"
-                  className="border-border bg-card/50 h-11 w-11 p-0 rounded-xl"
-                  title="Download PNG"
-                >
-                  {downloadDone ? (
-                    <Check className="h-4 w-4 text-success" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {/* Regenerate after capture */}
-            {dataUrl && (
-              <button
-                onClick={() => reset()}
-                className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-1"
-              >
-                Regenerate with new settings
-              </button>
+                  Regenerate with new settings
+                </button>
+              </>
             )}
           </div>
         </div>

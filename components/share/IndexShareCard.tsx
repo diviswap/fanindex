@@ -1,4 +1,3 @@
-import { TrendingUp, Users, Zap } from "lucide-react"
 import type { IndexData } from "@/components/indices/IndexCard"
 
 interface IndexShareCardProps {
@@ -19,11 +18,7 @@ export function IndexShareCard({
   cardRef,
 }: IndexShareCardProps) {
   const price = livePrice ?? index.price
-  const typeLabels: Record<string, string> = {
-    weighted: "Weighted Index",
-    equal: "Equal-Weight Index",
-    managed: "Managed Index",
-  }
+
   const typeColors: Record<string, string> = {
     weighted: "#3b82f6",
     equal: "#a855f7",
@@ -31,120 +26,145 @@ export function IndexShareCard({
   }
   const accent = typeColors[index.type] ?? "#10b981"
 
+  const typeLabels: Record<string, string> = {
+    weighted: "Weighted",
+    equal: "Equal-Weight",
+    managed: "Managed",
+  }
+
   return (
     <div
       ref={cardRef}
       data-share-card
       style={{
-        width: 600,
-        height: 314,
-        background: "linear-gradient(135deg, #0a0a0a 0%, #111111 60%, #0f1a12 100%)",
-        borderRadius: 20,
-        padding: "36px 40px",
-        fontFamily: "system-ui, -apple-system, sans-serif",
+        width: 640,
+        minHeight: 340,
+        background: "#0c0c0c",
+        borderRadius: 24,
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         position: "relative",
         overflow: "hidden",
         boxSizing: "border-box",
+        border: "1px solid #1a1a1a",
       }}
     >
-      {/* Background glow */}
+      {/* Top accent bar */}
+      <div style={{ height: 3, background: `linear-gradient(90deg, ${accent}, ${accent}44, transparent)` }} />
+
+      {/* Subtle grid texture overlay */}
       <div style={{
-        position: "absolute", top: -80, right: -80, width: 300, height: 300,
-        background: `radial-gradient(circle, ${accent}18 0%, transparent 70%)`,
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", bottom: -60, left: -60, width: 220, height: 220,
-        background: "radial-gradient(circle, #10b98112 0%, transparent 70%)",
+        position: "absolute", inset: 0,
+        backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff06 1px, transparent 0)",
+        backgroundSize: "28px 28px",
         pointerEvents: "none",
       }} />
 
-      {/* Top row: brand + type badge */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: "linear-gradient(135deg, #10b981, #059669)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <span style={{ fontSize: 16, fontWeight: 900, color: "#000", letterSpacing: -1 }}>F</span>
+      {/* Glow */}
+      <div style={{
+        position: "absolute", top: -100, right: -100, width: 360, height: 360,
+        background: `radial-gradient(circle, ${accent}0f 0%, transparent 65%)`,
+        pointerEvents: "none",
+      }} />
+      <div style={{
+        position: "absolute", bottom: -80, left: -80, width: 240, height: 240,
+        background: "radial-gradient(circle, #10b98108 0%, transparent 65%)",
+        pointerEvents: "none",
+      }} />
+
+      <div style={{ padding: "28px 32px 0", position: "relative" }}>
+        {/* Header: logo + badge */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+          {/* Brand */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/fi-logo.png"
+              alt="FanIndex"
+              style={{ width: 32, height: 32, borderRadius: 8, objectFit: "contain" }}
+            />
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.3 }}>FanIndex</div>
+              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.xyz</div>
+            </div>
           </div>
-          <span style={{ color: "#ffffff", fontWeight: 700, fontSize: 15, letterSpacing: -0.3 }}>FanIndex</span>
+          {/* Type badge */}
+          <div style={{
+            fontSize: 11, fontWeight: 700, letterSpacing: 0.6,
+            color: accent, background: `${accent}18`,
+            border: `1px solid ${accent}35`,
+            borderRadius: 100, padding: "5px 14px",
+          }}>
+            {typeLabels[index.type] ?? "Index"}
+          </div>
         </div>
-        <span style={{
-          fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
-          color: accent, background: `${accent}18`,
-          border: `1px solid ${accent}40`,
-          borderRadius: 20, padding: "4px 12px",
-        }}>
-          {typeLabels[index.type]}
-        </span>
-      </div>
 
-      {/* Index name + description */}
-      <div style={{ marginTop: 18, flex: 1 }}>
-        <div style={{ fontSize: 26, fontWeight: 800, color: "#ffffff", lineHeight: 1.15, letterSpacing: -0.8 }}>
+        {/* Index name */}
+        <div style={{ fontSize: 30, fontWeight: 800, color: "#f9fafb", letterSpacing: -1, lineHeight: 1.1, marginBottom: 8 }}>
           {index.name}
         </div>
-        <div style={{ fontSize: 13, color: "#6b7280", marginTop: 6, lineHeight: 1.4, maxWidth: 420 }}>
+        <div style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.5, maxWidth: 480, marginBottom: 24 }}>
           {index.description}
         </div>
-      </div>
 
-      {/* Stats row */}
-      <div style={{ display: "flex", gap: 28, marginTop: 16 }}>
-        {showPrice && (
-          <div>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Price</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#10b981", letterSpacing: -0.5, marginTop: 2 }}>
-              {Number(price).toFixed(4)} CHZ
+        {/* Stats row */}
+        <div style={{ display: "flex", gap: 0, marginBottom: 24 }}>
+          {showPrice && (
+            <div style={{ flex: 1, paddingRight: 20, borderRight: "1px solid #1f2937" }}>
+              <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Price</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#10b981", letterSpacing: -0.8, fontVariantNumeric: "tabular-nums" }}>
+                {Number(price).toFixed(4)}
+                <span style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginLeft: 4 }}>CHZ</span>
+              </div>
             </div>
-          </div>
-        )}
-        {showApy && (
-          <div>
-            <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>APY</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 4, marginTop: 2 }}>
-              <span style={{ fontSize: 22, fontWeight: 800, color: "#10b981", letterSpacing: -0.5 }}>{index.apy}</span>
-            </div>
-          </div>
-        )}
-        <div>
-          <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 600, letterSpacing: 0.8, textTransform: "uppercase" }}>Holders</div>
-          <div style={{ fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: -0.5, marginTop: 2 }}>{index.holders}</div>
-        </div>
-      </div>
-
-      {/* Tokens */}
-      {showTokens && (
-        <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
-          {index.tokens.slice(0, 7).map((t) => (
-            <span key={t} style={{
-              fontSize: 11, fontWeight: 700, color: "#d1d5db",
-              background: "#1f2937", border: "1px solid #374151",
-              borderRadius: 8, padding: "3px 10px",
-            }}>{t}</span>
-          ))}
-          {index.tokens.length > 7 && (
-            <span style={{
-              fontSize: 11, fontWeight: 700, color: "#6b7280",
-              background: "#1f2937", border: "1px solid #374151",
-              borderRadius: 8, padding: "3px 10px",
-            }}>+{index.tokens.length - 7}</span>
           )}
+          {showApy && (
+            <div style={{ flex: 1, paddingLeft: showPrice ? 20 : 0, paddingRight: 20, borderRight: "1px solid #1f2937" }}>
+              <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>APY</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#10b981", letterSpacing: -0.8 }}>{index.apy}</div>
+            </div>
+          )}
+          <div style={{ flex: 1, paddingLeft: (showPrice || showApy) ? 20 : 0 }}>
+            <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Holders</div>
+            <div style={{ fontSize: 24, fontWeight: 800, color: "#f9fafb", letterSpacing: -0.8 }}>{index.holders}</div>
+          </div>
         </div>
-      )}
+
+        {/* Token pills */}
+        {showTokens && (
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 28 }}>
+            {index.tokens.slice(0, 8).map((t) => (
+              <span key={t} style={{
+                fontSize: 11, fontWeight: 700, color: "#9ca3af",
+                background: "#161616", border: "1px solid #252525",
+                borderRadius: 6, padding: "4px 10px", letterSpacing: 0.2,
+              }}>{t}</span>
+            ))}
+            {index.tokens.length > 8 && (
+              <span style={{
+                fontSize: 11, fontWeight: 700, color: "#6b7280",
+                background: "#161616", border: "1px solid #252525",
+                borderRadius: 6, padding: "4px 10px",
+              }}>+{index.tokens.length - 8}</span>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Footer */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 18, paddingTop: 14, borderTop: "1px solid #1f2937" }}>
-        <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 500 }}>fanindex.xyz</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+      <div style={{
+        marginTop: "auto",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "14px 32px",
+        borderTop: "1px solid #161616",
+        background: "#0a0a0a",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />
-          <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 500 }}>Powered by Chiliz</span>
+          <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 500 }}>Powered by Chiliz Chain</span>
         </div>
+        <span style={{ fontSize: 11, color: "#374151", fontWeight: 500 }}>fanindex.xyz</span>
       </div>
     </div>
   )
