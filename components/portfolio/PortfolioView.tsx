@@ -24,7 +24,6 @@ import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
 import { getTokenByAddress, getTokenBySymbol, FAN_TOKENS } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { useNFTSupply } from "@/lib/hooks/use-nft-supply"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import { NFTPositionCard } from "./NFTPositionCard"
 import Image from "next/image"
@@ -101,7 +100,6 @@ function AvailableIndexCard({
   onBuy: () => void
 }) {
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
-  const { totalSupply } = useNFTSupply()
 
   const { data: history24h } = useSWR(
     `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
@@ -178,7 +176,7 @@ function AvailableIndexCard({
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Holders</span>
-              <span className="font-semibold text-foreground">{totalSupply}</span>
+              <span className="font-semibold text-foreground">{index.holders}</span>
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
