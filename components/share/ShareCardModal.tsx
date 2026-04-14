@@ -183,8 +183,38 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
       </div>
     )
 
-  // ── Card node (shared between preview + hidden capture target) ───────────
-  const cardNode =
+  // ── Card rendered for visible PREVIEW (no ref, just visual) ──────────────
+  const previewCard =
+    data.type === "index" ? (
+      <IndexShareCard
+        index={data.index}
+        livePrice={data.livePrice}
+        showPrice={showPrice}
+        showTokens={showTokens}
+        showApy={showApy}
+        cardRef={{ current: null }}
+      />
+    ) : data.type === "position" ? (
+      <PositionShareCard
+        holding={data.holding}
+        totalValueCHZ={data.totalValueCHZ}
+        tokenRows={data.tokenRows}
+        cardRef={{ current: null }}
+      />
+    ) : (
+      <PortfolioShareCard
+        totalValue={data.totalValue}
+        nftValue={data.nftValue}
+        chzBalance={data.chzBalance}
+        fanTokensValue={data.fanTokensValue}
+        positionsCount={data.positionsCount}
+        walletAddress={walletAddress}
+        cardRef={{ current: null }}
+      />
+    )
+
+  // ── Card rendered OFF-SCREEN at full size for html2canvas capture ─────────
+  const captureCard =
     data.type === "index" ? (
       <IndexShareCard
         index={data.index}
@@ -216,6 +246,23 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
+        {/* Off-screen capture target — full 1080x1350, invisible, not scaled */}
+        <div
+          style={{
+            position: "fixed",
+            top: -9999,
+            left: -9999,
+            width: 1080,
+            height: 1350,
+            pointerEvents: "none",
+            zIndex: -1,
+            overflow: "hidden",
+          }}
+          aria-hidden="true"
+        >
+          {captureCard}
+        </div>
+
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between px-5 pt-5 pb-4 border-b border-border">
           <DialogTitle className="text-base font-bold text-foreground">
@@ -225,76 +272,49 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
 
         <div className="p-5 space-y-5">
 
-        {/* Card preview — scales the 1080×1350 card to fill the dialog width */}
-        {/* The outer div establishes the visible bounding box; overflow:hidden clips the scaled content */}
-        <div
-          className="relative w-full rounded-xl overflow-hidden border border-border/40"
-          style={{ paddingBottom: "calc(1350 / 1080 * 100%)", background: "#080808" }}
-        >
+          {/* Card preview — scaled-down visual only, no ref */}
           <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "flex-start",
-            }}
+            className="relative w-full rounded-xl overflow-hidden border border-border/40"
+            style={{ paddingBottom: "calc(1350 / 1080 * 100%)", background: "#080808" }}
           >
-            {/* Scale wrapper: renders card at 1080px then scales to container width */}
-            <div
-              style={{
-                width: 1080,
-                height: 1350,
-                transformOrigin: "top left",
-                // We use a CSS variable set via inline style on a parent
-                // because we need JS to know the container width.
-                // Instead we rely on aspect-ratio + 100% width approach:
-                // scale = containerWidth / 1080. Expressed as a calc using
-                // container-query-style but compatible: vw based approximation
-                // is done via the sibling style tag approach:
-                transform: "scale(var(--fi-scale))",
-                flexShrink: 0,
-                overflow: "hidden",
-              }}
-              ref={(el) => {
-                if (el) {
+            <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
+              <div
+                style={{ width: 1080, height: 1350, transformOrigin: "top left", flexShrink: 0, overflow: "hidden" }}
+                ref={(el) => {
+                  if (!el) return
                   const updateScale = () => {
-                    const parent = el.parentElement?.parentElement
-                    if (parent) {
-                      const scale = parent.clientWidth / 1080
-                      el.style.setProperty("--fi-scale", String(scale))
+                    const container = el.parentElement?.parentElement
+                    if (container) {
+                      const scale = container.clientWidth / 1080
                       el.style.transform = `scale(${scale})`
                     }
                   }
                   updateScale()
                   const ro = new ResizeObserver(updateScale)
                   ro.observe(el.parentElement?.parentElement || el)
-                  // cleanup stored on el for HMR
                   ;(el as any).__ro = ro
-                }
-              }}
-            >
-              {cardNode}
-            </div>
-          </div>
-
-          {/* Capture overlay */}
-          {isCapturing && (
-            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                <Loader2 className="h-4 w-4 animate-spin text-success" />
-                Generating image...
+                }}
+              >
+                {previewCard}
               </div>
             </div>
-          )}
-        </div>
 
-          {/* Generated preview */}
+            {isCapturing && (
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center rounded-xl">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin text-success" />
+                  Generating...
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Generated image preview */}
           {dataUrl && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Preview</p>
-                <span className="text-xs font-semibold text-success">Ready to share</span>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Ready to share</p>
+                <span className="text-xs font-semibold text-success">Image generated</span>
               </div>
               <div className="rounded-xl overflow-hidden border border-success/20">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
