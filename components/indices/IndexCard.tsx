@@ -39,37 +39,41 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  // 24h fetch — used for current price and 24h return on the card.
-  const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+  // 90d fetch — same as detail view, then slice client-side for 24h
+  // This ensures 24h return matches the detail chart exactly
+  const { data: history90d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
     fetcher,
-    { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
   )
 
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
       return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
     }
-    const data = history24h?.data
+    const data = history90d?.data
     if (data && data.length > 0) {
       return data[data.length - 1].price.toFixed(4)
     }
     return Number.parseFloat(index.price).toFixed(4)
-  }, [history24h, liveTokenPrices, index.tokens, index.price])
+  }, [history90d, liveTokenPrices, index.tokens, index.price])
+
+  // Slice to last 24h (same logic as IndexDetailView)
+  const slice24h = useMemo(() => {
+    const data = history90d?.data
+    if (!data || data.length === 0) return []
+    const cutoff = Date.now() - 1 * 24 * 60 * 60 * 1000
+    const sliced = data.filter(d => d.timestamp >= cutoff)
+    return sliced.length > 1 ? sliced : data
+  }, [history90d])
 
   const return24h = useMemo(() => {
-    const data = history24h?.data
-    if (!data || data.length < 2) return null
-    
-    // For 24h data, use first price (oldest) and last price (current)
-    const firstPrice = data[0].price
-    const lastPrice = data[data.length - 1].price
-    
-    if (!firstPrice || firstPrice === 0) return null
-    
-    const change = ((lastPrice - firstPrice) / firstPrice) * 100
-    return change
-  }, [history24h])
+    if (slice24h.length < 2) return null
+    const first = slice24h[0].price
+    const last = slice24h[slice24h.length - 1].price
+    if (!first || first === 0) return null
+    return ((last - first) / first) * 100
+  }, [slice24h])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
