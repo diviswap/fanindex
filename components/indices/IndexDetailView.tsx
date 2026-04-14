@@ -33,24 +33,18 @@ interface HistoryResponse {
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 // Helper to calculate return percentage from historical data
-function calculateReturn(data: HistoricalDataPoint[] | undefined, daysBack: number): number | null {
-  if (!data || data.length < 2) return null
-  
-  const now = Date.now()
-  const targetTime = now - daysBack * 24 * 60 * 60 * 1000
-  
-  // Find closest data point to target time
-  const startPoint = data.find((d, i) => {
-    const nextPoint = data[i + 1]
-    if (!nextPoint) return true
-    return d.timestamp <= targetTime && nextPoint.timestamp > targetTime
-  }) || data[0]
-  
-  const endPoint = data[data.length - 1]
-  
-  if (!startPoint || !endPoint || startPoint.price === 0) return null
-  
-  return ((endPoint.price - startPoint.price) / startPoint.price) * 100
+function sliceByDays(data: HistoricalDataPoint[], daysBack: number): HistoricalDataPoint[] {
+  const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
+  const sliced = data.filter(d => d.timestamp >= cutoff)
+  return sliced.length > 1 ? sliced : data
+}
+
+function returnFromSlice(slice: HistoricalDataPoint[]): number | null {
+  if (slice.length < 2) return null
+  const first = slice[0].price
+  const last = slice[slice.length - 1].price
+  if (!first) return null
+  return ((last - first) / first) * 100
 }
 
 export function IndexDetailView({ index }: IndexDetailViewProps) {
@@ -84,34 +78,28 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     return Number.parseFloat(index.price).toFixed(4)
   }, [historyData, liveTokenPrices, index.tokens, index.price])
 
-  // Slice the 90-day dataset to the selected period client-side
-  const filteredData = useMemo(() => {
+  // Pre-compute all four slices from the single 90d dataset
+  const slices = useMemo(() => {
     const all = historyData?.data
-    if (!all || all.length === 0) return []
-    const now = Date.now()
-    const periodMs: Record<typeof timePeriod, number> = {
-      "24h": 1 * 24 * 60 * 60 * 1000,
-      "7d":  7 * 24 * 60 * 60 * 1000,
-      "30d": 30 * 24 * 60 * 60 * 1000,
-      "90d": 90 * 24 * 60 * 60 * 1000,
-    }
-    const cutoff = now - periodMs[timePeriod]
-    const sliced = all.filter(d => d.timestamp >= cutoff)
-    return sliced.length > 1 ? sliced : all
-  }, [historyData, timePeriod])
-
-  // Calculate real returns from the same 90d dataset
-  const returns = useMemo(() => {
-    const data = historyData?.data
+    if (!all || all.length === 0) return { "24h": [], "7d": [], "30d": [], "90d": [] }
     return {
-      "24h": calculateReturn(data, 1),
-      "7d":  calculateReturn(data, 7),
-      "30d": calculateReturn(data, 30),
-      "90d": data && data.length >= 2
-        ? ((data[data.length - 1].price - data[0].price) / data[0].price) * 100
-        : null,
+      "24h": sliceByDays(all, 1),
+      "7d":  sliceByDays(all, 7),
+      "30d": sliceByDays(all, 30),
+      "90d": sliceByDays(all, 90),
     }
   }, [historyData])
+
+  // Chart uses the slice for the selected period
+  const filteredData = slices[timePeriod]
+
+  // Returns are derived from the exact same slices the chart uses
+  const returns = useMemo(() => ({
+    "24h": returnFromSlice(slices["24h"]),
+    "7d":  returnFromSlice(slices["7d"]),
+    "30d": returnFromSlice(slices["30d"]),
+    "90d": returnFromSlice(slices["90d"]),
+  }), [slices])
 
   // ── Live aggregate stats from CoinGecko prices ──────────────────────────
   const liveStats = useMemo(() => {
