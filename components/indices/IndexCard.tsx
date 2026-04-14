@@ -63,7 +63,7 @@ export function IndexCard({ index }: IndexCardProps) {
     const data = history90d?.data
     if (!data || data.length === 0) return []
     const cutoff = Date.now() - 1 * 24 * 60 * 60 * 1000
-    const sliced = data.filter(d => d.timestamp >= cutoff)
+    const sliced = data.filter((d: { timestamp: number; date: string; price: number; volume: number }) => d.timestamp >= cutoff)
     return sliced.length > 1 ? sliced : data
   }, [history90d])
 
