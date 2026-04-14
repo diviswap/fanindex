@@ -11,7 +11,9 @@ import {
   Layers,
   Hash,
   Coins,
+  Share2,
 } from "lucide-react"
+import { ShareCardModal } from "@/components/share/ShareCardModal"
 import { useState, useMemo } from "react"
 import { RedeemDialog } from "./RedeemDialog"
 import { BuyIndexDialog } from "@/components/indices/BuyIndexDialog"
@@ -110,6 +112,7 @@ export function PortfolioView() {
     totalValueCHZ: number
   } | null>(null)
   const [selectedIndexToBuy, setSelectedIndexToBuy] = useState<IndexData | null>(null)
+  const [showSharePortfolio, setShowSharePortfolio] = useState(false)
   const [recentTxs, setRecentTxs] = useState<{
     id: string
     type: "buy" | "sell" | "withdraw"
@@ -355,8 +358,18 @@ export function PortfolioView() {
               )}
               <div className="text-xs text-muted-foreground font-medium">NFTs + CHZ + Tokens</div>
             </div>
-            <div className="p-3 rounded-xl bg-success/10 border border-success/20">
-              <TrendingUp className="h-6 w-6 text-success" />
+            <div className="flex flex-col items-end gap-2">
+              <div className="p-3 rounded-xl bg-success/10 border border-success/20">
+                <TrendingUp className="h-6 w-6 text-success" />
+              </div>
+              <button
+                onClick={() => setShowSharePortfolio(true)}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-success transition-colors font-medium"
+                title="Share portfolio"
+              >
+                <Share2 className="h-3 w-3" />
+                Share
+              </button>
             </div>
           </div>
         </div>
@@ -461,6 +474,7 @@ export function PortfolioView() {
                 tokenPrices={tokenPrices}
                 onSell={handleSell}
                 onBuy={handleBuyMore}
+                walletAddress={address}
               />
             ))}
           </div>
@@ -710,6 +724,20 @@ export function PortfolioView() {
           onSuccess={() => handleTransactionSuccess("sell", selectedPosition?.nftId)}
         />
       )}
+
+      <ShareCardModal
+        open={showSharePortfolio}
+        onOpenChange={setShowSharePortfolio}
+        walletAddress={address}
+        data={{
+          type: "portfolio",
+          totalValue: portfolioStats.totalValue,
+          nftValue: portfolioStats.totalValue - portfolioStats.chzValue - (userFanTokens.reduce((s, t) => s + t.valueInCHZ, 0)),
+          chzBalance: portfolioStats.chzValue,
+          fanTokensValue: userFanTokens.reduce((s, t) => s + t.valueInCHZ, 0),
+          positionsCount: holdings.length,
+        }}
+      />
     </div>
   )
 }

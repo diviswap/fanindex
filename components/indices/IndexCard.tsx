@@ -2,9 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
-import { TrendingUp, Users, BarChart3, ArrowUpRight, Info } from "lucide-react"
+import { TrendingUp, Users, Share2, ArrowUpRight, Info } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
+import { ShareCardModal } from "@/components/share/ShareCardModal"
 import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
@@ -29,6 +30,7 @@ interface IndexCardProps {
 
 export function IndexCard({ index }: IndexCardProps) {
   const [showBuyDialog, setShowBuyDialog] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
@@ -177,9 +179,14 @@ export function IndexCard({ index }: IndexCardProps) {
                 <Button
                   variant="outline"
                   className="border-border bg-card/50 text-foreground hover:bg-muted h-12 w-12 p-0 rounded-xl"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowShareModal(true)
+                  }}
+                  title="Share this index"
                 >
-                  <BarChart3 className="h-5 w-5" />
+                  <Share2 className="h-5 w-5" />
                 </Button>
               </div>
             </div>
@@ -188,6 +195,11 @@ export function IndexCard({ index }: IndexCardProps) {
       </TooltipProvider>
 
       <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
+      <ShareCardModal
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+        data={{ type: "index", index, livePrice: displayPrice }}
+      />
     </>
   )
 }

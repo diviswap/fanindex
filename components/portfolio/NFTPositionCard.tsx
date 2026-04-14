@@ -1,25 +1,29 @@
 "use client"
 
+import { useState } from "react"
 import { formatUnits } from "viem"
 import { Button } from "@/components/ui/button"
-import { TrendingDown, TrendingUp, Coins, ExternalLink } from "lucide-react"
+import { TrendingDown, TrendingUp, Coins, ExternalLink, Share2 } from "lucide-react"
 import { OnChainBadge } from "./OnChainBadge"
 import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import type { TokenPrice } from "@/lib/hooks/use-token-prices"
+import { ShareCardModal } from "@/components/share/ShareCardModal"
 
 interface NFTPositionCardProps {
   holding: NFTHolding
   tokenPrices: TokenPrice[]
   onSell: (holding: NFTHolding) => void
   onBuy?: (holding: NFTHolding) => void
+  walletAddress?: string
 }
 
 const VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
 
-export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy }: NFTPositionCardProps) {
+export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAddress }: NFTPositionCardProps) {
   const { tokenId, indexName, tokenAddresses, tokenAmounts } = holding
+  const [showShareModal, setShowShareModal] = useState(false)
 
   // Build per-token rows with live CHZ prices
   const tokenRows = tokenAddresses.map((addr, i) => {
@@ -48,6 +52,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy }: NFTPosi
   const chiliscanUrl = `https://chiliscan.com/token/0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9?a=${tokenId.toString()}`
 
   return (
+    <>
     <div className="relative border border-border bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-lg hover:border-success/30 transition-all duration-300 group">
       {/* Video background */}
       <div className="absolute inset-0 opacity-20 dark:opacity-15 pointer-events-none">
@@ -167,6 +172,15 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy }: NFTPosi
             <TrendingDown className="h-3.5 w-3.5 mr-1.5" />
             Sell
           </Button>
+          <Button
+            onClick={() => setShowShareModal(true)}
+            variant="outline"
+            size="sm"
+            className="border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted font-semibold transition-colors h-9 w-9 p-0"
+            title="Share position"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+          </Button>
           <a
             href={chiliscanUrl}
             target="_blank"
@@ -179,5 +193,18 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy }: NFTPosi
         </div>
       </div>
     </div>
+    <ShareCardModal
+      open={showShareModal}
+      onOpenChange={setShowShareModal}
+      walletAddress={walletAddress}
+      data={{
+        type: "position",
+        tokenId: tokenId.toString(),
+        indexName,
+        totalValueCHZ,
+        tokenRows,
+      }}
+    />
+    </>
   )
 }
