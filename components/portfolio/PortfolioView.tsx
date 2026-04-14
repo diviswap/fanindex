@@ -158,15 +158,13 @@ export function PortfolioView() {
   // ── Fan Token balances (read on-chain ERC20 balances) ────────────────────────
   // Get tokens with valid contract addresses
   const tokensWithAddresses = useMemo(() => {
-    return FAN_TOKENS.filter(
-      (t) => t.contractAddress && t.contractAddress !== "0x0000000000000000000000000000000000000000"
-    )
+    return FAN_TOKENS.filter((t) => !!t.unwrapped)
   }, [])
 
   // Read all fan token balances in a single multicall
   const { data: fanTokenBalances, isLoading: isLoadingFanTokens } = useReadContracts({
     contracts: tokensWithAddresses.map((token) => ({
-      address: token.contractAddress as `0x${string}`,
+      address: token.unwrapped as `0x${string}`,
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [address as `0x${string}`],
@@ -184,7 +182,7 @@ export function PortfolioView() {
       symbol: string
       name: string
       icon?: string
-      contractAddress: string
+      address: string
       balance: number
       priceInCHZ: number
       valueInCHZ: number
@@ -203,7 +201,7 @@ export function PortfolioView() {
             symbol: token.symbol,
             name: token.name,
             icon: token.icon,
-            contractAddress: token.contractAddress,
+            address: token.unwrapped!,
             balance,
             priceInCHZ,
             valueInCHZ: balance * priceInCHZ,
