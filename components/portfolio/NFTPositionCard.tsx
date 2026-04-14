@@ -2,7 +2,7 @@
 
 import { formatUnits } from "viem"
 import { Button } from "@/components/ui/button"
-import { TrendingDown, Coins, ExternalLink } from "lucide-react"
+import { TrendingDown, TrendingUp, Coins, ExternalLink } from "lucide-react"
 import { OnChainBadge } from "./OnChainBadge"
 import { getTokenByAddress } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
@@ -12,12 +12,13 @@ interface NFTPositionCardProps {
   holding: NFTHolding
   tokenPrices: TokenPrice[]
   onSell: (holding: NFTHolding) => void
+  onBuy?: (holding: NFTHolding) => void
 }
 
 const VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
 
-export function NFTPositionCard({ holding, tokenPrices, onSell }: NFTPositionCardProps) {
+export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy }: NFTPositionCardProps) {
   const { tokenId, indexName, tokenAddresses, tokenAmounts } = holding
 
   // Build per-token rows with live CHZ prices
@@ -88,54 +89,75 @@ export function NFTPositionCard({ holding, tokenPrices, onSell }: NFTPositionCar
           </div>
         </div>
 
-        {/* Token breakdown */}
+        {/* Token breakdown - Composition */}
         <div className="rounded-xl bg-muted/40 border border-border/60 overflow-hidden">
-          <div className="grid grid-cols-3 px-3 py-2 border-b border-border/60">
-            <span className="text-xs font-semibold text-muted-foreground">Token</span>
-            <span className="text-xs font-semibold text-muted-foreground text-right">Amount</span>
-            <span className="text-xs font-semibold text-muted-foreground text-right">Value (CHZ)</span>
+          <div className="px-3 py-2 border-b border-border/60 bg-muted/30">
+            <span className="text-xs font-semibold text-muted-foreground">Composition</span>
           </div>
-          {tokenRows.map((row) => (
-            <div
-              key={row.addr}
-              className="grid grid-cols-3 px-3 py-2.5 border-b border-border/30 last:border-0 hover:bg-muted/30 transition-colors"
-            >
-              <div className="flex items-center gap-2 min-w-0">
-                {row.icon ? (
-                  <img
-                    src={row.icon}
-                    alt={row.symbol}
-                    className="w-5 h-5 rounded-full object-contain shrink-0"
-                  />
-                ) : (
-                  <div className="w-5 h-5 rounded-full bg-success/20 border border-success/30 flex items-center justify-center shrink-0">
-                    <Coins className="h-3 w-3 text-success" />
+          <div className="divide-y divide-border/30">
+            {tokenRows.map((row) => (
+              <div
+                key={row.addr}
+                className="px-3 py-2.5 hover:bg-muted/30 transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  {row.icon ? (
+                    <img
+                      src={row.icon}
+                      alt={row.symbol}
+                      className="w-5 h-5 rounded-full object-contain shrink-0"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-success/20 border border-success/30 flex items-center justify-center shrink-0">
+                      <Coins className="h-3 w-3 text-success" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-sm font-bold text-foreground">
+                        {row.symbol}
+                      </span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {row.name}
+                      </span>
+                    </div>
                   </div>
-                )}
-                <span className="text-xs font-bold text-foreground font-mono truncate">
-                  {row.symbol}
-                </span>
+                </div>
+                <div className="flex items-center justify-between pl-7 text-xs">
+                  <span className="text-muted-foreground font-mono">
+                    {row.addr.slice(0, 6)}...{row.addr.slice(-4)}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-foreground tabular-nums">
+                      {row.amount > 0
+                        ? row.amount < 0.001
+                          ? row.amount.toExponential(2)
+                          : row.amount.toFixed(4)
+                        : "--"}
+                    </span>
+                    <span className={`font-mono tabular-nums ${row.valueInCHZ > 0 ? "text-success" : "text-muted-foreground"}`}>
+                      {row.valueInCHZ > 0 ? `${row.valueInCHZ.toFixed(3)} CHZ` : "--"}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="text-right">
-                <span className="text-xs font-mono text-foreground tabular-nums">
-                  {row.amount > 0
-                    ? row.amount < 0.001
-                      ? row.amount.toExponential(2)
-                      : row.amount.toFixed(4)
-                    : "--"}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className={`text-xs font-mono tabular-nums ${row.valueInCHZ > 0 ? "text-success" : "text-muted-foreground"}`}>
-                  {row.valueInCHZ > 0 ? row.valueInCHZ.toFixed(3) : "--"}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Footer actions */}
         <div className="flex items-center gap-2 pt-1">
+          {onBuy && (
+            <Button
+              onClick={() => onBuy(holding)}
+              variant="outline"
+              size="sm"
+              className="flex-1 border-success/40 bg-card text-success hover:bg-success/10 hover:text-success hover:border-success font-semibold transition-colors h-9"
+            >
+              <TrendingUp className="h-3.5 w-3.5 mr-1.5" />
+              Buy More
+            </Button>
+          )}
           <Button
             onClick={() => onSell(holding)}
             variant="outline"
@@ -143,7 +165,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell }: NFTPositionCar
             className="flex-1 border-destructive/40 bg-card text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive font-semibold transition-colors h-9"
           >
             <TrendingDown className="h-3.5 w-3.5 mr-1.5" />
-            Sell Position
+            Sell
           </Button>
           <a
             href={chiliscanUrl}
@@ -152,7 +174,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell }: NFTPositionCar
             className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-md border border-border bg-card text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border/80 transition-all"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">Chiliscan</span>
+            <span className="hidden sm:inline">View</span>
           </a>
         </div>
       </div>

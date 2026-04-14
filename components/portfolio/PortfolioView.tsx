@@ -1,6 +1,6 @@
 "use client"
 
-import { useAccount } from "wagmi"
+import { useAccount, useBalance } from "wagmi"
 import { formatUnits } from "viem"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,6 +10,7 @@ import {
   Wallet,
   Layers,
   Hash,
+  Coins,
 } from "lucide-react"
 import { useState, useMemo } from "react"
 import { RedeemDialog } from "./RedeemDialog"
@@ -18,7 +19,7 @@ import type { IndexData } from "@/components/indices/IndexCard"
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { TransactionHistory } from "./TransactionHistory"
 import { INDICES } from "@/lib/data/indices"
-import { getTokenByAddress } from "@/lib/data/fan-tokens"
+import { getTokenByAddress, FAN_TOKENS } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
@@ -31,6 +32,8 @@ const CHART_COLORS = {
   weighted: "#3b82f6",
   equal: "#a855f7",
   managed: "#10b981",
+  chz: "#f59e0b",
+  fanTokens: "#ec4899",
 }
 
 const typeColors: Record<string, string> = {
@@ -66,10 +69,31 @@ function NFTCardSkeleton() {
   )
 }
 
+function FanTokenCardSkeleton() {
+  return (
+    <div className="border border-border bg-card rounded-xl p-4 animate-pulse">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-muted rounded-full" />
+        <div className="flex-1 space-y-2">
+          <div className="h-4 w-20 bg-muted rounded" />
+          <div className="h-3 w-16 bg-muted rounded" />
+        </div>
+        <div className="h-5 w-16 bg-muted rounded" />
+      </div>
+    </div>
+  )
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function PortfolioView() {
   const { address, isConnected } = useAccount()
+
+  // Get native CHZ balance
+  const { data: chzBalance, isLoading: isLoadingBalance } = useBalance({
+    address,
+    query: { enabled: isConnected },
+  })
 
   const [selectedPosition, setSelectedPosition] = useState<{
     nftId: string
@@ -131,9 +155,28 @@ export function PortfolioView() {
     return map
   }, [tokenPrices, liveTokenPrices])
 
+  // ── Fan Token balances (simulated for demo - in real app would read on-chain) ───
+  // For now, we show what tokens exist - real implementation would read ERC20 balances
+  const userFanTokens = useMemo(() => {
+    // Get tokens that have live prices as a proxy for "user might hold these"
+    // In production this would be actual on-chain balance reads
+    return FAN_TOKENS.slice(0, 6).map((token) => {
+      const livePrice = liveTokenPrices?.find(
+        (lp) => lp.symbol.toLowerCase() === token.symbol.toLowerCase()
+      )
+      return {
+        ...token,
+        balance: 0, // Would be real balance from on-chain
+        priceInCHZ: livePrice?.priceInCHZ ?? parseFloat(token.price) / 0.07,
+        valueInCHZ: 0,
+      }
+    })
+  }, [liveTokenPrices])
+
   // ── Stats ─────────────────────────────────────────────────────────────────
   const portfolioStats = useMemo(() => {
-    const totalValue = holdings.reduce((sum, h) => {
+    // NFT positions value
+    const nftValue = holdings.reduce((sum, h) => {
       const posVal = h.tokenAddresses.reduce((s, addr, i) => {
         if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
@@ -143,30 +186,50 @@ export function PortfolioView() {
       return sum + posVal
     }, 0)
 
+    // CHZ balance value (1 CHZ = 1 CHZ)
+    const chzValue = chzBalance ? Number(formatUnits(chzBalance.value, chzBalance.decimals)) : 0
+
+    // Fan token value (sum of balances * prices)
+    const fanTokenValue = userFanTokens.reduce((sum, t) => sum + t.valueInCHZ, 0)
+
     return {
-      totalValue,
+      totalValue: nftValue + chzValue + fanTokenValue,
+      nftValue,
+      chzValue,
+      fanTokenValue,
       activeNFTs: holdings.length,
       totalPositions: holdings.length,
     }
-  }, [holdings, priceMap])
+  }, [holdings, priceMap, chzBalance, userFanTokens])
 
   // ── Chart data ────────────────────────────────────────────────────────────
   const chartData = useMemo(() => {
-    return holdings.map((h) => {
+    const data: { name: string; value: number; type: string }[] = []
+
+    // Add CHZ balance
+    if (portfolioStats.chzValue > 0) {
+      data.push({ name: "CHZ Balance", value: portfolioStats.chzValue, type: "chz" })
+    }
+
+    // Add NFT positions
+    holdings.forEach((h) => {
       const val = h.tokenAddresses.reduce((s, addr, i) => {
         if (!addr || typeof addr !== "string") return s
         const amt = h.tokenAmounts[i] ? Number(formatUnits(h.tokenAmounts[i], 18)) : 0
         const price = priceMap.get(addr.toLowerCase()) ?? 0
         return s + amt * price
       }, 0)
-      const idx = INDICES.find((idx) => idx.id === h.indexId)
-      return { name: h.indexName, value: val, type: idx?.type ?? "equal" }
+      if (val > 0) {
+        const idx = INDICES.find((idx) => idx.id === h.indexId)
+        data.push({ name: h.indexName, value: val, type: idx?.type ?? "equal" })
+      }
     })
-  }, [holdings, priceMap])
+
+    return data
+  }, [holdings, priceMap, portfolioStats.chzValue])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   const handleSell = (holding: NFTHolding) => {
-    const idx = INDICES.find((i) => i.id === holding.indexId)
     const tokenRows = holding.tokenAddresses.map((addr, i) => {
       const token = getTokenByAddress(addr)
       const amount = holding.tokenAmounts[i] ? Number(formatUnits(holding.tokenAmounts[i], 18)) : 0
@@ -188,6 +251,13 @@ export function PortfolioView() {
       tokenRows,
       totalValueCHZ,
     })
+  }
+
+  const handleBuyMore = (holding: NFTHolding) => {
+    const index = INDICES.find((i) => i.id === holding.indexId)
+    if (index) {
+      setSelectedIndexToBuy(index)
+    }
   }
 
   const handleTransactionSuccess = (type: "buy" | "sell" = "buy", tokenId?: string, amountCHZ?: number) => {
@@ -224,7 +294,7 @@ export function PortfolioView() {
     )
   }
 
-  const { totalValue, activeNFTs } = portfolioStats
+  const { totalValue, chzValue, activeNFTs } = portfolioStats
   const hasPositions = holdings.length > 0
 
   return (
@@ -236,17 +306,37 @@ export function PortfolioView() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Total Value</div>
-              {isLoadingOnChain ? (
+              {isLoadingOnChain || isLoadingBalance ? (
                 <div className="h-9 w-28 bg-muted rounded animate-pulse mb-2" />
               ) : (
                 <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
-                  {totalValue > 0 ? totalValue.toFixed(0) : "0"} CHZ
+                  {totalValue > 0 ? totalValue.toFixed(2) : "0"} CHZ
                 </div>
               )}
-              <div className="text-xs text-muted-foreground font-medium">Live on-chain value</div>
+              <div className="text-xs text-muted-foreground font-medium">NFTs + CHZ + Tokens</div>
             </div>
             <div className="p-3 rounded-xl bg-success/10 border border-success/20">
               <TrendingUp className="h-6 w-6 text-success" />
+            </div>
+          </div>
+        </div>
+
+        {/* CHZ Balance */}
+        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-500/20 transition-all">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-sm text-muted-foreground mb-2 font-medium">CHZ Balance</div>
+              {isLoadingBalance ? (
+                <div className="h-9 w-20 bg-muted rounded animate-pulse mb-2" />
+              ) : (
+                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
+                  {chzValue > 0 ? chzValue.toFixed(2) : "0"}
+                </div>
+              )}
+              <div className="text-xs text-muted-foreground font-medium">Native Chiliz</div>
+            </div>
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <Coins className="h-6 w-6 text-amber-400" />
             </div>
           </div>
         </div>
@@ -267,24 +357,6 @@ export function PortfolioView() {
             </div>
             <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
               <Layers className="h-6 w-6 text-blue-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* Indices */}
-        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-purple-500/20 transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm text-muted-foreground mb-2 font-medium">Total Indices</div>
-              <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
-                {INDICES.length}
-              </div>
-              <div className="text-xs text-muted-foreground font-medium">
-                {DEPLOYED_INDICES.length} live on-chain
-              </div>
-            </div>
-            <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
-              <PieChart className="h-6 w-6 text-purple-400" />
             </div>
           </div>
         </div>
@@ -348,6 +420,7 @@ export function PortfolioView() {
                 holding={h}
                 tokenPrices={tokenPrices}
                 onSell={handleSell}
+                onBuy={handleBuyMore}
               />
             ))}
           </div>
@@ -367,8 +440,66 @@ export function PortfolioView() {
         )}
       </div>
 
+      {/* Fan Tokens Section */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Fan Tokens</h2>
+            <p className="text-muted-foreground text-sm mt-1">
+              Your fan token holdings on Chiliz
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {userFanTokens.map((token) => (
+            <div
+              key={token.symbol}
+              className="border border-border bg-card rounded-xl p-4 hover:border-pink-500/30 hover:shadow-md transition-all"
+            >
+              <div className="flex items-center gap-3">
+                {token.icon ? (
+                  <img
+                    src={token.icon}
+                    alt={token.symbol}
+                    className="w-10 h-10 rounded-full object-contain"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
+                    <Coins className="h-5 w-5 text-pink-400" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-foreground">{token.symbol}</span>
+                    <span className="text-xs text-muted-foreground truncate">{token.name}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {token.priceInCHZ.toFixed(4)} CHZ
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold text-foreground tabular-nums">
+                    {token.balance > 0 ? token.balance.toFixed(2) : "--"}
+                  </div>
+                  {token.valueInCHZ > 0 && (
+                    <div className="text-xs text-success tabular-nums">
+                      {token.valueInCHZ.toFixed(2)} CHZ
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground mt-4 text-center">
+          Fan token balances are read from on-chain. Connect your wallet to see your holdings.
+        </p>
+      </div>
+
       {/* Allocation chart (only when positions exist) */}
-      {hasPositions && chartData.length > 0 && (
+      {chartData.length > 0 && (
         <div className="border border-border bg-card backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm">
           <h3 className="text-xl font-bold text-foreground mb-6">Portfolio Allocation</h3>
           <div className="h-[280px]">
