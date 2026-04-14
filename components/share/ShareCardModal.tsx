@@ -245,7 +245,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
+      <DialogContent className="max-w-xl w-[calc(100vw-2rem)] sm:w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl max-h-[90dvh] overflow-y-auto">
 
         {/*
           Capture target: visibility:hidden keeps it in document flow so
@@ -270,11 +270,11 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
         </div>
 
         {/* Header */}
-        <DialogHeader className="flex-row items-center justify-between px-5 pt-5 pb-4 border-b border-border">
+        <DialogHeader className="flex-row items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3 sm:pb-4 border-b border-border">
           <DialogTitle className="text-base font-bold text-foreground">Share Card</DialogTitle>
         </DialogHeader>
 
-        <div className="p-5 space-y-5">
+        <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
 
           {/* Preview: show generated PNG when ready, otherwise scaled live preview */}
           <div className="relative w-full rounded-xl overflow-hidden border border-border/40" style={{ paddingBottom: "100%" }}>
@@ -365,33 +365,33 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-2 pt-4 border-t border-border">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-4 border-t border-border">
             <Button
               onClick={handleCopy}
               disabled={isCapturing}
               variant="outline"
-              className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted hover:border-success/30"
+              className="border-border bg-card h-10 sm:h-11 rounded-xl font-semibold text-xs sm:text-sm hover:bg-muted hover:border-success/30"
             >
               {isCapturing ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
               ) : copyDone ? (
-                <Check className="h-4 w-4 mr-2 text-success" />
+                <Check className="h-3.5 w-3.5 mr-1.5 text-success" />
               ) : (
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="h-3.5 w-3.5 mr-1.5" />
               )}
-              {copyDone ? "Copied!" : "Copy Image"}
+              {copyDone ? "Copied!" : "Copy"}
             </Button>
 
             <Button
               onClick={handleDownload}
               disabled={isCapturing}
               variant="outline"
-              className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted"
+              className="border-border bg-card h-10 sm:h-11 rounded-xl font-semibold text-xs sm:text-sm hover:bg-muted"
             >
               {downloadDone ? (
-                <Check className="h-4 w-4 mr-2 text-success" />
+                <Check className="h-3.5 w-3.5 mr-1.5 text-success" />
               ) : (
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-3.5 w-3.5 mr-1.5" />
               )}
               {downloadDone ? "Saved!" : "Download"}
             </Button>
@@ -399,9 +399,9 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
             <Button
               onClick={handleShareX}
               disabled={isCapturing}
-              className="flex-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 font-bold h-11 rounded-xl"
+              className="col-span-2 sm:col-span-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 font-bold h-10 sm:h-11 rounded-xl text-xs sm:text-sm"
             >
-              <svg viewBox="0 0 24 24" className="h-4 w-4 mr-2 fill-current shrink-0" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 mr-1.5 fill-current shrink-0" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
               </svg>
               Post on X
