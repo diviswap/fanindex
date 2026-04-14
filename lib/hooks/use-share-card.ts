@@ -6,6 +6,7 @@ export interface UseShareCardReturn {
   cardRef: React.RefObject<HTMLDivElement | null>
   status: ShareCardStatus
   dataUrl: string | null
+  isDark: boolean
   capture: () => Promise<string | null>
   downloadPng: (filename?: string) => Promise<void>
   copyToClipboard: () => Promise<boolean>
@@ -13,49 +14,62 @@ export interface UseShareCardReturn {
   reset: () => void
 }
 
-/**
- * Convert base64 dataURL to Blob for clipboard operations
- */
+/** Read the app's active theme from the <html> class — matches Tailwind dark mode */
+function detectIsDark(): boolean {
+  if (typeof window === "undefined") return true
+  return document.documentElement.classList.contains("dark")
+}
+
+/** Convert a base64 dataURL to a Blob without using fetch() */
 function dataUrlToBlob(dataUrl: string): Blob {
-  const arr = dataUrl.split(",")
-  const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png"
-  const bstr = atob(arr[1])
-  const n = bstr.length
-  const u8arr = new Uint8Array(n)
-  for (let i = 0; i < n; i++) {
-    u8arr[i] = bstr.charCodeAt(i)
+  const [header, data] = dataUrl.split(",")
+  const mime = header.match(/:(.*?);/)?.[1] ?? "image/png"
+  const binary = atob(data)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
   }
-  return new Blob([u8arr], { type: mime })
+  return new Blob([bytes], { type: mime })
 }
 
 export function useShareCard(): UseShareCardReturn {
   const cardRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<ShareCardStatus>("idle")
   const [dataUrl, setDataUrl] = useState<string | null>(null)
-  // Keep a ref so callbacks always read the latest value without stale closures
   const dataUrlRef = useRef<string | null>(null)
+  const [isDark, setIsDark] = useState<boolean>(true)
 
   const capture = useCallback(async (): Promise<string | null> => {
-    // Return cached result immediately — never re-capture
     if (dataUrlRef.current) return dataUrlRef.current
     if (!cardRef.current) return null
+
+    // Detect and store theme at capture time
+    const dark = detectIsDark()
+    setIsDark(dark)
+
     setStatus("capturing")
 
     try {
       const html2canvas = (await import("html2canvas")).default
+
       const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
+        scale: 1,             // element is already 1080x1080 — no extra scaling needed
         useCORS: true,
         allowTaint: false,
         backgroundColor: null,
         logging: false,
         width: 1080,
         height: 1080,
+        scrollX: 0,
+        scrollY: 0,
         windowWidth: 1080,
         windowHeight: 1080,
+        ignoreElements: (el) => {
+          // Skip any ResizeObserver-attached wrappers that might interfere
+          return el.tagName === "SCRIPT" || el.tagName === "STYLE"
+        },
       })
-      
-      // Convert to PNG dataURL
+
       const url = canvas.toDataURL("image/png", 1.0)
       dataUrlRef.current = url
       setDataUrl(url)
@@ -70,13 +84,14 @@ export function useShareCard(): UseShareCardReturn {
 
   const downloadPng = useCallback(
     async (filename = "fanindex-share.png") => {
-      // Use ref so we always read the latest cached url, even if state hasn't re-rendered yet
       const url = dataUrlRef.current ?? (await capture())
       if (!url) return
       const a = document.createElement("a")
       a.href = url
       a.download = filename
+      document.body.appendChild(a)
       a.click()
+      document.body.removeChild(a)
     },
     [capture]
   )
@@ -87,12 +102,23 @@ export function useShareCard(): UseShareCardReturn {
 
     try {
       const blob = dataUrlToBlob(url)
+      // Use ClipboardItem with a Promise to work around async clipboard restrictions
       await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
+        new ClipboardItem({ "image/png": Promise.resolve(blob) }),
       ])
       return true
     } catch (err) {
       console.error("[useShareCard] clipboard error:", err)
+      // Fallback: trigger download so user at least gets the image
+      const url2 = dataUrlRef.current
+      if (url2) {
+        const a = document.createElement("a")
+        a.href = url2
+        a.download = "fanindex-share.png"
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
       return false
     }
   }, [capture])
@@ -108,5 +134,5 @@ export function useShareCard(): UseShareCardReturn {
     setDataUrl(null)
   }, [])
 
-  return { cardRef, status, dataUrl, capture, downloadPng, copyToClipboard, shareToX, reset }
+  return { cardRef, status, dataUrl, isDark, capture, downloadPng, copyToClipboard, shareToX, reset }
 }

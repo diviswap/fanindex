@@ -5,6 +5,7 @@ interface PortfolioShareCardProps {
   fanTokensValue: number
   positionsCount: number
   walletAddress?: string
+  isDark?: boolean
   cardRef: React.RefObject<HTMLDivElement | null>
 }
 
@@ -15,40 +16,45 @@ export function PortfolioShareCard({
   fanTokensValue,
   positionsCount,
   walletAddress,
+  isDark = true,
   cardRef,
 }: PortfolioShareCardProps) {
-  // Detect theme from system preference
-  const isDark = typeof window !== 'undefined' 
-    ? window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true
-    : true
-
-  const colors = isDark ? {
-    background: "linear-gradient(135deg, #0c0c0c 0%, #0f0f0f 100%)",
-    text: "#f9fafb",
-    muted: "#6b7280",
-    border: "#1a1a1a",
-    grid: "radial-gradient(circle at 1px 1px, #ffffff06 1px, transparent 0)",
-    cardBg: "#161616",
-    cardBorder: "#252525",
-    divider: "#1f2937",
-  } : {
-    background: "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)",
-    text: "#1f2937",
-    muted: "#6b7280",
-    border: "#e5e7eb",
-    grid: "radial-gradient(circle at 1px 1px, #00000003 1px, transparent 0)",
-    cardBg: "#e5e7eb",
-    cardBorder: "#d1d5db",
-    divider: "#d1d5db",
-  }
+  const colors = isDark
+    ? {
+        backgroundGradient: "linear-gradient(160deg, #111114 0%, #0a0a0a 60%, #0c0f0c 100%)",
+        text: "#f9fafb",
+        subtext: "#9ca3af",
+        muted: "#4b5563",
+        divider: "#1f2937",
+        cardBg: "#111827",
+        cardBorder: "#1f2937",
+        footerBg: "#050505",
+      }
+    : {
+        backgroundGradient: "linear-gradient(160deg, #f8fafc 0%, #ffffff 60%, #f0fdf4 100%)",
+        text: "#111827",
+        subtext: "#4b5563",
+        muted: "#9ca3af",
+        divider: "#e5e7eb",
+        cardBg: "#f9fafb",
+        cardBorder: "#e5e7eb",
+        footerBg: "#f9fafb",
+      }
 
   const accent = "#10b981"
+  const blueAccent = "#3b82f6"
+  const purpleAccent = "#a855f7"
   const shortAddr = walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : null
 
-  // Calculate percentages
   const nftPct = totalValue > 0 ? Math.round((nftValue / totalValue) * 100) : 0
   const chzPct = totalValue > 0 ? Math.round((chzBalance / totalValue) * 100) : 0
   const tokensPct = totalValue > 0 ? Math.round((fanTokensValue / totalValue) * 100) : 0
+
+  const segments: { value: number; color: string; label: string; pct: number }[] = [
+    { value: nftValue, color: accent, label: "NFT Positions", pct: nftPct },
+    { value: chzBalance, color: blueAccent, label: "CHZ Balance", pct: chzPct },
+    { value: fanTokensValue, color: purpleAccent, label: "Fan Tokens", pct: tokensPct },
+  ].filter((s) => s.value > 0)
 
   return (
     <div
@@ -57,185 +63,144 @@ export function PortfolioShareCard({
       style={{
         width: 1080,
         height: 1080,
-        background: colors.background,
-        borderRadius: 32,
+        background: colors.backgroundGradient,
+        borderRadius: 0,
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         display: "flex",
         flexDirection: "column",
         position: "relative",
         overflow: "hidden",
         boxSizing: "border-box",
-        border: `1px solid ${colors.border}`,
       }}
     >
       {/* Top accent bar */}
-      <div style={{ height: 6, background: `linear-gradient(90deg, ${accent}, ${accent}44, transparent)` }} />
+      <div style={{ height: 8, background: `linear-gradient(90deg, ${accent} 0%, ${blueAccent}80 50%, ${purpleAccent}40 100%)`, flexShrink: 0 }} />
 
-      {/* Subtle grid texture overlay */}
+      {/* Glow */}
       <div style={{
-        position: "absolute", inset: 0,
-        backgroundImage: colors.grid,
-        backgroundSize: "40px 40px",
+        position: "absolute", top: -160, right: -160, width: 560, height: 560,
+        background: `radial-gradient(circle, ${accent}18 0%, transparent 65%)`,
         pointerEvents: "none",
       }} />
 
-      {/* Glows */}
-      <div style={{
-        position: "absolute", top: -200, right: -200, width: 600, height: 600,
-        background: `radial-gradient(circle, ${accent}12 0%, transparent 60%)`,
-        pointerEvents: "none",
-      }} />
-      <div style={{
-        position: "absolute", bottom: -150, left: -150, width: 500, height: 500,
-        background: isDark
-          ? "radial-gradient(circle, #10b98110 0%, transparent 60%)"
-          : "radial-gradient(circle, #10b98108 0%, transparent 60%)",
-        pointerEvents: "none",
-      }} />
+      {/* Content */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "64px 72px 0 72px", position: "relative" }}>
 
-      <div style={{ padding: "48px 56px", position: "relative", flex: 1, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Header row */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 48 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/fi-logo.png"
               alt="FanIndex"
-              style={{ width: 40, height: 40, borderRadius: 8, objectFit: "contain", flexShrink: 0 }}
+              crossOrigin="anonymous"
+              style={{ width: 52, height: 52, borderRadius: 12, objectFit: "contain", flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: colors.text, letterSpacing: -0.3 }}>FanIndex</div>
-              <div style={{ fontSize: 10, color: colors.muted, fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: colors.text, letterSpacing: -0.5 }}>FanIndex</div>
+              <div style={{ fontSize: 14, color: colors.subtext, fontWeight: 500 }}>fanindex.pro</div>
             </div>
           </div>
           <div style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: 0.8,
-            color: accent, background: `${accent}15`,
-            border: `1.5px solid ${accent}40`,
-            borderRadius: 16, padding: "6px 14px",
-            textTransform: "uppercase",
+            fontSize: 14, fontWeight: 700, letterSpacing: 1.2,
+            color: accent, background: `${accent}18`, border: `1.5px solid ${accent}50`,
+            borderRadius: 100, padding: "10px 24px", textTransform: "uppercase",
           }}>
             My Portfolio
           </div>
         </div>
 
-        {/* Portfolio title */}
-        <div style={{ fontSize: 40, fontWeight: 800, color: colors.text, letterSpacing: -1.5, lineHeight: 1.1, marginBottom: 8 }}>
+        {/* Title + address */}
+        <div style={{ fontSize: 56, fontWeight: 900, color: colors.text, letterSpacing: -2, lineHeight: 1.05, marginBottom: 8 }}>
           My Portfolio
         </div>
         {shortAddr && (
-          <div style={{ fontSize: 12, color: colors.muted, fontFamily: "monospace", marginBottom: 20 }}>
+          <div style={{ fontSize: 16, color: colors.subtext, fontFamily: "monospace", marginBottom: 36 }}>
             {shortAddr}
           </div>
         )}
+        {!shortAddr && <div style={{ marginBottom: 36 }} />}
 
-        {/* Total value highlight */}
+        {/* Total value box */}
         <div style={{
-          background: `linear-gradient(135deg, ${accent}10 0%, ${accent}05 100%)`,
-          border: `1.5px solid ${accent}25`,
-          borderRadius: 16,
-          padding: "20px 24px",
-          marginBottom: 24,
+          background: isDark ? `${accent}10` : `${accent}08`,
+          border: `2px solid ${accent}40`,
+          borderRadius: 20,
+          padding: "32px 40px",
+          marginBottom: 44,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Total Portfolio Value</div>
-          <div style={{ fontSize: 36, fontWeight: 800, color: accent, letterSpacing: -0.8, fontVariantNumeric: "tabular-nums" }}>
-            {totalValue.toFixed(2)}
+          <div>
+            <div style={{ fontSize: 14, color: colors.muted, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>Total Portfolio Value</div>
+            <div style={{ fontSize: 56, fontWeight: 900, color: accent, letterSpacing: -2, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+              {totalValue.toFixed(2)}
+            </div>
           </div>
-          <div style={{ fontSize: 13, color: colors.muted, fontWeight: 600, marginTop: 3 }}>CHZ</div>
-          <div style={{ fontSize: 11, color: colors.muted, fontWeight: 600, marginTop: 6 }}>{positionsCount} active position{positionsCount !== 1 ? "s" : ""}</div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: `${accent}80`, letterSpacing: -0.5 }}>CHZ</div>
+            <div style={{ fontSize: 16, color: colors.muted, marginTop: 8 }}>
+              {positionsCount} position{positionsCount !== 1 ? "s" : ""}
+            </div>
+          </div>
         </div>
 
         {/* Breakdown grid */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>Portfolio Breakdown</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
-            {/* NFT Positions */}
-            <div style={{
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+          {[
+            { label: "NFT Positions", value: nftValue, color: accent, pct: nftPct },
+            { label: "CHZ Balance", value: chzBalance, color: blueAccent, pct: chzPct },
+            { label: "Fan Tokens", value: fanTokensValue, color: purpleAccent, pct: tokensPct },
+          ].map(({ label, value, color, pct }) => (
+            <div key={label} style={{
               background: colors.cardBg,
               border: `1.5px solid ${colors.cardBorder}`,
-              borderRadius: 12,
-              padding: "16px 18px",
+              borderRadius: 16,
+              padding: "22px 24px",
             }}>
-              <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 6 }}>NFT Positions</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: accent, letterSpacing: -0.6, fontVariantNumeric: "tabular-nums" }}>
-                {nftValue.toFixed(2)}
+              <div style={{ fontSize: 12, color: colors.muted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 10 }}>{label}</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color, letterSpacing: -0.6, fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+                {value.toFixed(2)}
               </div>
-              <div style={{ fontSize: 11, color: colors.muted, fontWeight: 600, marginTop: 6 }}>{nftPct}% of portfolio</div>
+              <div style={{ fontSize: 14, color: colors.muted, fontWeight: 500, marginTop: 4 }}>CHZ</div>
+              <div style={{ fontSize: 13, color, fontWeight: 700, marginTop: 8 }}>{pct}%</div>
             </div>
-
-            {/* CHZ Balance */}
-            <div style={{
-              background: colors.cardBg,
-              border: `1.5px solid ${colors.cardBorder}`,
-              borderRadius: 12,
-              padding: "16px 18px",
-            }}>
-              <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 6 }}>CHZ Balance</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#3b82f6", letterSpacing: -0.6, fontVariantNumeric: "tabular-nums" }}>
-                {chzBalance.toFixed(2)}
-              </div>
-              <div style={{ fontSize: 11, color: colors.muted, fontWeight: 600, marginTop: 6 }}>{chzPct}% of portfolio</div>
-            </div>
-
-            {/* Fan Tokens */}
-            <div style={{
-              background: colors.cardBg,
-              border: `1.5px solid ${colors.cardBorder}`,
-              borderRadius: 12,
-              padding: "16px 18px",
-              gridColumn: "1 / -1",
-            }}>
-              <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 0.8, textTransform: "uppercase", marginBottom: 6 }}>Fan Tokens Holdings</div>
-              <div style={{ fontSize: 24, fontWeight: 800, color: "#a855f7", letterSpacing: -0.6, fontVariantNumeric: "tabular-nums" }}>
-                {fanTokensValue.toFixed(2)}
-              </div>
-              <div style={{ fontSize: 11, color: colors.muted, fontWeight: 600, marginTop: 6 }}>{tokensPct}% of portfolio</div>
-            </div>
-          </div>
-
-          {/* Allocation bar */}
-          <div style={{ marginTop: "auto" }}>
-            <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", gap: 2 }}>
-              {nftValue > 0 && (
-                <div style={{ flex: nftValue, background: accent, borderRadius: 4 }} />
-              )}
-              {chzBalance > 0 && (
-                <div style={{ flex: chzBalance, background: "#3b82f6", borderRadius: 4 }} />
-              )}
-              {fanTokensValue > 0 && (
-                <div style={{ flex: fanTokensValue, background: "#a855f7", borderRadius: 4 }} />
-              )}
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12, gap: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
-                <div style={{ width: 6, height: 6, borderRadius: 1, background: accent, flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: colors.muted, fontWeight: 600, truncate: true }}>NFTs ({nftPct}%)</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
-                <div style={{ width: 6, height: 6, borderRadius: 1, background: "#3b82f6", flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: colors.muted, fontWeight: 600, truncate: true }}>CHZ ({chzPct}%)</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
-                <div style={{ width: 6, height: 6, borderRadius: 1, background: "#a855f7", flexShrink: 0 }} />
-                <span style={{ fontSize: 10, color: colors.muted, fontWeight: 600, truncate: true }}>Tokens ({tokensPct}%)</span>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
+
+        {/* Allocation bar */}
+        {segments.length > 0 && (
+          <div style={{ marginTop: 28 }}>
+            <div style={{ display: "flex", height: 10, borderRadius: 6, overflow: "hidden", gap: 3 }}>
+              {segments.map(({ value, color, label }) => (
+                <div key={label} style={{ flex: value, background: color, borderRadius: 6 }} />
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 24, marginTop: 14 }}>
+              {segments.map(({ color, label, pct }) => (
+                <div key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: 2, background: color, flexShrink: 0 }} />
+                  <span style={{ fontSize: 14, color: colors.subtext, fontWeight: 600 }}>{label} ({pct}%)</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "24px 56px",
-        borderTop: "1px solid #161616",
-        background: "linear-gradient(180deg, rgba(15,15,15,0) 0%, rgba(10,10,10,1) 100%)",
+        padding: "28px 72px",
+        marginTop: "auto",
+        borderTop: `1px solid ${colors.divider}`,
+        background: colors.footerBg,
+        flexShrink: 0,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981" }} />
-          <span style={{ fontSize: 13, color: "#4b5563", fontWeight: 600 }}>Powered by Chiliz Chain</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 10, height: 10, borderRadius: "50%", background: accent, boxShadow: `0 0 8px ${accent}` }} />
+          <span style={{ fontSize: 16, color: colors.subtext, fontWeight: 600 }}>Powered by Chiliz Chain</span>
         </div>
-        <span style={{ fontSize: 13, color: "#374151", fontWeight: 600 }}>fanindex.pro</span>
+        <span style={{ fontSize: 16, color: colors.subtext, fontWeight: 700, letterSpacing: -0.3 }}>fanindex.pro</span>
       </div>
     </div>
   )
