@@ -1,7 +1,8 @@
-import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
-
 interface PositionShareCardProps {
-  holding: NFTHolding
+  holding: {
+    tokenId: bigint
+    indexName: string
+  }
   totalValueCHZ: number
   tokenRows: Array<{ symbol: string; name: string; amount: number; valueInCHZ: number }>
   cardRef: React.RefObject<HTMLDivElement | null>
