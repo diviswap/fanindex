@@ -121,10 +121,15 @@ function AvailableIndexCard({
   const return24h = useMemo(() => {
     const data = history24h?.data
     if (!data || data.length < 2) return null
-    const first = data[0].price
-    const last = data[data.length - 1].price
-    if (!first) return null
-    return ((last - first) / first) * 100
+    
+    // For 24h data, use first price (oldest) and last price (current)
+    const firstPrice = data[0].price
+    const lastPrice = data[data.length - 1].price
+    
+    if (!firstPrice || firstPrice === 0) return null
+    
+    const change = ((lastPrice - firstPrice) / firstPrice) * 100
+    return change
   }, [history24h])
 
   return (

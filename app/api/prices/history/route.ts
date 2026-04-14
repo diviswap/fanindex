@@ -156,6 +156,23 @@ export async function GET(request: NextRequest) {
       })
       .sort((a, b) => a.timestamp - b.timestamp)
 
+    // For 24h data, ensure we have at least a 24h window by filtering old data
+    if (days === 1 && chartData.length > 0) {
+      const now = Date.now()
+      const oneDayAgo = now - 24 * 60 * 60 * 1000
+      const recentData = chartData.filter(d => d.timestamp >= oneDayAgo)
+      
+      // If we have recent data, use it; otherwise use what we have
+      if (recentData.length > 0) {
+        return NextResponse.json({
+          tokens: tokenSymbols,
+          days,
+          data: recentData,
+          source: "coingecko"
+        })
+      }
+    }
+
     return NextResponse.json({
       tokens: tokenSymbols,
       days,
