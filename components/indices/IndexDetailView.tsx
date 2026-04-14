@@ -500,6 +500,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
             <div className="space-y-3 sm:space-y-4">
               {renderReturn(returns["24h"], "24h")}
+              {renderReturn(returns["7d"], "7d")}
               {renderReturn(returns["30d"], "30d")}
               {renderReturn(returns["90d"], "90d")}
             </div>
