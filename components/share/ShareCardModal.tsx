@@ -309,28 +309,8 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
             {toggleRow}
           </div>
 
-          {/* Generate button — shown when image not yet captured */}
-          {!dataUrl && (
-            <Button
-              onClick={handleCapture}
-              disabled={isCapturing}
-              className="w-full bg-success hover:bg-success/90 text-black font-bold h-11 rounded-xl"
-            >
-              {isCapturing ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                "Generate Image"
-              )}
-            </Button>
-          )}
-
-          {/* Once ready: show Save + Share on X */}
-          {/* Action buttons */}
-          {dataUrl && <div className="flex gap-2 pt-4 border-t border-border">
-            {/* Save — downloadPng internally uses cached dataUrl, captures only if needed */}
+          {/* Action buttons — always visible, capture lazily on first click */}
+          <div className="flex gap-2 pt-4 border-t border-border">
             <Button
               onClick={handleDownload}
               disabled={isCapturing}
@@ -347,7 +327,6 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               {downloadDone ? "Saved!" : "Save"}
             </Button>
 
-            {/* Share on X — opens tweet intent; image must be saved manually (X web intent does not accept blobs) */}
             <Button
               onClick={handleShareX}
               disabled={isCapturing}
@@ -358,7 +337,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               </svg>
               Share on X
             </Button>
-          </div>}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
