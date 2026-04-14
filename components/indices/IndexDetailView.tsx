@@ -71,13 +71,18 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     }
   )
 
+  // Price is derived from the chart dataset so it always matches the last point.
+  // Fall back to liveTokenPrices average only while chart data is still loading.
   const displayPrice = useMemo(() => {
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      const price = calculateIndexPrice(index.tokens, liveTokenPrices)
-      return price.toFixed(6)
+    const chartData = historyData?.data
+    if (chartData && chartData.length > 0) {
+      return chartData[chartData.length - 1].price.toFixed(4)
     }
-    return index.price
-  }, [liveTokenPrices, index.tokens, index.price])
+    if (liveTokenPrices && liveTokenPrices.length > 0) {
+      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+    }
+    return Number.parseFloat(index.price).toFixed(4)
+  }, [historyData, liveTokenPrices, index.tokens, index.price])
 
   // Slice the 90-day dataset to the selected period client-side
   const filteredData = useMemo(() => {

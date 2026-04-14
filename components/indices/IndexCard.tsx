@@ -39,20 +39,24 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  const displayPrice = useMemo(() => {
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      const price = calculateIndexPrice(index.tokens, liveTokenPrices)
-      return price.toFixed(2)
-    }
-    return Number.parseFloat(index.price).toFixed(2)
-  }, [liveTokenPrices, index.tokens, index.price])
-
-  // Fetch 90d history once, compute return client-side
+  // Single 90d fetch — last point is used as current price so card and
+  // detail chart always show the same number.
   const { data: history90d } = useSWR(
     `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
     fetcher,
     { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
   )
+
+  const displayPrice = useMemo(() => {
+    const data = history90d?.data
+    if (data && data.length > 0) {
+      return data[data.length - 1].price.toFixed(4)
+    }
+    if (liveTokenPrices && liveTokenPrices.length > 0) {
+      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+    }
+    return Number.parseFloat(index.price).toFixed(4)
+  }, [history90d, liveTokenPrices, index.tokens, index.price])
 
   const return90d = useMemo(() => {
     const data = history90d?.data

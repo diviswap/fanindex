@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { formatUnits } from "viem"
+import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { TrendingDown, TrendingUp, Coins, ExternalLink, Share2 } from "lucide-react"
 import { OnChainBadge } from "./OnChainBadge"
-import { getTokenByAddress } from "@/lib/data/fan-tokens"
+import { getTokenByAddress, getTokenBySymbol } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import type { TokenPrice } from "@/lib/hooks/use-token-prices"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
@@ -49,6 +50,34 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
   const totalValueCHZ = tokenRows.reduce((sum, r) => sum + r.valueInCHZ, 0)
   const hasLivePrices = tokenRows.some((r) => r.priceInCHZ > 0)
 
+  // Derive token symbols from addresses for history API
+  const tokenSymbols = useMemo(
+    () => tokenAddresses.map(addr => getTokenByAddress(addr)?.symbol).filter(Boolean).join(","),
+    [tokenAddresses]
+  )
+
+  const { data: history90d } = useSWR(
+    tokenSymbols ? `/api/prices/history?tokens=${tokenSymbols}&days=90` : null,
+    (url: string) => fetch(url).then(r => r.json()),
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+  )
+
+  // Current price from chart (matches detail view) and 90d return
+  const chartPrice = useMemo(() => {
+    const data = history90d?.data
+    if (!data || data.length === 0) return null
+    return data[data.length - 1].price
+  }, [history90d])
+
+  const return90d = useMemo(() => {
+    const data = history90d?.data
+    if (!data || data.length < 2) return null
+    const first = data[0].price
+    const last = data[data.length - 1].price
+    if (!first) return null
+    return ((last - first) / first) * 100
+  }, [history90d])
+
   const chiliscanUrl = `https://chiliscan.com/token/0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9?a=${tokenId.toString()}`
 
   return (
@@ -87,10 +116,16 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             </h3>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <div className="text-xs text-muted-foreground font-medium">Total Value</div>
-            <div className="text-xl font-bold text-success tabular-nums">
-              {hasLivePrices ? totalValueCHZ.toFixed(2) : "--"} CHZ
+            <div className="text-xs text-muted-foreground font-medium">Index Price</div>
+            <div className="text-xl font-bold text-foreground tabular-nums">
+              {chartPrice !== null ? chartPrice.toFixed(4) : hasLivePrices ? totalValueCHZ.toFixed(2) : "--"} CHZ
             </div>
+            {return90d !== null && (
+              <div className={`flex items-center gap-1 text-xs font-semibold ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
+                {return90d >= 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                {return90d >= 0 ? "+" : ""}{return90d.toFixed(1)}% 90d
+              </div>
+            )}
           </div>
         </div>
 
