@@ -9,7 +9,7 @@ export function useNFTSupply() {
     functionName: "totalSupply",
   })
 
-  const totalSupply = data ? Number(data) : null
+  const totalSupply = data ? Number(data).toLocaleString() : undefined
 
   return { totalSupply, isLoading, error }
 }

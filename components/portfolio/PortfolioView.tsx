@@ -178,7 +178,7 @@ function AvailableIndexCard({
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Holders</span>
-              <span className="font-semibold text-foreground">{totalSupply ?? "--"}</span>
+              <span className="font-semibold text-foreground">{totalSupply}</span>
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
