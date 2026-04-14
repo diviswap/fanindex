@@ -187,7 +187,7 @@ export function IndexCard({ index }: IndexCardProps) {
         </Link>
       </TooltipProvider>
 
-      <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} />
+      <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
     </>
   )
 }

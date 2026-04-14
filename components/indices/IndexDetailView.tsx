@@ -504,7 +504,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
       </div>
 
-      <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} />
+        <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
     </>
   )
 }

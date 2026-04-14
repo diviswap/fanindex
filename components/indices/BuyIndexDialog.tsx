@@ -21,9 +21,17 @@ interface BuyIndexDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
+  /** Live calculated price in CHZ — overrides the static index.price */
+  livePrice?: string
 }
 
-export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyIndexDialogProps) {
+export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice }: BuyIndexDialogProps) {
+  // Use live price when available; fall back to static index.price.
+  // Either way, ensure we never show "0" — use a sensible placeholder.
+  const effectivePrice = (() => {
+    const p = parseFloat(livePrice ?? index.price)
+    return p > 0 ? (livePrice ?? index.price) : index.price
+  })()
   const [amount, setAmount] = useState("")
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
@@ -49,7 +57,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
     if (isSuccess && amount) {
       setPurchaseDetails({
         amount,
-        units: Number.parseFloat(amount) / Number.parseFloat(index.price),
+        units: Number.parseFloat(amount) / Number.parseFloat(effectivePrice),
         fee: Number.parseFloat(amount) * 0.01,
       })
       onSuccess?.()
@@ -96,7 +104,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
 
   const entryFee = amount ? Number.parseFloat(amount) * 0.01 : 0
   const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
-  const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(index.price) : 0
+  const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(effectivePrice) : 0
 
   // Composition: build token rows from index.tokens list
   const compositionRows = (index.tokens ?? []).map((symbol) => {
@@ -309,7 +317,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <p className="text-muted-foreground">Minimum: {index.price} CHZ</p>
+                  <p className="text-muted-foreground">Minimum: {effectivePrice} CHZ</p>
                   {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
                 </div>
               </div>
@@ -318,7 +326,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-2">
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Price per unit</span>
-                  <span className="font-semibold">{index.price} CHZ</span>
+                  <span className="font-semibold">{effectivePrice} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Protocol fee (1%)</span>

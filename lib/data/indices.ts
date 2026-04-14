@@ -29,7 +29,9 @@ export function calculateIndexPrice(
   }, 0)
   
   const avgPrice = totalPrice / tokenSymbols.length
-  return avgPrice
+  // Never return 0 — live prices will override this in the UI,
+  // but a non-zero static fallback avoids "Minimum: 0 CHZ" flash.
+  return avgPrice > 0 ? avgPrice : 1
 }
 
 export const INDICES: IndexData[] = [
