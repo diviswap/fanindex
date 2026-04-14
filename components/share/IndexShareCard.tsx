@@ -86,7 +86,7 @@ export function IndexShareCard({
             />
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.3 }}>FanIndex</div>
-              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.xyz</div>
+              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
             </div>
           </div>
           {/* Type badge */}
@@ -164,7 +164,7 @@ export function IndexShareCard({
           <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />
           <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 500 }}>Powered by Chiliz Chain</span>
         </div>
-        <span style={{ fontSize: 11, color: "#374151", fontWeight: 500 }}>fanindex.xyz</span>
+            <span style={{ fontSize: 11, color: "#374151", fontWeight: 500 }}>fanindex.pro</span>
       </div>
     </div>
   )

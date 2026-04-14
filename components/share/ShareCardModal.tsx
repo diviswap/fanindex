@@ -100,14 +100,14 @@ function Toggle({
 
 function buildTweetText(data: ShareData): string {
   if (data.type === "index") {
-    return `Discover the ${data.index.name} on @FanIndex — ${data.index.apy} APY with ${data.index.tokens.length} fan tokens on Chiliz.\n\n#Chiliz #FanTokens #DeFi\nfanindex.xyz`
+    return `Discover the ${data.index.name} on @FanIndex — ${data.index.apy} APY with ${data.index.tokens.length} fan tokens on Chiliz.\n\n#Chiliz #FanTokens #DeFi\nfanindex.pro`
   }
   if (data.type === "position") {
     const val = data.totalValueCHZ > 0 ? `${data.totalValueCHZ.toFixed(2)} CHZ` : "–"
-    return `My ${data.indexName} position is worth ${val} on @FanIndex.\n\n#Chiliz #FanTokens\nfanindex.xyz`
+    return `My ${data.indexName} position is worth ${val} on @FanIndex.\n\n#Chiliz #FanTokens\nfanindex.pro`
   }
   const val = data.totalValue > 0 ? `${data.totalValue.toFixed(2)} CHZ` : "–"
-  return `My @FanIndex portfolio is worth ${val} across ${data.positionsCount} positions.\n\n#Chiliz #FanTokens #DeFi\nfanindex.xyz`
+  return `My @FanIndex portfolio is worth ${val} across ${data.positionsCount} positions.\n\n#Chiliz #FanTokens #DeFi\nfanindex.pro`
 }
 
 // ── Main modal ────────────────────────────────────────────────────────────────
