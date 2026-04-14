@@ -37,40 +37,64 @@ export function useShareCard(): UseShareCardReturn {
   const [status, setStatus] = useState<ShareCardStatus>("idle")
   const [dataUrl, setDataUrl] = useState<string | null>(null)
   const dataUrlRef = useRef<string | null>(null)
-  const [isDark, setIsDark] = useState<boolean>(true)
+  const [isDark, setIsDark] = useState<boolean>(() => detectIsDark())
 
   const capture = useCallback(async (): Promise<string | null> => {
     if (dataUrlRef.current) return dataUrlRef.current
-    if (!cardRef.current) return null
 
-    // Detect and store theme at capture time
+    const el = cardRef.current
+    if (!el) {
+      console.log("[useShareCard] cardRef is null, cannot capture")
+      return null
+    }
+
     const dark = detectIsDark()
     setIsDark(dark)
-
     setStatus("capturing")
 
     try {
       const html2canvas = (await import("html2canvas")).default
 
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 1,             // element is already 1080x1080 — no extra scaling needed
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: null,
-        logging: false,
-        width: 1080,
-        height: 1080,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: 1080,
-        windowHeight: 1080,
-        ignoreElements: (el) => {
-          // Skip any ResizeObserver-attached wrappers that might interfere
-          return el.tagName === "SCRIPT" || el.tagName === "STYLE"
-        },
-      })
+      // Temporarily make the element visible to html2canvas by removing visibility:hidden
+      // from the wrapper while capturing. We do this on the wrapper (parent), not the card.
+      const wrapper = el.parentElement
+      const prevVisibility = wrapper?.style.visibility ?? ""
+      const prevOpacity = wrapper?.style.opacity ?? ""
+      if (wrapper) {
+        wrapper.style.visibility = "visible"
+        wrapper.style.opacity = "0"  // Still invisible to user but readable by html2canvas
+      }
 
-      const url = canvas.toDataURL("image/png", 1.0)
+      let url: string | null = null
+      try {
+        const canvas = await html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: dark ? "#0a0a0a" : "#ffffff",
+          logging: false,
+          width: 1080,
+          height: 1080,
+          scrollX: 0,
+          scrollY: 0,
+          windowWidth: 1080,
+          windowHeight: 1080,
+          foreignObjectRendering: false,
+        })
+        url = canvas.toDataURL("image/png", 1.0)
+      } finally {
+        // Always restore visibility
+        if (wrapper) {
+          wrapper.style.visibility = prevVisibility
+          wrapper.style.opacity = prevOpacity
+        }
+      }
+
+      if (!url) {
+        setStatus("error")
+        return null
+      }
+
       dataUrlRef.current = url
       setDataUrl(url)
       setStatus("success")
@@ -102,18 +126,17 @@ export function useShareCard(): UseShareCardReturn {
 
     try {
       const blob = dataUrlToBlob(url)
-      // Use ClipboardItem with a Promise to work around async clipboard restrictions
       await navigator.clipboard.write([
         new ClipboardItem({ "image/png": Promise.resolve(blob) }),
       ])
       return true
-    } catch (err) {
-      console.error("[useShareCard] clipboard error:", err)
-      // Fallback: trigger download so user at least gets the image
-      const url2 = dataUrlRef.current
-      if (url2) {
+    } catch (clipErr) {
+      console.error("[useShareCard] clipboard error:", clipErr)
+      // Fallback: download
+      const fallbackUrl = dataUrlRef.current
+      if (fallbackUrl) {
         const a = document.createElement("a")
-        a.href = url2
+        a.href = fallbackUrl
         a.download = "fanindex-share.png"
         document.body.appendChild(a)
         a.click()
