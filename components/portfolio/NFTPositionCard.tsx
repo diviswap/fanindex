@@ -193,18 +193,20 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
         </div>
       </div>
     </div>
-    <ShareCardModal
-      open={showShareModal}
-      onOpenChange={setShowShareModal}
-      walletAddress={walletAddress}
-      data={{
-        type: "position",
-        tokenId: tokenId.toString(),
-        indexName,
-        totalValueCHZ,
-        tokenRows,
-      }}
-    />
+      <ShareCardModal
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+        walletAddress={walletAddress}
+        data={{
+          type: "position",
+          holding: {
+            tokenId: holding.tokenId,
+            indexName: holding.indexName,
+          },
+          totalValueCHZ,
+          tokenRows,
+        }}
+      />
     </>
   )
 }

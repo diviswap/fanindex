@@ -5,8 +5,6 @@ interface PortfolioShareCardProps {
   fanTokensValue: number
   positionsCount: number
   walletAddress?: string
-  showWallet?: boolean
-  showBreakdown?: boolean
   cardRef: React.RefObject<HTMLDivElement | null>
 }
 
@@ -17,37 +15,25 @@ export function PortfolioShareCard({
   fanTokensValue,
   positionsCount,
   walletAddress,
-  showWallet = false,
-  showBreakdown = true,
   cardRef,
 }: PortfolioShareCardProps) {
-  const shortAddr = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
-    : null
+  const accent = "#10b981"
+  const shortAddr = walletAddress ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}` : null
 
-  const segments = [
-    { label: "Index NFTs", value: nftValue, color: "#10b981" },
-    { label: "CHZ Balance", value: chzBalance, color: "#f59e0b" },
-    { label: "Fan Tokens", value: fanTokensValue, color: "#a855f7" },
-  ].filter((s) => s.value > 0)
-
-  const total = segments.reduce((s, seg) => s + seg.value, 0)
-
-  const statCards = [
-    { label: "Index NFTs", value: nftValue, color: "#10b981", bg: "#10b98110" },
-    { label: "CHZ Balance", value: chzBalance, color: "#f59e0b", bg: "#f59e0b10" },
-    { label: "Fan Tokens", value: fanTokensValue, color: "#a855f7", bg: "#a855f710" },
-  ]
+  // Calculate percentages
+  const nftPct = totalValue > 0 ? Math.round((nftValue / totalValue) * 100) : 0
+  const chzPct = totalValue > 0 ? Math.round((chzBalance / totalValue) * 100) : 0
+  const tokensPct = totalValue > 0 ? Math.round((fanTokensValue / totalValue) * 100) : 0
 
   return (
     <div
       ref={cardRef}
       data-share-card
       style={{
-        width: 640,
-        minHeight: 340,
-        background: "#0c0c0c",
-        borderRadius: 24,
+        width: 1080,
+        height: 1350,
+        background: "linear-gradient(135deg, #0c0c0c 0%, #0f0f0f 100%)",
+        borderRadius: 32,
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         display: "flex",
         flexDirection: "column",
@@ -58,124 +44,171 @@ export function PortfolioShareCard({
       }}
     >
       {/* Top accent bar */}
-      <div style={{ height: 3, background: "linear-gradient(90deg, #10b981, #10b98144, transparent)" }} />
+      <div style={{ height: 6, background: `linear-gradient(90deg, ${accent}, ${accent}44, transparent)` }} />
 
-      {/* Grid texture */}
+      {/* Subtle grid texture overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff05 1px, transparent 0)",
-        backgroundSize: "28px 28px",
+        backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff06 1px, transparent 0)",
+        backgroundSize: "40px 40px",
         pointerEvents: "none",
       }} />
 
       {/* Glows */}
       <div style={{
-        position: "absolute", top: -100, right: -100, width: 350, height: 350,
-        background: "radial-gradient(circle, #10b9810d 0%, transparent 65%)",
+        position: "absolute", top: -200, right: -200, width: 600, height: 600,
+        background: `radial-gradient(circle, ${accent}12 0%, transparent 60%)`,
         pointerEvents: "none",
       }} />
       <div style={{
-        position: "absolute", bottom: -80, left: -80, width: 260, height: 260,
-        background: "radial-gradient(circle, #f59e0b08 0%, transparent 65%)",
+        position: "absolute", bottom: -150, left: -150, width: 500, height: 500,
+        background: "radial-gradient(circle, #10b98110 0%, transparent 60%)",
         pointerEvents: "none",
       }} />
 
-      <div style={{ padding: "28px 32px 0", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ padding: "48px 56px", position: "relative", flex: 1, display: "flex", flexDirection: "column" }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 40 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/images/fi-logo.png"
               alt="FanIndex"
-              style={{ width: 32, height: 32, borderRadius: 8, objectFit: "contain" }}
+              style={{ width: 48, height: 48, borderRadius: 12, objectFit: "contain", flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.3 }}>FanIndex</div>
-              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.5 }}>FanIndex</div>
+              <div style={{ fontSize: 12, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {showWallet && shortAddr && (
-              <span style={{ fontSize: 11, color: "#4b5563", fontFamily: "monospace" }}>{shortAddr}</span>
-            )}
-            <div style={{
-              fontSize: 11, fontWeight: 700, letterSpacing: 0.5,
-              color: "#10b981", background: "#10b98118",
-              border: "1px solid #10b98130",
-              borderRadius: 100, padding: "5px 14px",
-            }}>My Portfolio</div>
+          <div style={{
+            fontSize: 13, fontWeight: 700, letterSpacing: 0.8,
+            color: accent, background: `${accent}15`,
+            border: `1.5px solid ${accent}40`,
+            borderRadius: 20, padding: "8px 20px",
+            textTransform: "uppercase",
+          }}>
+            My Portfolio
           </div>
         </div>
 
-        {/* Total value hero */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>
-            Total Portfolio Value
+        {/* Portfolio title */}
+        <div style={{ fontSize: 56, fontWeight: 800, color: "#f9fafb", letterSpacing: -2, lineHeight: 1.1, marginBottom: 12 }}>
+          My Portfolio
+        </div>
+        {shortAddr && (
+          <div style={{ fontSize: 14, color: "#6b7280", fontFamily: "monospace", marginBottom: 40 }}>
+            {shortAddr}
           </div>
-          <div style={{ display: "flex", alignItems: "flex-end", gap: 12, marginBottom: 4 }}>
-            <div style={{ fontSize: 52, fontWeight: 900, color: "#10b981", letterSpacing: -2.5, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-              {totalValue > 0 ? totalValue.toFixed(2) : "0.00"}
+        )}
+
+        {/* Total value highlight */}
+        <div style={{
+          background: `linear-gradient(135deg, ${accent}10 0%, ${accent}05 100%)`,
+          border: `1.5px solid ${accent}25`,
+          borderRadius: 20,
+          padding: "28px 32px",
+          marginBottom: 48,
+        }}>
+          <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Total Portfolio Value</div>
+          <div style={{ fontSize: 48, fontWeight: 800, color: accent, letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>
+            {totalValue.toFixed(2)}
+          </div>
+          <div style={{ fontSize: 16, color: "#4b5563", fontWeight: 600, marginTop: 4 }}>CHZ</div>
+          <div style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginTop: 8 }}>{positionsCount} active position{positionsCount !== 1 ? "s" : ""}</div>
+        </div>
+
+        {/* Breakdown grid */}
+        <div>
+          <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 20 }}>Portfolio Breakdown</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 32 }}>
+            {/* NFT Positions */}
+            <div style={{
+              background: "#161616",
+              border: "1.5px solid #252525",
+              borderRadius: 16,
+              padding: "20px 24px",
+            }}>
+              <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>NFT Positions</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: accent, letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>
+                {nftValue.toFixed(2)}
+              </div>
+              <div style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginTop: 8 }}>{nftPct}% of portfolio</div>
             </div>
-            <div style={{ fontSize: 20, fontWeight: 600, color: "#4b9c6b", marginBottom: 6 }}>CHZ</div>
-          </div>
-          <div style={{ fontSize: 12, color: "#4b5563", fontWeight: 500 }}>
-            {positionsCount} active position{positionsCount !== 1 ? "s" : ""}
+
+            {/* CHZ Balance */}
+            <div style={{
+              background: "#161616",
+              border: "1.5px solid #252525",
+              borderRadius: 16,
+              padding: "20px 24px",
+            }}>
+              <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>CHZ Balance</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "#3b82f6", letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>
+                {chzBalance.toFixed(2)}
+              </div>
+              <div style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginTop: 8 }}>{chzPct}% of portfolio</div>
+            </div>
+
+            {/* Fan Tokens */}
+            <div style={{
+              background: "#161616",
+              border: "1.5px solid #252525",
+              borderRadius: 16,
+              padding: "20px 24px",
+              gridColumn: "1 / -1",
+            }}>
+              <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8 }}>Fan Tokens Holdings</div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: "#a855f7", letterSpacing: -1, fontVariantNumeric: "tabular-nums" }}>
+                {fanTokensValue.toFixed(2)}
+              </div>
+              <div style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginTop: 8 }}>{tokensPct}% of portfolio</div>
+            </div>
           </div>
         </div>
 
         {/* Allocation bar */}
-        {showBreakdown && segments.length > 0 && (
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ display: "flex", height: 5, borderRadius: 3, overflow: "hidden", gap: 3 }}>
-              {segments.map((seg) => (
-                <div key={seg.label} style={{
-                  flex: total > 0 ? seg.value / total : 1,
-                  background: seg.color,
-                  borderRadius: 3,
-                }} />
-              ))}
+        <div style={{ marginTop: "auto" }}>
+          <div style={{ display: "flex", height: 10, borderRadius: 6, overflow: "hidden", gap: 3 }}>
+            {nftValue > 0 && (
+              <div style={{ flex: nftValue, background: accent, borderRadius: 6 }} />
+            )}
+            {chzBalance > 0 && (
+              <div style={{ flex: chzBalance, background: "#3b82f6", borderRadius: 6 }} />
+            )}
+            {fanTokensValue > 0 && (
+              <div style={{ flex: fanTokensValue, background: "#a855f7", borderRadius: 6 }} />
+            )}
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 2, background: accent }} />
+              <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>NFTs ({nftPct}%)</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 2, background: "#3b82f6" }} />
+              <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>CHZ ({chzPct}%)</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 2, background: "#a855f7" }} />
+              <span style={{ fontSize: 12, color: "#6b7280", fontWeight: 600 }}>Tokens ({tokensPct}%)</span>
             </div>
           </div>
-        )}
-
-        {/* Breakdown stat cards */}
-        {showBreakdown && (
-          <div style={{ display: "flex", gap: 10, marginBottom: 24 }}>
-            {statCards.map((s) => (
-              <div key={s.label} style={{
-                flex: 1,
-                background: "#111111",
-                border: "1px solid #1c1c1c",
-                borderRadius: 12,
-                padding: "12px 14px",
-              }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 6 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: s.color }} />
-                  <span style={{ fontSize: 10, color: "#6b7280", fontWeight: 600, letterSpacing: 0.5 }}>{s.label}</span>
-                </div>
-                <div style={{ fontSize: 17, fontWeight: 800, color: "#e5e7eb", letterSpacing: -0.5, fontVariantNumeric: "tabular-nums" }}>
-                  {s.value > 0 ? s.value.toFixed(2) : "0.00"}
-                  <span style={{ fontSize: 11, color: "#6b7280", marginLeft: 3, fontWeight: 600 }}>CHZ</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Footer */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "14px 32px",
+        padding: "24px 56px",
         borderTop: "1px solid #161616",
-        background: "#0a0a0a",
+        background: "linear-gradient(180deg, rgba(15,15,15,0) 0%, rgba(10,10,10,1) 100%)",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />
-          <span style={{ fontSize: 11, color: "#4b5563", fontWeight: 500 }}>Powered by Chiliz Chain</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981" }} />
+          <span style={{ fontSize: 13, color: "#4b5563", fontWeight: 600 }}>Powered by Chiliz Chain</span>
         </div>
-            <span style={{ fontSize: 11, color: "#374151", fontWeight: 500 }}>fanindex.pro</span>
+        <span style={{ fontSize: 13, color: "#374151", fontWeight: 600 }}>fanindex.pro</span>
       </div>
     </div>
   )

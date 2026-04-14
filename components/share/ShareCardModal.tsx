@@ -39,8 +39,10 @@ export interface IndexShareData {
 
 export interface PositionShareData {
   type: "position"
-  tokenId: string
-  indexName: string
+  holding: {
+    tokenId: bigint
+    indexName: string
+  }
   totalValueCHZ: number
   tokenRows: {
     symbol: string
@@ -195,13 +197,9 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
       />
     ) : data.type === "position" ? (
       <PositionShareCard
-        tokenId={data.tokenId}
-        indexName={data.indexName}
+        holding={data.holding}
         totalValueCHZ={data.totalValueCHZ}
         tokenRows={data.tokenRows}
-        walletAddress={walletAddress}
-        showComposition={showComposition}
-        showWallet={showWallet}
         cardRef={cardRef}
       />
     ) : (
@@ -212,8 +210,6 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
         fanTokensValue={data.fanTokensValue}
         positionsCount={data.positionsCount}
         walletAddress={walletAddress}
-        showWallet={showWallet}
-        showBreakdown={showBreakdown}
         cardRef={cardRef}
       />
     )
@@ -233,39 +229,38 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
 
         <div className="p-5 space-y-5">
 
-          {/* Card preview — scales down to fit dialog width */}
-          <div className="relative w-full rounded-xl overflow-hidden bg-[#080808] border border-border/40" style={{ aspectRatio: "640 / 340" }}>
-            <div
-              style={{
-                position: "absolute",
-                top: 0, left: 0,
-                width: 640,
-                transformOrigin: "top left",
-                // Scale to fill container: containerWidth / cardWidth
-              }}
-              className="card-scale-wrapper"
-            >
-              {cardNode}
-            </div>
-            <style>{`
-              .card-scale-wrapper {
-                transform: scale(var(--card-preview-scale, 1));
-              }
-              @media (min-width: 0px) {
-                .card-scale-wrapper { --card-preview-scale: calc((min(100vw - 80px, 544px)) / 640); }
-              }
-            `}</style>
-
-            {/* Capture overlay */}
-            {isCapturing && (
-              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
-                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <Loader2 className="h-4 w-4 animate-spin text-success" />
-                  Generating image...
-                </div>
-              </div>
-            )}
+        {/* Card preview — scales down to fit dialog width with 1080x1350 aspect ratio */}
+        <div className="relative w-full rounded-xl overflow-hidden bg-[#080808] border border-border/40" style={{ aspectRatio: "1080 / 1350" }}>
+          <div
+            style={{
+              position: "absolute",
+              top: 0, left: 0,
+              width: 1080,
+              transformOrigin: "top left",
+            }}
+            className="card-scale-wrapper"
+          >
+            {cardNode}
           </div>
+          <style>{`
+            .card-scale-wrapper {
+              transform: scale(var(--card-preview-scale, 1));
+            }
+            @media (min-width: 0px) {
+              .card-scale-wrapper { --card-preview-scale: calc((min(100vw - 80px, 544px)) / 1080); }
+            }
+          `}</style>
+
+          {/* Capture overlay */}
+          {isCapturing && (
+            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Loader2 className="h-4 w-4 animate-spin text-success" />
+                Generating image...
+              </div>
+            </div>
+          )}
+        </div>
 
           {/* Generated preview */}
           {dataUrl && (
@@ -306,20 +301,22 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               </Button>
             ) : (
               <>
-                <div className="flex gap-2 mt-3">
-                  {/* Share on X */}
-                  <Button
-                    onClick={handleShareX}
-                    className="flex-1 bg-[#0f0f0f] hover:bg-[#1a1a1a] text-white border border-[#2a2a2a] font-bold h-11 rounded-xl"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Share on X
-                  </Button>
+                {/* Primary X share button */}
+                <Button
+                  onClick={handleShareX}
+                  className="w-full bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2 text-base"
+                >
+                  <Twitter className="h-5 w-5" />
+                  Share on X
+                </Button>
+
+                {/* Secondary actions row */}
+                <div className="flex gap-2">
                   {/* Copy to clipboard */}
                   <Button
                     onClick={handleCopy}
                     variant="outline"
-                    className="flex-1 border-border bg-card/50 h-11 rounded-xl font-semibold"
+                    className="flex-1 border-border bg-card/50 h-11 rounded-xl font-semibold hover:bg-card hover:border-success/30"
                   >
                     {copyDone ? (
                       <>
@@ -329,7 +326,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
                     ) : (
                       <>
                         <Copy className="h-4 w-4 mr-2" />
-                        Copy Image
+                        Copy
                       </>
                     )}
                   </Button>
@@ -338,7 +335,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
                     onClick={handleDownload}
                     variant="outline"
                     title="Download PNG"
-                    className="border-border bg-card/50 h-11 w-11 p-0 rounded-xl shrink-0"
+                    className="border-border bg-card/50 h-11 w-11 p-0 rounded-xl shrink-0 hover:bg-card hover:border-success/30"
                   >
                     {downloadDone ? (
                       <Check className="h-4 w-4 text-success" />
@@ -347,11 +344,12 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
                     )}
                   </Button>
                 </div>
+
                 <button
                   onClick={() => reset()}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-1"
+                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-2"
                 >
-                  Regenerate with new settings
+                  ← Regenerate
                 </button>
               </>
             )}
