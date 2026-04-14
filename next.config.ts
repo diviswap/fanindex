@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "raw.githubusercontent.com",
       },
+      {
+        protocol: "https",
+        hostname: "ipfs.io",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ipfs.io",
+      },
     ],
   },
   webpack: (config, { isServer }) => {
