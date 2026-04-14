@@ -14,7 +14,7 @@ import {
   Share2,
 } from "lucide-react"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
-import { useState, useMemo } from "react"
+import { useState, useMemo, memo } from "react"
 import { RedeemDialog } from "./RedeemDialog"
 import { BuyIndexDialog } from "@/components/indices/BuyIndexDialog"
 import type { IndexData } from "@/components/indices/IndexCard"
@@ -26,6 +26,109 @@ import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import { NFTPositionCard } from "./NFTPositionCard"
+import { getTokenBySymbol } from "@/lib/data/fan-tokens"
+import Image from "next/image"
+import useSWR from "swr"
+
+const swrFetcher = (url: string) => fetch(url).then(r => r.json())
+
+// Mini card sub-component that fetches its own live price + 24h return
+function AvailableIndexCard({ index, onBuy }: { index: import("@/components/indices/IndexCard").IndexData; onBuy: () => void }) {
+  const { data: hist } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    swrFetcher,
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+  )
+
+  const data = hist?.data as { timestamp: number; price: number }[] | undefined
+
+  const displayPrice = useMemo(() => {
+    if (data && data.length > 0) return data[data.length - 1].price.toFixed(4)
+    return Number.parseFloat(index.price).toFixed(4)
+  }, [data, index.price])
+
+  const return24h = useMemo(() => {
+    if (!data || data.length < 2) return null
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000
+    const sliced = data.filter(d => d.timestamp >= cutoff)
+    const slice = sliced.length > 1 ? sliced : data
+    const first = slice[0].price
+    const last = slice[slice.length - 1].price
+    if (!first) return null
+    return ((last - first) / first) * 100
+  }, [data])
+
+  return (
+    <div className="relative min-h-[380px] border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all duration-300 overflow-hidden">
+      <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-80 dark:opacity-25">
+        <video
+          autoPlay loop muted playsInline
+          className="w-full h-full object-cover"
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
+        />
+        <div className="absolute inset-0 bg-background/50 dark:bg-background/30" />
+      </div>
+
+      <div className="relative z-10 h-full flex flex-col">
+        <div className="flex-1">
+          <div className="flex items-center justify-between mb-3">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-semibold ${typeColors[index.type]}`}>
+              {typeLabels[index.type]}
+            </span>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-success/20 text-success border border-success/30">
+              Live
+            </span>
+          </div>
+          <h3 className="text-lg font-bold text-foreground mb-2 text-balance">{index.name}</h3>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-4">{index.description}</p>
+
+          <div className="space-y-2 mb-4 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Price</span>
+              <span className="font-semibold text-foreground">{displayPrice} CHZ</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">24h</span>
+              {return24h === null ? (
+                <span className="font-semibold text-muted-foreground">--</span>
+              ) : (
+                <span className={`font-semibold ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
+                  {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
+                </span>
+              )}
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Holders</span>
+              <span className="font-semibold text-foreground">{index.holders}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {index.tokens.map((symbol) => {
+              const tokenData = getTokenBySymbol(symbol)
+              return (
+                <span key={symbol} className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted text-xs font-medium text-muted-foreground border border-border">
+                  {tokenData?.icon && (
+                    <Image src={tokenData.icon} alt={symbol} width={14} height={14} className="rounded-full" />
+                  )}
+                  {symbol}
+                </span>
+              )
+            })}
+          </div>
+        </div>
+
+        <Button
+          onClick={onBuy}
+          className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-10"
+        >
+          <ShoppingCart className="h-4 w-4 mr-2" />
+          Buy Index
+        </Button>
+      </div>
+    </div>
+  )
+}
 
 // Only index "1" is deployed on Chiliz Mainnet
 const DEPLOYED_INDICES = ["1"]
@@ -632,72 +735,11 @@ export function PortfolioView() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id)).map((index) => (
-            <div
+            <AvailableIndexCard
               key={index.id}
-              className="relative min-h-[380px] border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all duration-300 overflow-hidden"
-            >
-              <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-80 dark:opacity-25">
-                <video
-                  autoPlay loop muted playsInline
-                  className="w-full h-full object-cover"
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
-                />
-                <div className="absolute inset-0 bg-background/50 dark:bg-background/30" />
-              </div>
-
-              <div className="relative z-10 h-full flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-3">
-                    <span
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-semibold ${typeColors[index.type]}`}
-                    >
-                      {typeLabels[index.type]}
-                    </span>
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-success/20 text-success border border-success/30">
-                      Live
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-foreground mb-2 text-balance">
-                    {index.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-                    {index.description}
-                  </p>
-                  <div className="space-y-2 mb-4 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Price</span>
-                      <span className="font-semibold text-foreground">{index.price} CHZ</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Est. APY</span>
-                      <span className="font-semibold text-success">{index.apy}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Holders</span>
-                      <span className="font-semibold text-foreground">{index.holders}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {index.tokens.map((token) => (
-                      <span
-                        key={token}
-                        className="px-2 py-1 rounded-md bg-muted text-xs font-mono font-medium text-muted-foreground border border-border"
-                      >
-                        {token}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => setSelectedIndexToBuy(index)}
-                  className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-10"
-                >
-                  <ShoppingCart className="h-4 w-4 mr-2" />
-                  Buy Index
-                </Button>
-              </div>
-            </div>
+              index={index}
+              onBuy={() => setSelectedIndexToBuy(index)}
+            />
           ))}
         </div>
       </div>
