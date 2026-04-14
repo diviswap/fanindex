@@ -10,8 +10,6 @@ import {
 import { Button } from "@/components/ui/button"
 import {
   Download,
-  Copy,
-  Twitter,
   Check,
   Loader2,
   Wallet,
@@ -19,7 +17,6 @@ import {
   Tag,
   TrendingUp,
   Layers,
-  X,
 } from "lucide-react"
 import { useShareCard } from "@/lib/hooks/use-share-card"
 import { IndexShareCard } from "./IndexShareCard"
@@ -219,37 +216,65 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
       <DialogContent className="max-w-xl w-full border-border bg-card p-0 gap-0 overflow-hidden rounded-2xl">
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between px-5 pt-5 pb-4 border-b border-border">
-          <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#1d9bf0]/10 border border-[#1d9bf0]/20 flex items-center justify-center">
-              <Twitter className="h-3.5 w-3.5 text-[#1d9bf0]" />
-            </div>
+          <DialogTitle className="text-base font-bold text-foreground">
             Share Card
           </DialogTitle>
         </DialogHeader>
 
         <div className="p-5 space-y-5">
 
-        {/* Card preview — scales down to fit dialog width with 1080x1350 aspect ratio */}
-        <div className="relative w-full rounded-xl overflow-hidden bg-[#080808] border border-border/40" style={{ aspectRatio: "1080 / 1350" }}>
+        {/* Card preview — scales the 1080×1350 card to fill the dialog width */}
+        {/* The outer div establishes the visible bounding box; overflow:hidden clips the scaled content */}
+        <div
+          className="relative w-full rounded-xl overflow-hidden border border-border/40"
+          style={{ paddingBottom: "calc(1350 / 1080 * 100%)", background: "#080808" }}
+        >
           <div
             style={{
               position: "absolute",
-              top: 0, left: 0,
-              width: 1080,
-              transformOrigin: "top left",
+              inset: 0,
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "flex-start",
             }}
-            className="card-scale-wrapper"
           >
-            {cardNode}
+            {/* Scale wrapper: renders card at 1080px then scales to container width */}
+            <div
+              style={{
+                width: 1080,
+                height: 1350,
+                transformOrigin: "top left",
+                // We use a CSS variable set via inline style on a parent
+                // because we need JS to know the container width.
+                // Instead we rely on aspect-ratio + 100% width approach:
+                // scale = containerWidth / 1080. Expressed as a calc using
+                // container-query-style but compatible: vw based approximation
+                // is done via the sibling style tag approach:
+                transform: "scale(var(--fi-scale))",
+                flexShrink: 0,
+                overflow: "hidden",
+              }}
+              ref={(el) => {
+                if (el) {
+                  const updateScale = () => {
+                    const parent = el.parentElement?.parentElement
+                    if (parent) {
+                      const scale = parent.clientWidth / 1080
+                      el.style.setProperty("--fi-scale", String(scale))
+                      el.style.transform = `scale(${scale})`
+                    }
+                  }
+                  updateScale()
+                  const ro = new ResizeObserver(updateScale)
+                  ro.observe(el.parentElement?.parentElement || el)
+                  // cleanup stored on el for HMR
+                  ;(el as any).__ro = ro
+                }
+              }}
+            >
+              {cardNode}
+            </div>
           </div>
-          <style>{`
-            .card-scale-wrapper {
-              transform: scale(var(--card-preview-scale, 1));
-            }
-            @media (min-width: 0px) {
-              .card-scale-wrapper { --card-preview-scale: calc((min(100vw - 80px, 544px)) / 1080); }
-            }
-          `}</style>
 
           {/* Capture overlay */}
           {isCapturing && (
@@ -282,77 +307,55 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
             {toggleRow}
           </div>
 
-          {/* Action buttons */}
-          <div className="space-y-3 pt-1 border-t border-border">
-            {!dataUrl ? (
-              <Button
-                onClick={handleCapture}
-                disabled={isCapturing}
-                className="w-full bg-success hover:bg-success/90 text-black font-bold h-11 rounded-xl mt-3"
-              >
-                {isCapturing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate Image"
-                )}
-              </Button>
-            ) : (
-              <>
-                {/* Primary X share button */}
-                <Button
-                  onClick={handleShareX}
-                  className="w-full bg-[#1d9bf0] hover:bg-[#1a8cd8] text-white font-bold h-12 rounded-xl flex items-center justify-center gap-2 text-base"
-                >
-                  <Twitter className="h-5 w-5" />
-                  Share on X
-                </Button>
+          {/* Action buttons — always visible, capture on demand */}
+          <div className="flex gap-2 pt-1 border-t border-border mt-1">
+            {/* Save / Download */}
+            <Button
+              onClick={async () => {
+                if (!dataUrl) await capture()
+                const filename =
+                  data.type === "index"
+                    ? `fanindex-${data.index.id}.png`
+                    : data.type === "position"
+                    ? `fanindex-nft-${data.holding.tokenId}.png`
+                    : "fanindex-portfolio.png"
+                await downloadPng(filename)
+                setDownloadDone(true)
+                setTimeout(() => setDownloadDone(false), 2000)
+              }}
+              disabled={isCapturing}
+              variant="outline"
+              className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted hover:border-success/30 mt-3"
+            >
+              {isCapturing ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : downloadDone ? (
+                <Check className="h-4 w-4 mr-2 text-success" />
+              ) : (
+                <Download className="h-4 w-4 mr-2" />
+              )}
+              {downloadDone ? "Saved!" : "Save"}
+            </Button>
 
-                {/* Secondary actions row */}
-                <div className="flex gap-2">
-                  {/* Copy to clipboard */}
-                  <Button
-                    onClick={handleCopy}
-                    variant="outline"
-                    className="flex-1 border-border bg-card/50 h-11 rounded-xl font-semibold hover:bg-card hover:border-success/30"
-                  >
-                    {copyDone ? (
-                      <>
-                        <Check className="h-4 w-4 mr-2 text-success" />
-                        Copied!
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-4 w-4 mr-2" />
-                        Copy
-                      </>
-                    )}
-                  </Button>
-                  {/* Download */}
-                  <Button
-                    onClick={handleDownload}
-                    variant="outline"
-                    title="Download PNG"
-                    className="border-border bg-card/50 h-11 w-11 p-0 rounded-xl shrink-0 hover:bg-card hover:border-success/30"
-                  >
-                    {downloadDone ? (
-                      <Check className="h-4 w-4 text-success" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-
-                <button
-                  onClick={() => reset()}
-                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center py-2"
-                >
-                  ← Regenerate
-                </button>
-              </>
-            )}
+            {/* Share on X */}
+            <Button
+              onClick={async () => {
+                if (!dataUrl) await capture()
+                handleShareX()
+              }}
+              disabled={isCapturing}
+              className="flex-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 font-bold h-11 rounded-xl flex items-center justify-center gap-2 mt-3"
+            >
+              {isCapturing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                /* X (Twitter) wordmark — plain SVG, no icon library */
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+                </svg>
+              )}
+              Share on X
+            </Button>
           </div>
         </div>
       </DialogContent>
