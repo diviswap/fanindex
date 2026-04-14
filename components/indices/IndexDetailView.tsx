@@ -10,7 +10,7 @@ import type { IndexData } from "./IndexCard"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice } from "@/lib/data/indices"
+import { calculateIndexPrice, getIndexAPY } from "@/lib/data/indices"
 import useSWR from "swr"
 
 interface IndexDetailViewProps {
@@ -116,6 +116,44 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         : null,
     }
   }, [returns90d])
+
+  // ── Live aggregate stats from CoinGecko prices ──────────────────────────
+  const liveStats = useMemo(() => {
+    if (!liveTokenPrices || liveTokenPrices.length === 0) return null
+
+    const tokens = index.tokens
+      .map(sym => liveTokenPrices.find(p => p.symbol === sym))
+      .filter((t): t is NonNullable<typeof t> => !!t)
+
+    if (tokens.length === 0) return null
+
+    // Sum of constituent token market caps (proxy for index market cap)
+    const totalMarketCap = tokens.reduce((s, t) => s + (t.marketCap ?? 0), 0)
+    // Sum of 24h volumes
+    const totalVolume = tokens.reduce((s, t) => s + (t.volume24h ?? 0), 0)
+
+    // Volatility: std-dev of 7-day returns across tokens (annualised ≈ * √52)
+    const weekly = tokens.map(t => t.change7d ?? 0)
+    const mean = weekly.reduce((a, b) => a + b, 0) / weekly.length
+    const variance = weekly.reduce((s, r) => s + Math.pow(r - mean, 2), 0) / weekly.length
+    const weeklyStdDev = Math.sqrt(variance)
+    const annualisedVol = weeklyStdDev * Math.sqrt(52) // annualise weekly vol
+
+    return { totalMarketCap, totalVolume, annualisedVol }
+  }, [liveTokenPrices, index.tokens])
+
+  const displayAPY = useMemo(
+    () => getIndexAPY(index.tokens, index.type, liveTokenPrices ?? undefined),
+    [index.tokens, index.type, liveTokenPrices]
+  )
+
+  // Format dollar amounts compactly
+  function fmtUSD(n: number): string {
+    if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`
+    if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`
+    if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}K`
+    return `$${n.toFixed(0)}`
+  }
 
   const firstPrice = filteredData[0]?.price || 0
   const lastPrice = filteredData[filteredData.length - 1]?.price || 0
@@ -366,18 +404,34 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12">
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
           <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Market Cap</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">{index.totalValue}</div>
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            {liveStats ? fmtUSD(liveStats.totalMarketCap) : index.totalValue}
+          </div>
+          {liveStats && (
+            <div className="text-xs text-muted-foreground mt-1">Combined tokens</div>
+          )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Annual Yield</div>
-          <div className="flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold text-success">
-            <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-            {index.apy}
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Est. Annual Return</div>
+          <div className={`flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold ${parseFloat(displayAPY) >= 0 ? "text-success" : "text-destructive"}`}>
+            {parseFloat(displayAPY) >= 0
+              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+            }
+            {displayAPY}
           </div>
+          {liveStats && (
+            <div className="text-xs text-muted-foreground mt-1">7d compounded × 52</div>
+          )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
           <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">24h Volume</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">$2.4M</div>
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            {liveStats ? fmtUSD(liveStats.totalVolume) : "--"}
+          </div>
+          {liveStats && (
+            <div className="text-xs text-muted-foreground mt-1">Combined tokens</div>
+          )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
           <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Investors</div>
@@ -388,7 +442,12 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
           <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Volatility</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">12.4%</div>
+          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
+            {liveStats ? `${liveStats.annualisedVol.toFixed(1)}%` : "--"}
+          </div>
+          {liveStats && (
+            <div className="text-xs text-muted-foreground mt-1">Annualised (7d σ)</div>
+          )}
         </Card>
       </div>
 
