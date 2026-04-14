@@ -32,6 +32,7 @@ export interface IndexShareData {
   type: "index"
   index: IndexData
   livePrice?: string
+  liveAPY?: string
 }
 
 export interface PositionShareData {
@@ -100,7 +101,8 @@ function Toggle({
 function buildTweetText(data: ShareData): string {
   if (data.type === "index") {
     const tokens = data.index.tokens.join(", ")
-    return `Just discovered the ${data.index.name} on @FanIndexes — earning ${data.index.apy} APY backed by ${tokens} fan tokens on Chiliz Chain.\n\nInvest in the future of sports. fanindex.pro\n\n#Chiliz #CHZ #FanTokens #DeFi`
+    const apy = data.liveAPY ?? data.index.apy
+    return `Just discovered the ${data.index.name} on @FanIndexes — earning ${apy} APY backed by ${tokens} fan tokens on Chiliz Chain.\n\nInvest in the future of sports. fanindex.pro\n\n#Chiliz #CHZ #FanTokens #DeFi`
   }
   if (data.type === "position") {
     const val = data.totalValueCHZ > 0 ? `${data.totalValueCHZ.toFixed(2)} CHZ` : "–"
@@ -186,14 +188,15 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   // ── Card rendered for visible PREVIEW (no ref, just visual) ──────────────
   const previewCard =
     data.type === "index" ? (
-      <IndexShareCard
-        index={data.index}
-        livePrice={data.livePrice}
-        showPrice={showPrice}
-        showTokens={showTokens}
-        showApy={showApy}
-        cardRef={{ current: null }}
-      />
+<IndexShareCard
+  index={data.index}
+  livePrice={data.livePrice}
+  liveAPY={data.liveAPY}
+  showPrice={showPrice}
+  showTokens={showTokens}
+  showApy={showApy}
+  cardRef={{ current: null }}
+/>
     ) : data.type === "position" ? (
       <PositionShareCard
         holding={data.holding}
@@ -216,14 +219,15 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   // ── Card rendered OFF-SCREEN at full size for html2canvas capture ─────────
   const captureCard =
     data.type === "index" ? (
-      <IndexShareCard
-        index={data.index}
-        livePrice={data.livePrice}
-        showPrice={showPrice}
-        showTokens={showTokens}
-        showApy={showApy}
-        cardRef={cardRef}
-      />
+<IndexShareCard
+  index={data.index}
+  livePrice={data.livePrice}
+  liveAPY={data.liveAPY}
+  showPrice={showPrice}
+  showTokens={showTokens}
+  showApy={showApy}
+  cardRef={cardRef}
+/>
     ) : data.type === "position" ? (
       <PositionShareCard
         holding={data.holding}

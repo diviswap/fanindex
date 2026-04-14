@@ -10,7 +10,9 @@ import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice } from "@/lib/data/indices"
+import { calculateIndexPrice, getIndexAPY } from "@/lib/data/indices"
+import { getTokenBySymbol } from "@/lib/data/fan-tokens"
+import Image from "next/image"
 
 export interface IndexData {
   id: string
@@ -41,6 +43,11 @@ export function IndexCard({ index }: IndexCardProps) {
     }
     return Number.parseFloat(index.price).toFixed(2)
   }, [liveTokenPrices, index.tokens, index.price])
+
+  // Calculate real APY based on historical token performance
+  const displayAPY = useMemo(() => {
+    return getIndexAPY(index.tokens, index.type, liveTokenPrices ?? undefined)
+  }, [index.tokens, index.type, liveTokenPrices])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -128,7 +135,7 @@ export function IndexCard({ index }: IndexCardProps) {
                     </div>
                     <div className="flex items-center gap-1.5 text-xl font-bold text-success">
                       <TrendingUp className="h-5 w-5" />
-                      {index.apy}
+                      {displayAPY}
                     </div>
                   </div>
                   <div>
@@ -147,14 +154,26 @@ export function IndexCard({ index }: IndexCardProps) {
                     Asset Allocation ({index.tokens.length})
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {index.tokens.slice(0, 5).map((token) => (
-                      <span
-                        key={token}
-                        className="px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-foreground border border-border"
-                      >
-                        {token}
-                      </span>
-                    ))}
+                    {index.tokens.slice(0, 5).map((symbol) => {
+                      const tokenData = getTokenBySymbol(symbol)
+                      return (
+                        <span
+                          key={symbol}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-foreground border border-border"
+                        >
+                          {tokenData?.icon && (
+                            <Image
+                              src={tokenData.icon}
+                              alt={symbol}
+                              width={20}
+                              height={20}
+                              className="rounded-full"
+                            />
+                          )}
+                          {symbol}
+                        </span>
+                      )
+                    })}
                     {index.tokens.length > 5 && (
                       <span className="px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-muted-foreground border border-border">
                         +{index.tokens.length - 5}
@@ -198,7 +217,7 @@ export function IndexCard({ index }: IndexCardProps) {
       <ShareCardModal
         open={showShareModal}
         onOpenChange={setShowShareModal}
-        data={{ type: "index", index, livePrice: displayPrice }}
+        data={{ type: "index", index, livePrice: displayPrice, liveAPY: displayAPY }}
       />
     </>
   )

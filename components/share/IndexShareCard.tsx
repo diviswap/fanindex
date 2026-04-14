@@ -3,6 +3,7 @@ import type { IndexData } from "@/components/indices/IndexCard"
 interface IndexShareCardProps {
   index: IndexData
   livePrice?: string
+  liveAPY?: string
   showPrice?: boolean
   showTokens?: boolean
   showApy?: boolean
@@ -12,12 +13,14 @@ interface IndexShareCardProps {
 export function IndexShareCard({
   index,
   livePrice,
+  liveAPY,
   showPrice = true,
   showTokens = true,
   showApy = true,
   cardRef,
 }: IndexShareCardProps) {
   const price = livePrice ?? index.price
+  const apy = liveAPY ?? index.apy
 
   const typeColors: Record<string, string> = {
     weighted: "#3b82f6",
@@ -125,7 +128,7 @@ export function IndexShareCard({
           {showApy && (
             <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>
               <div style={{ fontSize: 12, color: "#6b7280", fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>Annual APY</div>
-              <div style={{ fontSize: 40, fontWeight: 800, color: "#10b981", letterSpacing: -1 }}>{index.apy}</div>
+              <div style={{ fontSize: 40, fontWeight: 800, color: "#10b981", letterSpacing: -1 }}>{apy}</div>
             </div>
           )}
           <div style={{ padding: "24px 0", borderBottom: "1px solid #1f2937" }}>

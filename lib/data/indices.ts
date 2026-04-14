@@ -34,6 +34,98 @@ export function calculateIndexPrice(
   return avgPrice > 0 ? avgPrice : 1
 }
 
+/**
+ * Calculate estimated APY for an index based on historical token performance.
+ * 
+ * Formula explanation:
+ * - We use the 7-day change (change7d) as a proxy for short-term momentum
+ * - Annualize the weekly return: weeklyReturn * 52 weeks = annualized
+ * - Apply different weighting strategies based on index type:
+ *   - Equal: Simple average of all tokens' annualized returns
+ *   - Weighted: Market-cap weighted average (larger tokens have more influence)
+ *   - Managed: Uses a volatility-adjusted return with diversification bonus
+ * 
+ * This is an ESTIMATE based on historical performance, not a guaranteed return.
+ */
+export function calculateIndexAPY(
+  tokenSymbols: string[],
+  indexType: "weighted" | "equal" | "managed",
+  livePrices?: Array<{ symbol: string; priceInCHZ: number; change7d?: number }>
+): number {
+  if (tokenSymbols.length === 0) return 0
+
+  // Get token data with 7-day changes
+  const tokenData = tokenSymbols
+    .map(symbol => {
+      const token = getTokenBySymbol(symbol)
+      if (!token) return null
+      
+      // Try live 7d change first, fallback to static
+      const liveData = livePrices?.find(p => p.symbol === symbol)
+      const change7d = liveData?.change7d ?? parseFloat(token.change7d) ?? 0
+      const marketCap = parseFloat(token.marketCap) || 1
+      
+      return { symbol, change7d, marketCap }
+    })
+    .filter((t): t is NonNullable<typeof t> => t !== null)
+
+  if (tokenData.length === 0) return 0
+
+  let weightedReturn: number
+
+  if (indexType === "equal") {
+    // Equal-Weight: Simple average of all tokens' returns
+    const totalReturn = tokenData.reduce((sum, t) => sum + t.change7d, 0)
+    weightedReturn = totalReturn / tokenData.length
+    
+  } else if (indexType === "weighted") {
+    // Market-Cap Weighted: Larger tokens contribute more to the return
+    const totalMarketCap = tokenData.reduce((sum, t) => sum + t.marketCap, 0)
+    weightedReturn = tokenData.reduce((sum, t) => {
+      const weight = t.marketCap / totalMarketCap
+      return sum + (t.change7d * weight)
+    }, 0)
+    
+  } else {
+    // Managed: Volatility-adjusted with diversification bonus
+    // Uses the Sharpe-like approach: reward consistent performers, penalize high variance
+    const returns = tokenData.map(t => t.change7d)
+    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length
+    const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length
+    const stdDev = Math.sqrt(variance)
+    
+    // Risk-adjusted return (penalize volatility)
+    const riskAdjustedReturn = stdDev > 0 ? avgReturn / (1 + stdDev * 0.1) : avgReturn
+    
+    // Diversification bonus: more tokens = lower risk = slight APY boost
+    const diversificationBonus = Math.min(tokenData.length * 0.5, 3) // Max 3% bonus
+    
+    weightedReturn = riskAdjustedReturn + diversificationBonus
+  }
+
+  // Annualize the weekly return: weeklyReturn * 52 = annualized percentage
+  // Add a small base yield (2%) to represent platform/staking rewards
+  const baseYield = 2
+  const annualizedReturn = (weightedReturn * 52) / 100 // Convert to decimal then back
+  
+  // Cap APY between 0% and 50% for realistic display
+  const estimatedAPY = Math.max(0, Math.min(50, baseYield + (annualizedReturn * 100)))
+  
+  return estimatedAPY
+}
+
+/**
+ * Get formatted APY string for display
+ */
+export function getIndexAPY(
+  tokenSymbols: string[],
+  indexType: "weighted" | "equal" | "managed",
+  livePrices?: Array<{ symbol: string; priceInCHZ: number; change7d?: number }>
+): string {
+  const apy = calculateIndexAPY(tokenSymbols, indexType, livePrices)
+  return `${apy.toFixed(1)}%`
+}
+
 export const INDICES: IndexData[] = [
   {
     id: "1",
