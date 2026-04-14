@@ -177,7 +177,7 @@ function AvailableIndexCard({
               )}
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Emitted NFTs</span>
+              <span className="text-muted-foreground">Holders</span>
               <span className="font-semibold text-foreground">{totalSupply ?? "--"}</span>
             </div>
           </div>
