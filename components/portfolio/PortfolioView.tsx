@@ -1,7 +1,7 @@
 "use client"
 
-import { useAccount, useBalance } from "wagmi"
-import { formatUnits } from "viem"
+import { useAccount, useBalance, useReadContracts } from "wagmi"
+import { formatUnits, erc20Abi } from "viem"
 import { Button } from "@/components/ui/button"
 import {
   TrendingUp,
@@ -155,23 +155,65 @@ export function PortfolioView() {
     return map
   }, [tokenPrices, liveTokenPrices])
 
-  // ── Fan Token balances (simulated for demo - in real app would read on-chain) ───
-  // For now, we show what tokens exist - real implementation would read ERC20 balances
+  // ── Fan Token balances (read on-chain ERC20 balances) ────────────────────────
+  // Get tokens with valid contract addresses
+  const tokensWithAddresses = useMemo(() => {
+    return FAN_TOKENS.filter(
+      (t) => t.contractAddress && t.contractAddress !== "0x0000000000000000000000000000000000000000"
+    )
+  }, [])
+
+  // Read all fan token balances in a single multicall
+  const { data: fanTokenBalances, isLoading: isLoadingFanTokens } = useReadContracts({
+    contracts: tokensWithAddresses.map((token) => ({
+      address: token.contractAddress as `0x${string}`,
+      abi: erc20Abi,
+      functionName: "balanceOf",
+      args: [address as `0x${string}`],
+    })),
+    query: {
+      enabled: isConnected && !!address && tokensWithAddresses.length > 0,
+    },
+  })
+
+  // Build user fan tokens list - only those with balance > 0
   const userFanTokens = useMemo(() => {
-    // Get tokens that have live prices as a proxy for "user might hold these"
-    // In production this would be actual on-chain balance reads
-    return FAN_TOKENS.slice(0, 6).map((token) => {
-      const livePrice = liveTokenPrices?.find(
-        (lp) => lp.symbol.toLowerCase() === token.symbol.toLowerCase()
-      )
-      return {
-        ...token,
-        balance: 0, // Would be real balance from on-chain
-        priceInCHZ: livePrice?.priceInCHZ ?? parseFloat(token.price) / 0.07,
-        valueInCHZ: 0,
+    if (!fanTokenBalances) return []
+
+    const tokensWithBalance: {
+      symbol: string
+      name: string
+      icon?: string
+      contractAddress: string
+      balance: number
+      priceInCHZ: number
+      valueInCHZ: number
+    }[] = []
+
+    tokensWithAddresses.forEach((token, i) => {
+      const result = fanTokenBalances[i]
+      if (result?.status === "success" && result.result) {
+        const balance = Number(formatUnits(result.result as bigint, 18))
+        if (balance > 0) {
+          const livePrice = liveTokenPrices?.find(
+            (lp) => lp.symbol.toLowerCase() === token.symbol.toLowerCase()
+          )
+          const priceInCHZ = livePrice?.priceInCHZ ?? parseFloat(token.price) / 0.07
+          tokensWithBalance.push({
+            symbol: token.symbol,
+            name: token.name,
+            icon: token.icon,
+            contractAddress: token.contractAddress,
+            balance,
+            priceInCHZ,
+            valueInCHZ: balance * priceInCHZ,
+          })
+        }
       }
     })
-  }, [liveTokenPrices])
+
+    return tokensWithBalance
+  }, [fanTokenBalances, tokensWithAddresses, liveTokenPrices])
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   const portfolioStats = useMemo(() => {
@@ -306,7 +348,7 @@ export function PortfolioView() {
           <div className="flex items-start justify-between">
             <div>
               <div className="text-sm text-muted-foreground mb-2 font-medium">Total Value</div>
-              {isLoadingOnChain || isLoadingBalance ? (
+              {isLoadingOnChain || isLoadingBalance || isLoadingFanTokens ? (
                 <div className="h-9 w-28 bg-muted rounded animate-pulse mb-2" />
               ) : (
                 <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
@@ -446,56 +488,77 @@ export function PortfolioView() {
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-foreground">Fan Tokens</h2>
             <p className="text-muted-foreground text-sm mt-1">
-              Your fan token holdings on Chiliz
+              {isLoadingFanTokens
+                ? "Reading balances from Chiliz..."
+                : `${userFanTokens.length} token${userFanTokens.length !== 1 ? "s" : ""} in your wallet`}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {userFanTokens.map((token) => (
-            <div
-              key={token.symbol}
-              className="border border-border bg-card rounded-xl p-4 hover:border-pink-500/30 hover:shadow-md transition-all"
-            >
-              <div className="flex items-center gap-3">
-                {token.icon ? (
-                  <img
-                    src={token.icon}
-                    alt={token.symbol}
-                    className="w-10 h-10 rounded-full object-contain"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
-                    <Coins className="h-5 w-5 text-pink-400" />
+        {/* Loading skeletons */}
+        {isLoadingFanTokens && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <FanTokenCardSkeleton />
+            <FanTokenCardSkeleton />
+            <FanTokenCardSkeleton />
+          </div>
+        )}
+
+        {/* Fan tokens with balance */}
+        {!isLoadingFanTokens && userFanTokens.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {userFanTokens.map((token) => (
+              <div
+                key={token.symbol}
+                className="border border-border bg-card rounded-xl p-4 hover:border-pink-500/30 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  {token.icon ? (
+                    <img
+                      src={token.icon}
+                      alt={token.symbol}
+                      className="w-10 h-10 rounded-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center">
+                      <Coins className="h-5 w-5 text-pink-400" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-foreground">{token.symbol}</span>
+                      <span className="text-xs text-muted-foreground truncate">{token.name}</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {token.priceInCHZ.toFixed(4)} CHZ
+                    </div>
                   </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-foreground">{token.symbol}</span>
-                    <span className="text-xs text-muted-foreground truncate">{token.name}</span>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {token.priceInCHZ.toFixed(4)} CHZ
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold text-foreground tabular-nums">
-                    {token.balance > 0 ? token.balance.toFixed(2) : "--"}
-                  </div>
-                  {token.valueInCHZ > 0 && (
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-foreground tabular-nums">
+                      {token.balance.toFixed(2)}
+                    </div>
                     <div className="text-xs text-success tabular-nums">
                       {token.valueInCHZ.toFixed(2)} CHZ
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        <p className="text-xs text-muted-foreground mt-4 text-center">
-          Fan token balances are read from on-chain. Connect your wallet to see your holdings.
-        </p>
+        {/* Empty state */}
+        {!isLoadingFanTokens && userFanTokens.length === 0 && (
+          <div className="border border-border border-dashed bg-card/50 rounded-2xl p-12 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted border border-border mb-4">
+              <Coins className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">No fan tokens yet</h3>
+            <p className="text-muted-foreground text-sm max-w-sm mx-auto">
+              You don&apos;t have any fan tokens in your wallet. Visit the Fan Tokens page to explore available tokens.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Allocation chart (only when positions exist) */}
