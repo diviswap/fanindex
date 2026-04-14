@@ -99,14 +99,15 @@ function Toggle({
 
 function buildTweetText(data: ShareData): string {
   if (data.type === "index") {
-    return `Discover the ${data.index.name} on @FanIndex — ${data.index.apy} APY with ${data.index.tokens.length} fan tokens on Chiliz.\n\n#Chiliz #FanTokens #DeFi\nfanindex.pro`
+    const tokens = data.index.tokens.join(", ")
+    return `Just discovered the ${data.index.name} on @FanIndexes — earning ${data.index.apy} APY backed by ${tokens} fan tokens on Chiliz Chain.\n\nInvest in the future of sports. fanindex.pro\n\n#Chiliz #CHZ #FanTokens #DeFi`
   }
   if (data.type === "position") {
     const val = data.totalValueCHZ > 0 ? `${data.totalValueCHZ.toFixed(2)} CHZ` : "–"
-    return `My ${data.indexName} position is worth ${val} on @FanIndex.\n\n#Chiliz #FanTokens\nfanindex.pro`
+    return `My ${data.holding.indexName} position on @FanIndexes is currently worth ${val}.\n\nBuilding my sports portfolio on Chiliz Chain. fanindex.pro\n\n#Chiliz #CHZ #FanTokens`
   }
   const val = data.totalValue > 0 ? `${data.totalValue.toFixed(2)} CHZ` : "–"
-  return `My @FanIndex portfolio is worth ${val} across ${data.positionsCount} positions.\n\n#Chiliz #FanTokens #DeFi\nfanindex.pro`
+  return `My @FanIndexes portfolio is worth ${val} across ${data.positionsCount} index position${data.positionsCount !== 1 ? "s" : ""}.\n\nInvesting in fan tokens on Chiliz Chain. fanindex.pro\n\n#Chiliz #CHZ #FanTokens #DeFi`
 }
 
 // ── Main modal ────────────────────────────────────────────────────────────────
@@ -137,8 +138,9 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
       data.type === "index"
         ? `fanindex-${data.index.id}.png`
         : data.type === "position"
-        ? `fanindex-nft-${data.tokenId}.png`
+        ? `fanindex-nft-${data.holding.tokenId}.png`
         : "fanindex-portfolio.png"
+    // downloadPng already uses cached dataUrl internally — no need to re-capture
     await downloadPng(filename)
     setDownloadDone(true)
     setTimeout(() => setDownloadDone(false), 2000)
@@ -307,25 +309,33 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
             {toggleRow}
           </div>
 
-          {/* Action buttons — always visible, capture on demand */}
-          <div className="flex gap-2 pt-1 border-t border-border mt-1">
-            {/* Save / Download */}
+          {/* Generate button — shown when image not yet captured */}
+          {!dataUrl && (
             <Button
-              onClick={async () => {
-                if (!dataUrl) await capture()
-                const filename =
-                  data.type === "index"
-                    ? `fanindex-${data.index.id}.png`
-                    : data.type === "position"
-                    ? `fanindex-nft-${data.holding.tokenId}.png`
-                    : "fanindex-portfolio.png"
-                await downloadPng(filename)
-                setDownloadDone(true)
-                setTimeout(() => setDownloadDone(false), 2000)
-              }}
+              onClick={handleCapture}
+              disabled={isCapturing}
+              className="w-full bg-success hover:bg-success/90 text-black font-bold h-11 rounded-xl"
+            >
+              {isCapturing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                "Generate Image"
+              )}
+            </Button>
+          )}
+
+          {/* Once ready: show Save + Share on X */}
+          {/* Action buttons */}
+          {dataUrl && <div className="flex gap-2 pt-4 border-t border-border">
+            {/* Save — downloadPng internally uses cached dataUrl, captures only if needed */}
+            <Button
+              onClick={handleDownload}
               disabled={isCapturing}
               variant="outline"
-              className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted hover:border-success/30 mt-3"
+              className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted hover:border-success/30"
             >
               {isCapturing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -337,26 +347,18 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               {downloadDone ? "Saved!" : "Save"}
             </Button>
 
-            {/* Share on X */}
+            {/* Share on X — opens tweet intent; image must be saved manually (X web intent does not accept blobs) */}
             <Button
-              onClick={async () => {
-                if (!dataUrl) await capture()
-                handleShareX()
-              }}
+              onClick={handleShareX}
               disabled={isCapturing}
-              className="flex-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 font-bold h-11 rounded-xl flex items-center justify-center gap-2 mt-3"
+              className="flex-1 bg-black hover:bg-neutral-900 text-white border border-neutral-800 font-bold h-11 rounded-xl flex items-center justify-center gap-2"
             >
-              {isCapturing ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                /* X (Twitter) wordmark — plain SVG, no icon library */
-                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
-                </svg>
-              )}
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current shrink-0" aria-hidden="true">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+              </svg>
               Share on X
             </Button>
-          </div>
+          </div>}
         </div>
       </DialogContent>
     </Dialog>
