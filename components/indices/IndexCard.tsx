@@ -1,8 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
-import { TrendingUp, Users, Share2, ArrowUpRight, Info } from "lucide-react"
+
+import { TrendingUp, TrendingDown, Users, Share2, ArrowUpRight } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
@@ -10,9 +10,12 @@ import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice, getIndexAPY } from "@/lib/data/indices"
+import { calculateIndexPrice } from "@/lib/data/indices"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import Image from "next/image"
+import useSWR from "swr"
+
+const fetcher = (url: string) => fetch(url).then(r => r.json())
 
 export interface IndexData {
   id: string
@@ -44,10 +47,21 @@ export function IndexCard({ index }: IndexCardProps) {
     return Number.parseFloat(index.price).toFixed(2)
   }, [liveTokenPrices, index.tokens, index.price])
 
-  // Calculate real APY based on historical token performance
-  const displayAPY = useMemo(() => {
-    return getIndexAPY(index.tokens, index.type, liveTokenPrices ?? undefined)
-  }, [index.tokens, index.type, liveTokenPrices])
+  // Fetch 90d history once, compute return client-side
+  const { data: history90d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    fetcher,
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+  )
+
+  const return90d = useMemo(() => {
+    const data = history90d?.data
+    if (!data || data.length < 2) return null
+    const first = data[0].price
+    const last = data[data.length - 1].price
+    if (!first) return null
+    return ((last - first) / first) * 100
+  }, [history90d])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -82,8 +96,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   return (
     <>
-      <TooltipProvider>
-        <Link href={`/indices/${index.id}`} className="block h-full group">
+      <Link href={`/indices/${index.id}`} className="block h-full group">
           <div className="h-full min-h-[500px] border border-border bg-card/80 backdrop-blur-sm p-8 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
@@ -105,38 +118,17 @@ export function IndexCard({ index }: IndexCardProps) {
                     <div className="text-xl font-bold text-foreground">{displayPrice} CHZ</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide flex items-center gap-1">
-                      APY
-                      <Tooltip>
-                        <TooltipTrigger
-                          asChild
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                          }}
-                        >
-                          <Info className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="top"
-                          className="max-w-xs"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                          }}
-                        >
-                          <p className="font-semibold mb-1">Annual Percentage Yield</p>
-                          <p className="text-xs">
-                            Estimated annual return based on the historical performance of the tokens that make up the
-                            index. APY is variable and may change depending on market conditions.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
+                      90d Return
                     </div>
-                    <div className="flex items-center gap-1.5 text-xl font-bold text-success">
-                      <TrendingUp className="h-5 w-5" />
-                      {displayAPY}
-                    </div>
+                    {return90d === null ? (
+                      <div className="text-xl font-bold text-muted-foreground">--</div>
+                    ) : (
+                      <div className={`flex items-center gap-1.5 text-xl font-bold ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
+                        {return90d >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                        {return90d >= 0 ? "+" : ""}{return90d.toFixed(1)}%
+                      </div>
+                    )}
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
@@ -211,8 +203,6 @@ export function IndexCard({ index }: IndexCardProps) {
             </div>
           </div>
         </Link>
-      </TooltipProvider>
-
       <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
       <ShareCardModal
         open={showShareModal}

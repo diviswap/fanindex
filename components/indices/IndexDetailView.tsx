@@ -10,7 +10,7 @@ import type { IndexData } from "./IndexCard"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice, getIndexAPY } from "@/lib/data/indices"
+import { calculateIndexPrice } from "@/lib/data/indices"
 import useSWR from "swr"
 
 interface IndexDetailViewProps {
@@ -59,27 +59,9 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  // Map time period to days for API
-  const periodDays = {
-    "24h": 1,
-    "7d": 7,
-    "30d": 30,
-    "90d": 90,
-  }
-
-  // Fetch historical price data from CoinGecko for the selected period
+  // Single 90-day fetch — slice client-side per period so the price is always
+  // derived from the same dataset (no price drift between period switches)
   const { data: historyData, isLoading: historyLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=${periodDays[timePeriod]}`,
-    fetcher,
-    {
-      refreshInterval: 300000,
-      revalidateOnFocus: false,
-      dedupingInterval: 60000,
-    }
-  )
-
-  // Fetch 90-day data for returns calculation
-  const { data: returns90d } = useSWR<HistoryResponse>(
     `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
     fetcher,
     {
@@ -97,25 +79,34 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     return index.price
   }, [liveTokenPrices, index.tokens, index.price])
 
+  // Slice the 90-day dataset to the selected period client-side
   const filteredData = useMemo(() => {
-    if (historyData?.data && historyData.data.length > 0) {
-      return historyData.data
+    const all = historyData?.data
+    if (!all || all.length === 0) return []
+    const now = Date.now()
+    const periodMs: Record<typeof timePeriod, number> = {
+      "24h": 1 * 24 * 60 * 60 * 1000,
+      "7d":  7 * 24 * 60 * 60 * 1000,
+      "30d": 30 * 24 * 60 * 60 * 1000,
+      "90d": 90 * 24 * 60 * 60 * 1000,
     }
-    return []
-  }, [historyData])
+    const cutoff = now - periodMs[timePeriod]
+    const sliced = all.filter(d => d.timestamp >= cutoff)
+    return sliced.length > 1 ? sliced : all
+  }, [historyData, timePeriod])
 
-  // Calculate returns for different periods
+  // Calculate real returns from the same 90d dataset
   const returns = useMemo(() => {
-    const data = returns90d?.data
+    const data = historyData?.data
     return {
       "24h": calculateReturn(data, 1),
-      "7d": calculateReturn(data, 7),
+      "7d":  calculateReturn(data, 7),
       "30d": calculateReturn(data, 30),
-      "90d": data && data.length >= 2 
-        ? ((data[data.length - 1].price - data[0].price) / data[0].price) * 100 
+      "90d": data && data.length >= 2
+        ? ((data[data.length - 1].price - data[0].price) / data[0].price) * 100
         : null,
     }
-  }, [returns90d])
+  }, [historyData])
 
   // ── Live aggregate stats from CoinGecko prices ──────────────────────────
   const liveStats = useMemo(() => {
@@ -141,11 +132,6 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
     return { totalMarketCap, totalVolume, annualisedVol }
   }, [liveTokenPrices, index.tokens])
-
-  const displayAPY = useMemo(
-    () => getIndexAPY(index.tokens, index.type, liveTokenPrices ?? undefined),
-    [index.tokens, index.type, liveTokenPrices]
-  )
 
   // Format dollar amounts compactly
   function fmtUSD(n: number): string {
@@ -412,17 +398,19 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Est. Annual Return</div>
-          <div className={`flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold ${parseFloat(displayAPY) >= 0 ? "text-success" : "text-destructive"}`}>
-            {parseFloat(displayAPY) >= 0
-              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-            }
-            {displayAPY}
-          </div>
-          {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">7d compounded × 52</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">90d Return</div>
+          {returns["90d"] === null ? (
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-muted-foreground">--</div>
+          ) : (
+            <div className={`flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold ${returns["90d"] >= 0 ? "text-success" : "text-destructive"}`}>
+              {returns["90d"] >= 0
+                ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+              }
+              {returns["90d"] >= 0 ? "+" : ""}{returns["90d"].toFixed(1)}%
+            </div>
           )}
+          <div className="text-xs text-muted-foreground mt-1">Last 90 days</div>
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
           <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">24h Volume</div>
