@@ -283,7 +283,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
           >
             <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "flex-start", justifyContent: "flex-start" }}>
               <div
-                style={{ width: 1080, height: 1350, transformOrigin: "top left", flexShrink: 0, overflow: "hidden" }}
+                style={{ width: 1080, height: 1080, transformOrigin: "top left", flexShrink: 0, overflow: "hidden" }}
                 ref={(el) => {
                   if (!el) return
                   const updateScale = () => {

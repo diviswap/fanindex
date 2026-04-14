@@ -49,17 +49,13 @@ export function useShareCard(): UseShareCardReturn {
         allowTaint: false,
         backgroundColor: null,
         logging: false,
-        width: cardRef.current.offsetWidth,
-        height: cardRef.current.offsetHeight,
-        onclone: (doc) => {
-          const el = doc.querySelector("[data-share-card]") as HTMLElement | null
-          if (el) {
-            el.style.fontFamily = "inherit"
-            el.style.width = "1080px"
-            el.style.height = "1080px"
-          }
-        },
+        width: 1080,
+        height: 1080,
+        windowWidth: 1080,
+        windowHeight: 1080,
       })
+      
+      // Convert to PNG dataURL
       const url = canvas.toDataURL("image/png", 1.0)
       dataUrlRef.current = url
       setDataUrl(url)

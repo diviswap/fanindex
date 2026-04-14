@@ -14,6 +14,29 @@ export function PositionShareCard({
   tokenRows,
   cardRef,
 }: PositionShareCardProps) {
+  // Detect theme from system preference
+  const isDark = typeof window !== 'undefined' 
+    ? window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true
+    : true
+
+  const colors = isDark ? {
+    background: "linear-gradient(135deg, #0c0c0c 0%, #0f0f0f 100%)",
+    text: "#f9fafb",
+    muted: "#6b7280",
+    border: "#1a1a1a",
+    grid: "radial-gradient(circle at 1px 1px, #ffffff06 1px, transparent 0)",
+    cardBg: "#161616",
+    cardBorder: "#252525",
+  } : {
+    background: "linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%)",
+    text: "#1f2937",
+    muted: "#6b7280",
+    border: "#e5e7eb",
+    grid: "radial-gradient(circle at 1px 1px, #00000003 1px, transparent 0)",
+    cardBg: "#e5e7eb",
+    cardBorder: "#d1d5db",
+  }
+
   const accent = "#10b981"
 
   return (
@@ -23,7 +46,7 @@ export function PositionShareCard({
       style={{
         width: 1080,
         height: 1080,
-        background: "linear-gradient(135deg, #0c0c0c 0%, #0f0f0f 100%)",
+        background: colors.background,
         borderRadius: 32,
         fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
         display: "flex",
@@ -31,7 +54,7 @@ export function PositionShareCard({
         position: "relative",
         overflow: "hidden",
         boxSizing: "border-box",
-        border: "1px solid #1a1a1a",
+        border: `1px solid ${colors.border}`,
       }}
     >
       {/* Top accent bar */}
@@ -40,7 +63,7 @@ export function PositionShareCard({
       {/* Subtle grid texture overlay */}
       <div style={{
         position: "absolute", inset: 0,
-        backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff06 1px, transparent 0)",
+        backgroundImage: colors.grid,
         backgroundSize: "40px 40px",
         pointerEvents: "none",
       }} />
@@ -53,7 +76,9 @@ export function PositionShareCard({
       }} />
       <div style={{
         position: "absolute", bottom: -150, left: -150, width: 500, height: 500,
-        background: "radial-gradient(circle, #10b98110 0%, transparent 60%)",
+        background: isDark
+          ? "radial-gradient(circle, #10b98110 0%, transparent 60%)"
+          : "radial-gradient(circle, #10b98108 0%, transparent 60%)",
         pointerEvents: "none",
       }} />
 
@@ -68,8 +93,8 @@ export function PositionShareCard({
               style={{ width: 40, height: 40, borderRadius: 8, objectFit: "contain", flexShrink: 0 }}
             />
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#f9fafb", letterSpacing: -0.3 }}>FanIndex</div>
-              <div style={{ fontSize: 10, color: "#4b5563", fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: colors.text, letterSpacing: -0.3 }}>FanIndex</div>
+              <div style={{ fontSize: 10, color: colors.muted, fontWeight: 500, letterSpacing: 0.5 }}>fanindex.pro</div>
             </div>
           </div>
           <div style={{
@@ -84,10 +109,10 @@ export function PositionShareCard({
         </div>
 
         {/* Position title */}
-        <div style={{ fontSize: 40, fontWeight: 800, color: "#f9fafb", letterSpacing: -1.5, lineHeight: 1.1, marginBottom: 8 }}>
+        <div style={{ fontSize: 40, fontWeight: 800, color: colors.text, letterSpacing: -1.5, lineHeight: 1.1, marginBottom: 8 }}>
           {holding.indexName}
         </div>
-        <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 20 }}>
+        <div style={{ fontSize: 13, color: colors.muted, marginBottom: 20 }}>
           NFT Position #{holding.tokenId.toString().slice(-4)}
         </div>
 
@@ -99,31 +124,31 @@ export function PositionShareCard({
           padding: "20px 24px",
           marginBottom: 28,
         }}>
-          <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Total Position Value</div>
+          <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 6 }}>Total Position Value</div>
           <div style={{ fontSize: 36, fontWeight: 800, color: accent, letterSpacing: -0.8, fontVariantNumeric: "tabular-nums" }}>
             {totalValueCHZ.toFixed(2)}
           </div>
-          <div style={{ fontSize: 13, color: "#4b5563", fontWeight: 600, marginTop: 3 }}>CHZ</div>
+          <div style={{ fontSize: 13, color: colors.muted, fontWeight: 600, marginTop: 3 }}>CHZ</div>
         </div>
 
         {/* Token breakdown section */}
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>Position Composition</div>
+          <div style={{ fontSize: 10, color: colors.muted, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>Position Composition</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, maxHeight: 180, overflowY: "auto" }}>
             {tokenRows.map((token) => (
               <div key={token.symbol} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
-                paddingBottom: 12, borderBottom: "1px solid #1f2937",
+                paddingBottom: 12, borderBottom: `1px solid ${isDark ? "#1f2937" : "#d1d5db"}`,
               }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#f9fafb", marginBottom: 2 }}>{token.name}</div>
-                  <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 500 }}>{token.symbol}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: colors.text, marginBottom: 2 }}>{token.name}</div>
+                  <div style={{ fontSize: 11, color: colors.muted, fontWeight: 500 }}>{token.symbol}</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 14, fontWeight: 800, color: accent, fontVariantNumeric: "tabular-nums" }}>
                     {token.valueInCHZ.toFixed(2)}
                   </div>
-                  <div style={{ fontSize: 11, color: "#6b7280", fontWeight: 500, marginTop: 1 }}>
+                  <div style={{ fontSize: 11, color: colors.muted, fontWeight: 500, marginTop: 1 }}>
                     {token.amount.toFixed(0)} tokens
                   </div>
                 </div>
