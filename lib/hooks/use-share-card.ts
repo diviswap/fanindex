@@ -17,13 +17,16 @@ export function useShareCard(): UseShareCardReturn {
   const cardRef = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<ShareCardStatus>("idle")
   const [dataUrl, setDataUrl] = useState<string | null>(null)
+  // Keep a ref so callbacks always read the latest value without stale closures
+  const dataUrlRef = useRef<string | null>(null)
 
   const capture = useCallback(async (): Promise<string | null> => {
+    // Return cached result immediately — never re-capture
+    if (dataUrlRef.current) return dataUrlRef.current
     if (!cardRef.current) return null
     setStatus("capturing")
 
     try {
-      // Dynamically import html2canvas to keep it out of the SSR bundle
       const html2canvas = (await import("html2canvas")).default
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
@@ -34,12 +37,12 @@ export function useShareCard(): UseShareCardReturn {
         width: cardRef.current.offsetWidth,
         height: cardRef.current.offsetHeight,
         onclone: (doc) => {
-          // Ensure fonts are loaded in the clone
           const el = doc.querySelector("[data-share-card]") as HTMLElement | null
           if (el) el.style.fontFamily = "inherit"
         },
       })
       const url = canvas.toDataURL("image/png", 1.0)
+      dataUrlRef.current = url
       setDataUrl(url)
       setStatus("success")
       return url
@@ -52,18 +55,19 @@ export function useShareCard(): UseShareCardReturn {
 
   const downloadPng = useCallback(
     async (filename = "fanindex-share.png") => {
-      const url = dataUrl ?? (await capture())
+      // Use ref so we always read the latest cached url, even if state hasn't re-rendered yet
+      const url = dataUrlRef.current ?? (await capture())
       if (!url) return
       const a = document.createElement("a")
       a.href = url
       a.download = filename
       a.click()
     },
-    [dataUrl, capture]
+    [capture]
   )
 
   const copyToClipboard = useCallback(async (): Promise<boolean> => {
-    const url = dataUrl ?? (await capture())
+    const url = dataUrlRef.current ?? (await capture())
     if (!url) return false
 
     try {
@@ -77,7 +81,7 @@ export function useShareCard(): UseShareCardReturn {
       console.error("[useShareCard] clipboard error:", err)
       return false
     }
-  }, [dataUrl, capture])
+  }, [capture])
 
   const shareToX = useCallback((text: string) => {
     const encoded = encodeURIComponent(text)
@@ -85,6 +89,7 @@ export function useShareCard(): UseShareCardReturn {
   }, [])
 
   const reset = useCallback(() => {
+    dataUrlRef.current = null
     setStatus("idle")
     setDataUrl(null)
   }, [])

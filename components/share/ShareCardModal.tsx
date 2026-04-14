@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import {
-  Download,
+  Copy,
   Check,
   Loader2,
   Wallet,
@@ -312,19 +312,19 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
           {/* Action buttons — always visible, capture lazily on first click */}
           <div className="flex gap-2 pt-4 border-t border-border">
             <Button
-              onClick={handleDownload}
+              onClick={handleCopy}
               disabled={isCapturing}
               variant="outline"
               className="flex-1 border-border bg-card h-11 rounded-xl font-semibold hover:bg-muted hover:border-success/30"
             >
               {isCapturing ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : downloadDone ? (
+              ) : copyDone ? (
                 <Check className="h-4 w-4 mr-2 text-success" />
               ) : (
-                <Download className="h-4 w-4 mr-2" />
+                <Copy className="h-4 w-4 mr-2" />
               )}
-              {downloadDone ? "Saved!" : "Save"}
+              {copyDone ? "Copied!" : "Copy Image"}
             </Button>
 
             <Button
