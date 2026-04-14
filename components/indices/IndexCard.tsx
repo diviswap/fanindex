@@ -39,33 +39,32 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  // Single 90d fetch — last point is used as current price so card and
-  // detail chart always show the same number.
-  const { data: history90d } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+  // 24h fetch — used for current price and 24h return on the card.
+  const { data: history24h } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
     fetcher,
-    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+    { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
 
   const displayPrice = useMemo(() => {
-    const data = history90d?.data
-    if (data && data.length > 0) {
-      return data[data.length - 1].price.toFixed(4)
-    }
     if (liveTokenPrices && liveTokenPrices.length > 0) {
       return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
     }
+    const data = history24h?.data
+    if (data && data.length > 0) {
+      return data[data.length - 1].price.toFixed(4)
+    }
     return Number.parseFloat(index.price).toFixed(4)
-  }, [history90d, liveTokenPrices, index.tokens, index.price])
+  }, [history24h, liveTokenPrices, index.tokens, index.price])
 
-  const return90d = useMemo(() => {
-    const data = history90d?.data
+  const return24h = useMemo(() => {
+    const data = history24h?.data
     if (!data || data.length < 2) return null
     const first = data[0].price
     const last = data[data.length - 1].price
     if (!first) return null
     return ((last - first) / first) * 100
-  }, [history90d])
+  }, [history24h])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -123,14 +122,14 @@ export function IndexCard({ index }: IndexCardProps) {
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
-                      90d Return
+                      24h Return
                     </div>
-                    {return90d === null ? (
+                    {return24h === null ? (
                       <div className="text-xl font-bold text-muted-foreground">--</div>
                     ) : (
-                      <div className={`flex items-center gap-1.5 text-xl font-bold ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
-                        {return90d >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
-                        {return90d >= 0 ? "+" : ""}{return90d.toFixed(1)}%
+                      <div className={`flex items-center gap-1.5 text-xl font-bold ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
+                        {return24h >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                        {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
                       </div>
                     )}
                   </div>
