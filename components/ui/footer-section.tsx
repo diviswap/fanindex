@@ -2,7 +2,7 @@
 import type React from "react"
 import type { ComponentProps, ReactNode } from "react"
 import { motion, useReducedMotion } from "framer-motion"
-import { Twitter, MessageCircle, BookOpen, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import Image from "next/image"
 
 interface FooterLink {
@@ -30,7 +30,6 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: "Documentation", href: "/resources" },
       { title: "Whitepaper", href: "/whitepaper", icon: FileText },
-      { title: "Blog", href: "/blog", icon: BookOpen },
     ],
   },
   {
@@ -38,12 +37,18 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: "Privacy Policy", href: "/privacy" },
       { title: "Terms of Service", href: "/terms" },
-      { title: "X", href: "https://x.com/FanIndexes", icon: Twitter },
+      { title: "X", href: "https://x.com/FanIndexes" },
     ],
   },
 ]
 
 export function Footer() {
+  const XIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
+    </svg>
+  )
+
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     // Only handle internal section links that start with #
     if (href.startsWith("#") && href.length > 1) {
@@ -80,18 +85,25 @@ export function Footer() {
               <div className="mb-10 md:mb-0">
                 <h3 className="text-xs text-foreground font-semibold">{section.label}</h3>
                 <ul className="text-muted-foreground mt-4 space-y-2 text-sm">
-                  {section.links.map((link) => (
-                    <li key={link.title}>
-                      <a
-                        href={link.href}
-                        onClick={(e) => handleLinkClick(e, link.href)}
-                        className="hover:text-success inline-flex items-center transition-all duration-300"
-                      >
-                        {link.icon && <link.icon className="me-1 size-4" />}
-                        {link.title}
-                      </a>
-                    </li>
-                  ))}
+                  {section.links.map((link) => {
+                    let Icon = link.icon
+                    // Use X icon for X links
+                    if (link.href === "https://x.com/FanIndexes") {
+                      Icon = XIcon
+                    }
+                    return (
+                      <li key={link.title}>
+                        <a
+                          href={link.href}
+                          onClick={(e) => handleLinkClick(e, link.href)}
+                          className="hover:text-success inline-flex items-center transition-all duration-300"
+                        >
+                          {Icon && <Icon className="me-1 size-4" />}
+                          {link.title}
+                        </a>
+                      </li>
+                    )
+                  })}
                 </ul>
               </div>
             </AnimatedContainer>
