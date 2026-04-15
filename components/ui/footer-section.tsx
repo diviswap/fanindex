@@ -20,32 +20,32 @@ const footerLinks: FooterSection[] = [
   {
     label: "Product",
     links: [
-      { title: "Features", href: "#features" },
-      { title: "About", href: "#about" },
-      { title: "Roadmap", href: "#roadmap" },
+      { title: "Indices", href: "/indices" },
+      { title: "Portfolio", href: "/portfolio" },
+      { title: "Fan Tokens", href: "/fan-tokens" },
     ],
   },
   {
     label: "Resources",
     links: [
+      { title: "Documentation", href: "/resources" },
       { title: "Whitepaper", href: "/whitepaper", icon: FileText },
-      { title: "Privacy", href: "/privacy" },
-      { title: "Terms", href: "/terms" },
+      { title: "Blog", href: "https://medium.com/fanindex", icon: BookOpen },
     ],
   },
   {
-    label: "Community",
+    label: "Legal & Support",
     links: [
+      { title: "Privacy Policy", href: "/privacy" },
+      { title: "Terms of Service", href: "/terms" },
       { title: "Twitter", href: "https://x.com/FanIndexes", icon: Twitter },
-      { title: "Discord", href: "#", icon: MessageCircle },
-      { title: "Blog", href: "#", icon: BookOpen },
     ],
   },
 ]
 
 export function Footer() {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    // Only handle internal section links
+    // Only handle internal section links that start with #
     if (href.startsWith("#") && href.length > 1) {
       e.preventDefault()
       const targetId = href.substring(1)
@@ -54,6 +54,7 @@ export function Footer() {
         element.scrollIntoView({ behavior: "smooth", block: "start" })
       }
     }
+    // External links and regular paths handled by browser default
   }
 
   return (
