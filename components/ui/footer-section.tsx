@@ -30,7 +30,7 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: "Documentation", href: "/resources" },
       { title: "Whitepaper", href: "/whitepaper", icon: FileText },
-      { title: "Blog", href: "https://medium.com/fanindex", icon: BookOpen },
+      { title: "Blog", href: "/blog", icon: BookOpen },
     ],
   },
   {
@@ -38,7 +38,7 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: "Privacy Policy", href: "/privacy" },
       { title: "Terms of Service", href: "/terms" },
-      { title: "Twitter", href: "https://x.com/FanIndexes", icon: Twitter },
+      { title: "X", href: "https://x.com/FanIndexes", icon: Twitter },
     ],
   },
 ]
