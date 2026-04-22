@@ -1,44 +1,18 @@
-import { http, createConfig, type Config } from "wagmi"
+import { http, createConfig, createStorage, type Config } from "wagmi"
 import { chiliz } from "wagmi/chains"
-import { walletConnect, injected } from "wagmi/connectors"
 
-// Get WalletConnect project ID from environment
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
-
-// Factory function to create config only on client side
-// This avoids indexedDB errors during SSR
-export function createWagmiConfig(): Config {
+// Base config factory — no connectors here.
+// Connectors are injected by Web3Provider after mount to avoid
+// pulling @metamask/sdk and WalletConnect into the SSR bundle.
+export function createWagmiConfig(connectors: any[] = []): Config {
   return createConfig({
     chains: [chiliz],
-    connectors: [
-      injected({
-        target: "metaMask",
-      }),
-      injected({
-        target: "coinbaseWallet",
-      }),
-      injected(), // Generic injected for other browser wallets
-      walletConnect({
-        projectId,
-        metadata: {
-          name: "FanIndex",
-          description: "Fan Token Investment Platform",
-          url: "https://fanindex.app",
-          icons: ["https://fanindex.app/logo.png"],
-        },
-      }),
-    ],
+    connectors,
     transports: {
       [chiliz.id]: http(),
     },
+    // Persist the session in localStorage so the wallet stays connected
+    // across page navigations and SSR → client config swaps.
+    storage: createStorage({ storage: typeof window !== "undefined" ? window.localStorage : undefined }),
   })
-}
-
-// For backward compatibility - lazy initialized config
-let _config: Config | null = null
-export const getConfig = (): Config => {
-  if (!_config) {
-    _config = createWagmiConfig()
-  }
-  return _config
 }

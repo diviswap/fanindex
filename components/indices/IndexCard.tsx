@@ -1,15 +1,21 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip"
-import { TrendingUp, Users, BarChart3, ArrowUpRight, Info } from "lucide-react"
+
+import { TrendingUp, TrendingDown, Users, Share2, ArrowUpRight } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
+import { ShareCardModal } from "@/components/share/ShareCardModal"
 import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { calculateIndexPrice } from "@/lib/data/indices"
+import { getTokenBySymbol } from "@/lib/data/fan-tokens"
+import Image from "next/image"
+import useSWR from "swr"
+
+const fetcher = (url: string) => fetch(url).then(r => r.json())
 
 export interface IndexData {
   id: string
@@ -29,16 +35,45 @@ interface IndexCardProps {
 
 export function IndexCard({ index }: IndexCardProps) {
   const [showBuyDialog, setShowBuyDialog] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
+  // 90d fetch — same as detail view, then slice client-side for 24h
+  // This ensures 24h return matches the detail chart exactly
+  const { data: history90d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    fetcher,
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+  )
+
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      const price = calculateIndexPrice(index.tokens, liveTokenPrices)
-      return typeof price === "number" ? price.toFixed(2) : Number.parseFloat(price).toFixed(2)
+      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
     }
-    return typeof index.price === "number" ? index.price.toFixed(2) : Number.parseFloat(index.price).toFixed(2)
-  }, [liveTokenPrices, index.tokens, index.price])
+    const data = history90d?.data
+    if (data && data.length > 0) {
+      return data[data.length - 1].price.toFixed(4)
+    }
+    return Number.parseFloat(index.price).toFixed(4)
+  }, [history90d, liveTokenPrices, index.tokens, index.price])
+
+  // Slice to last 24h (same logic as IndexDetailView)
+  const slice24h = useMemo(() => {
+    const data = history90d?.data
+    if (!data || data.length === 0) return []
+    const cutoff = Date.now() - 1 * 24 * 60 * 60 * 1000
+    const sliced = data.filter((d: { timestamp: number; date: string; price: number; volume: number }) => d.timestamp >= cutoff)
+    return sliced.length > 1 ? sliced : data
+  }, [history90d])
+
+  const return24h = useMemo(() => {
+    if (slice24h.length < 2) return null
+    const first = slice24h[0].price
+    const last = slice24h[slice24h.length - 1].price
+    if (!first || first === 0) return null
+    return ((last - first) / first) * 100
+  }, [slice24h])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -73,8 +108,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   return (
     <>
-      <TooltipProvider>
-        <Link href={`/indices/${index.id}`} className="block h-full group">
+      <Link href={`/indices/${index.id}`} className="block h-full group">
           <div className="h-full min-h-[500px] border border-border bg-card/80 backdrop-blur-sm p-8 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
@@ -96,38 +130,17 @@ export function IndexCard({ index }: IndexCardProps) {
                     <div className="text-xl font-bold text-foreground">{displayPrice} CHZ</div>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide flex items-center gap-1">
-                      APY
-                      <Tooltip>
-                        <TooltipTrigger
-                          asChild
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                          }}
-                        >
-                          <Info className="h-3.5 w-3.5 text-muted-foreground/60 hover:text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent
-                          side="top"
-                          className="max-w-xs"
-                          onClick={(e) => {
-                            e.preventDefault()
-                            e.stopPropagation()
-                          }}
-                        >
-                          <p className="font-semibold mb-1">Annual Percentage Yield</p>
-                          <p className="text-xs">
-                            Estimated annual return based on the historical performance of the tokens that make up the
-                            index. APY is variable and may change depending on market conditions.
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
+                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
+                      24h Return
                     </div>
-                    <div className="flex items-center gap-1.5 text-xl font-bold text-success">
-                      <TrendingUp className="h-5 w-5" />
-                      {index.apy}
-                    </div>
+                    {return24h === null ? (
+                      <div className="text-xl font-bold text-muted-foreground">--</div>
+                    ) : (
+                      <div className={`flex items-center gap-1.5 text-xl font-bold ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
+                        {return24h >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                        {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
+                      </div>
+                    )}
                   </div>
                   <div>
                     <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
@@ -145,14 +158,26 @@ export function IndexCard({ index }: IndexCardProps) {
                     Asset Allocation ({index.tokens.length})
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {index.tokens.slice(0, 5).map((token) => (
-                      <span
-                        key={token}
-                        className="px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-foreground border border-border"
-                      >
-                        {token}
-                      </span>
-                    ))}
+                    {index.tokens.slice(0, 5).map((symbol) => {
+                      const tokenData = getTokenBySymbol(symbol)
+                      return (
+                        <span
+                          key={symbol}
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-foreground border border-border"
+                        >
+                          {tokenData?.icon && (
+                            <Image
+                              src={tokenData.icon}
+                              alt={symbol}
+                              width={20}
+                              height={20}
+                              className="rounded-full"
+                            />
+                          )}
+                          {symbol}
+                        </span>
+                      )
+                    })}
                     {index.tokens.length > 5 && (
                       <span className="px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-muted-foreground border border-border">
                         +{index.tokens.length - 5}
@@ -177,17 +202,25 @@ export function IndexCard({ index }: IndexCardProps) {
                 <Button
                   variant="outline"
                   className="border-border bg-card/50 text-foreground hover:bg-muted h-12 w-12 p-0 rounded-xl"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowShareModal(true)
+                  }}
+                  title="Share this index"
                 >
-                  <BarChart3 className="h-5 w-5" />
+                  <Share2 className="h-5 w-5" />
                 </Button>
               </div>
             </div>
           </div>
         </Link>
-      </TooltipProvider>
-
-      <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} />
+      <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
+      <ShareCardModal
+        open={showShareModal}
+        onOpenChange={setShowShareModal}
+        data={{ type: "index", index, livePrice: displayPrice }}
+      />
     </>
   )
 }

@@ -1,82 +1,39 @@
 "use client"
 
-import { ArrowDownRight, ArrowUpRight, ExternalLink } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useDemoMode } from "@/lib/demo/DemoModeContext"
+import { ArrowDownRight, ArrowUpRight, ExternalLink, History } from "lucide-react"
 import { useAccount } from "wagmi"
 
-interface Transaction {
+interface OnChainTx {
+  id: string
+  type: "buy" | "sell" | "withdraw"
+  tokenId: string
+  amountCHZ: number
+  txHash: `0x${string}` | null
+  blockNumber: bigint | null
+  user: string
+}
+
+interface DisplayTransaction {
   id: string
   type: "buy" | "sell"
   indexName: string
   amount: number
-  price: number
   total: number
-  timestamp: Date
+  timestamp: Date | null
   txHash: string
+  blockNumber?: bigint
 }
 
-const MOCK_TRANSACTIONS: Transaction[] = [
-  {
-    id: "1",
-    type: "buy",
-    indexName: "Champions League Index",
-    amount: 2,
-    price: 100,
-    total: 200,
-    timestamp: new Date("2024-01-15T10:30:00"),
-    txHash: "0x1234...5678",
-  },
-  {
-    id: "2",
-    type: "buy",
-    indexName: "Premier League Index",
-    amount: 1,
-    price: 80,
-    total: 80,
-    timestamp: new Date("2024-01-14T15:45:00"),
-    txHash: "0xabcd...efgh",
-  },
-  {
-    id: "3",
-    type: "sell",
-    indexName: "La Liga Elite",
-    amount: 1,
-    price: 120,
-    total: 120,
-    timestamp: new Date("2024-01-10T09:20:00"),
-    txHash: "0x9876...4321",
-  },
-  {
-    id: "4",
-    type: "buy",
-    indexName: "Champions League Index",
-    amount: 1,
-    price: 95,
-    total: 95,
-    timestamp: new Date("2024-01-08T14:15:00"),
-    txHash: "0xfedc...ba98",
-  },
-]
+interface TransactionHistoryProps {
+  refetchPortfolio?: () => void
+  onChainTxs?: OnChainTx[]
+}
 
-export function TransactionHistory() {
-  const { isDemoMode, demoTransactions } = useDemoMode()
+export function TransactionHistory({ onChainTxs = [] }: TransactionHistoryProps) {
   const { isConnected } = useAccount()
 
-  const displayTransactions: Transaction[] = isDemoMode
-    ? demoTransactions.map((tx) => ({
-        id: tx.id,
-        type: tx.type,
-        indexName: tx.indexName,
-        amount: tx.units,
-        price: tx.price,
-        total: tx.amount,
-        timestamp: new Date(tx.timestamp),
-        txHash: `0x${tx.id.slice(-8)}...${tx.id.slice(-4)}`,
-      }))
-    : [] // Empty array for real mode until we implement blockchain transaction reading
-
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | null) => {
+    if (!date) return "Just now"
     return new Intl.DateTimeFormat("en-US", {
       month: "short",
       day: "numeric",
@@ -87,102 +44,126 @@ export function TransactionHistory() {
   }
 
   const openExplorer = (txHash: string) => {
+    if (!txHash || txHash.startsWith("0x00")) return
     window.open(`https://chiliscan.com/tx/${txHash}`, "_blank")
   }
+
+  const displayTransactions: DisplayTransaction[] = onChainTxs.map((tx) => ({
+    id: tx.id,
+    type: (tx.type === "buy" ? "buy" : "sell") as "buy" | "sell",
+    indexName: `NFT Position #${tx.tokenId}`,
+    amount: 1,
+    total: tx.amountCHZ,
+    timestamp: null,
+    txHash: tx.txHash ?? "pending",
+    blockNumber: tx.blockNumber ?? undefined,
+  }))
 
   return (
     <div className="border border-border bg-card backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Transaction History</h3>
+          <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
+            Transaction History
+          </h3>
           <p className="text-base text-muted-foreground">
             {displayTransactions.length > 0
-              ? `${displayTransactions.length} transactions`
-              : isConnected && !isDemoMode
-                ? "Connect to view your transactions"
-                : "No transactions yet"}
+              ? `${displayTransactions.length} transaction${displayTransactions.length !== 1 ? "s" : ""}`
+              : "Transactions will appear here after you buy or sell"}
           </p>
         </div>
+        {isConnected && (
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+            </span>
+            <span className="text-xs text-success font-medium">Live</span>
+          </div>
+        )}
       </div>
 
       <div className="space-y-3">
         {displayTransactions.length === 0 ? (
           <div className="text-center py-16">
-            <div className="text-lg text-muted-foreground mb-2">
-              {isConnected && !isDemoMode ? "No transactions found" : "No transactions yet"}
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-muted border border-border mb-4">
+              <History className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div className="text-base text-muted-foreground mb-2 font-medium">
+              No transactions yet
             </div>
             <div className="text-sm text-muted-foreground/70">
-              {isConnected && !isDemoMode
-                ? "Your transaction history will appear here after your first trade"
-                : "Start trading to see your transaction history"}
+              Buy or sell a position to see your transaction history
             </div>
           </div>
         ) : (
           displayTransactions.map((tx) => (
             <div
               key={tx.id}
-              className="flex items-center gap-4 p-5 rounded-xl bg-muted/30 border border-border hover:bg-muted/50 hover:border-border/80 transition-all duration-200"
+              className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 border border-border hover:bg-muted/50 hover:border-border/80 transition-all duration-200"
             >
               <div
-                className={`p-2 md:p-3 rounded-xl shrink-0 ${
+                className={`p-2.5 rounded-xl shrink-0 ${
                   tx.type === "buy"
                     ? "bg-success/10 border border-success/20"
                     : "bg-destructive/10 border border-destructive/20"
                 }`}
               >
                 {tx.type === "buy" ? (
-                  <ArrowDownRight className="h-4 w-4 md:h-5 md:w-5 text-success" />
+                  <ArrowDownRight className="h-4 w-4 text-success" />
                 ) : (
-                  <ArrowUpRight className="h-4 w-4 md:h-5 md:w-5 text-destructive" />
+                  <ArrowUpRight className="h-4 w-4 text-destructive" />
                 )}
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 md:gap-2 mb-0.5 md:mb-1">
-                  <span className="text-sm md:text-base font-semibold text-foreground capitalize">{tx.type}</span>
-                  <span className="text-muted-foreground text-xs md:text-sm">•</span>
-                  <span className="text-xs md:text-sm text-foreground/80 truncate">{tx.indexName}</span>
-                </div>
-                <div className="flex items-center gap-2 md:gap-3 text-xs md:text-sm text-muted-foreground">
-                  <span>
-                    {tx.amount} × {tx.price} CHZ
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <span className="text-sm font-semibold text-foreground capitalize">
+                    {tx.type}
                   </span>
-                  <span className="hidden sm:inline">•</span>
+                  <span className="text-muted-foreground text-xs">•</span>
+                  <span className="text-xs text-foreground/80 truncate">{tx.indexName}</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  {tx.blockNumber && (
+                    <>
+                      <span>Block {tx.blockNumber.toString()}</span>
+                      <span className="hidden sm:inline">•</span>
+                    </>
+                  )}
                   <span className="hidden sm:inline">{formatDate(tx.timestamp)}</span>
                 </div>
               </div>
 
               <div className="flex flex-col items-end gap-1 shrink-0">
                 <div
-                  className={`text-sm md:text-base font-bold ${tx.type === "buy" ? "text-destructive" : "text-success"}`}
+                  className={`text-sm font-bold tabular-nums ${
+                    tx.type === "buy" ? "text-destructive" : "text-success"
+                  }`}
                 >
                   {tx.type === "buy" ? "-" : "+"}
-                  {tx.total.toFixed(2)} CHZ
+                  {tx.total > 0 ? `${tx.total.toFixed(2)} CHZ` : "Tokens"}
                 </div>
-                <button
-                  onClick={() => openExplorer(tx.txHash)}
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                >
-                  <span className="hidden sm:inline">{tx.txHash}</span>
-                  <span className="sm:hidden">View</span>
-                  <ExternalLink className="h-3 w-3" />
-                </button>
+                {tx.txHash && tx.txHash !== "pending" && (
+                  <button
+                    onClick={() => openExplorer(tx.txHash)}
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+                  >
+                    <span className="hidden sm:inline font-mono">
+                      {tx.txHash.slice(0, 10)}...
+                    </span>
+                    <span className="sm:hidden">View</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </button>
+                )}
+                {tx.txHash === "pending" && (
+                  <span className="text-xs text-yellow-500 font-medium">Confirming...</span>
+                )}
               </div>
             </div>
           ))
         )}
       </div>
-
-      {displayTransactions.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-border">
-          <Button
-            variant="outline"
-            className="w-full border-border bg-card text-foreground hover:bg-muted h-11 font-semibold"
-          >
-            View All Transactions
-          </Button>
-        </div>
-      )}
     </div>
   )
 }

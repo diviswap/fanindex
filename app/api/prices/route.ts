@@ -24,12 +24,14 @@ export async function GET(request: Request) {
     const tokensWithId = tokensToFetch.filter((t) => t.cgId)
     const tokensWithAddressOnly = tokensToFetch.filter((t) => !t.cgId && t.wrapped)
 
+    type PriceMap = Record<string, { usd?: number; usd_24h_change?: number; usd_7d_change?: number; usd_market_cap?: number; usd_24h_vol?: number }>
+
     // Fetch data in parallel
     const [pricesById, pricesByAddress] = await Promise.all([
-      tokensWithId.length > 0 ? fetchPricesByIds(tokensWithId.map((t) => t.cgId!)) : Promise.resolve({}),
+      tokensWithId.length > 0 ? fetchPricesByIds(tokensWithId.map((t) => t.cgId!)) : Promise.resolve({} as PriceMap),
       tokensWithAddressOnly.length > 0
         ? fetchTokenPrices(tokensWithAddressOnly.map((t) => t.wrapped!.toLowerCase()))
-        : Promise.resolve({}),
+        : Promise.resolve({} as PriceMap),
     ])
 
     // Map results back to tokens
@@ -49,6 +51,7 @@ export async function GET(request: Request) {
         symbol: token.symbol,
         address: token.wrapped,
         cgId: token.cgId,
+        icon: token.icon ?? null,
         priceUSD: priceData?.usd || Number.parseFloat(token.price),
         priceInCHZ: priceData?.usd ? priceData.usd / chzPrice : Number.parseFloat(token.price) / chzPrice,
         change24h: priceData?.usd_24h_change || Number.parseFloat(token.change24h),

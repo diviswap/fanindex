@@ -1,11 +1,55 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Component, type ReactNode } from "react"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { Footer } from "@/components/ui/footer-section"
 import { PortfolioView } from "@/components/portfolio/PortfolioView"
-import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
+class PortfolioErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-[50vh] flex flex-col items-center justify-center gap-6 text-center px-4">
+          <div className="p-4 rounded-full bg-destructive/10 border border-destructive/20">
+            <svg className="h-10 w-10 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-foreground mb-2">Portfolio failed to load</h2>
+            <p className="text-muted-foreground text-sm max-w-sm">
+              There was a problem loading the portfolio. Please refresh the page.
+            </p>
+            {this.state.error && (
+              <p className="text-xs text-muted-foreground/60 mt-2 font-mono max-w-sm truncate">
+                {this.state.error.message}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-5 py-2.5 rounded-lg bg-success text-background font-semibold text-sm hover:bg-success/90 transition-colors"
+          >
+            Refresh Page
+          </button>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 export default function PortfolioPage() {
   useEffect(() => {
@@ -14,7 +58,6 @@ export default function PortfolioPage() {
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
-      <DemoModeBanner />
       <WebGLShader />
       <NavBar />
 
@@ -32,7 +75,9 @@ export default function PortfolioPage() {
           </p>
         </div>
 
-        <PortfolioView />
+        <PortfolioErrorBoundary>
+          <PortfolioView />
+        </PortfolioErrorBoundary>
       </main>
 
       <Footer />

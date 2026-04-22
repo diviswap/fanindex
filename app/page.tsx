@@ -19,7 +19,6 @@ import { ConnectWallet } from "@/components/web3/ConnectWallet"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useEffect } from "react"
-import { DemoModeBanner } from "@/components/demo/DemoModeBanner"
 import Image from "next/image"
 
 export default function FanIndexLanding() {
@@ -29,8 +28,6 @@ export default function FanIndexLanding() {
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
-      <DemoModeBanner />
-
       <NavBar />
 
       <main className="relative z-10 w-full">

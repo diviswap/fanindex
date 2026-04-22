@@ -10,34 +10,15 @@ export const MAINNET_CONTRACTS = {
   NFT: "0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9" as `0x${string}`,
 } as const
 
+// Currently only the Global ETF is deployed on mainnet
 export const ETF_CONTRACTS = {
-  // FanIndex Global ETF (id: "1") -> Main Mainnet ETF
+  // FanIndex Global ETF (id: "1") -> Main Mainnet ETF (50% OG, 50% VCF)
   "1": {
     vault: MAINNET_CONTRACTS.ETF_VAULT,
     nft: MAINNET_CONTRACTS.NFT,
     batchBuyer: MAINNET_CONTRACTS.BATCH_BUYER,
     name: "FanIndex Global ETF",
-  },
-  // Premier League Index (id: "2") -> England ETF
-  "2": {
-    vault: MAINNET_CONTRACTS.ETF_VAULT,
-    nft: MAINNET_CONTRACTS.NFT,
-    batchBuyer: MAINNET_CONTRACTS.BATCH_BUYER,
-    name: "FanIndex ENGLAND ETF",
-  },
-  // Serie A Champions (id: "3") -> Italy ETF
-  "3": {
-    vault: MAINNET_CONTRACTS.ETF_VAULT,
-    nft: MAINNET_CONTRACTS.NFT,
-    batchBuyer: MAINNET_CONTRACTS.BATCH_BUYER,
-    name: "FanIndex ITALY ETF",
-  },
-  // La Liga Elite (id: "4") -> Spain ETF
-  "4": {
-    vault: MAINNET_CONTRACTS.ETF_VAULT,
-    nft: MAINNET_CONTRACTS.NFT,
-    batchBuyer: MAINNET_CONTRACTS.BATCH_BUYER,
-    name: "FanIndex SPAIN ETF",
+    tokens: 2, // OG and VCF
   },
 } as const
 

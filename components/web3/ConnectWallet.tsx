@@ -20,16 +20,13 @@ import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, Che
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"
-import Image from "next/image"
 import { cn } from "@/lib/utils"
 
 export function ConnectWallet() {
   const { address, isConnected, connector } = useAccount()
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
-  const { data: balance } = useBalance({
-    address: address,
-  })
+  const { data: balance } = useBalance({ address })
   const [mounted, setMounted] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null)
@@ -40,26 +37,21 @@ export function ConnectWallet() {
   }, [])
 
   const handleConnect = async (connectorId: string) => {
-    const connector = connectors.find((c) => c.id === connectorId)
-    if (connector) {
-      setConnectingWallet(connectorId)
-      try {
-        await connect({ connector })
-        localStorage.setItem("wagmi.connected", "true")
-        localStorage.setItem("wagmi.connector", connectorId)
-        setDialogOpen(false)
-      } catch (error) {
-        console.error("Connection failed:", error)
-      } finally {
-        setConnectingWallet(null)
-      }
+    const found = connectors.find((c) => c.id === connectorId)
+    if (!found) return
+    setConnectingWallet(connectorId)
+    try {
+      await connect({ connector: found })
+      setDialogOpen(false)
+    } catch (error) {
+      // wagmi surfaces errors via its own error state
+    } finally {
+      setConnectingWallet(null)
     }
   }
 
   const handleDisconnect = () => {
     disconnect()
-    localStorage.removeItem("wagmi.connected")
-    localStorage.removeItem("wagmi.connector")
     toast.success("Wallet disconnected")
   }
 
@@ -73,35 +65,19 @@ export function ConnectWallet() {
   }
 
   const getWalletInfo = (connectorId: string) => {
-    if (connectorId.includes("metaMask")) {
-      return {
-        name: "MetaMask",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-        description: "Connect using browser extension",
-        popular: true,
-      }
-    }
-    if (connectorId.includes("coinbase")) {
-      return {
-        name: "Coinbase Wallet",
-        logo: "https://avatars.githubusercontent.com/u/18060234?s=200&v=4",
-        description: "Connect using Coinbase Wallet",
-        popular: true,
-      }
-    }
     if (connectorId.includes("walletConnect")) {
       return {
         name: "WalletConnect",
         logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        description: "Scan with mobile wallet",
+        description: "Scan with any mobile wallet",
         popular: true,
       }
     }
     return {
       name: "Browser Wallet",
-      logo: "https://cdn-icons-png.flaticon.com/512/2965/2965358.png",
-      description: "Connect using browser wallet",
-      popular: false,
+      logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+      description: "MetaMask, Coinbase, or any EIP-1193 wallet",
+      popular: true,
     }
   }
 
@@ -120,7 +96,7 @@ export function ConnectWallet() {
   if (isConnected && address) {
     const walletInfo = connector
       ? getWalletInfo(connector.id)
-      : { name: "Wallet", logo: "https://cdn-icons-png.flaticon.com/512/2965/2965358.png", description: "", popular: false }
+      : { name: "Wallet", logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg", description: "", popular: false }
 
     return (
       <DropdownMenu>
@@ -153,8 +129,9 @@ export function ConnectWallet() {
             <div className="relative flex items-center gap-3">
               <div className="relative">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-background to-muted flex items-center justify-center border border-success/30">
-                  <Image
-                    src={walletInfo.logo || "/placeholder.svg"}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={walletInfo.logo}
                     alt={walletInfo.name}
                     width={24}
                     height={24}
@@ -179,9 +156,7 @@ export function ConnectWallet() {
             {/* Address */}
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                  Address
-                </span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Address</span>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -201,9 +176,7 @@ export function ConnectWallet() {
               <div className="p-2.5 bg-success/5 rounded-lg border border-success/20">
                 <div className="flex items-center gap-1.5 mb-1">
                   <Zap className="h-3 w-3 text-success" />
-                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
-                    Balance
-                  </span>
+                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Balance</span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-lg font-bold text-foreground">
@@ -281,80 +254,82 @@ export function ConnectWallet() {
       </DialogTrigger>
       <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden">
         <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        
+
         <div className="relative">
           {/* Header */}
           <DialogHeader className="px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
-                <Wallet className="h-4.5 w-4.5 text-success" />
+                <Wallet className="h-4 w-4 text-success" />
               </div>
               <div>
                 <DialogTitle className="text-base font-bold">Connect Wallet</DialogTitle>
-                <p className="text-xs text-muted-foreground">Choose your wallet</p>
+                <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
               </div>
             </div>
           </DialogHeader>
 
           {/* Wallet Options */}
           <div className="p-3 space-y-1.5">
-            {connectors.map((connector) => {
-              const { name, logo, description, popular } = getWalletInfo(connector.id)
-              const isConnecting = connectingWallet === connector.id
-              
-              return (
-                <button
-                  key={connector.id}
-                  onClick={() => handleConnect(connector.id)}
-                  disabled={isConnecting}
-                  className={cn(
-                    "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-                    "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
-                    "focus:outline-none focus:ring-2 focus:ring-success/50",
-                    isConnecting && "opacity-70 cursor-wait"
-                  )}
-                >
-                  <div className="relative">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
-                      <Image 
-                        src={logo || "/placeholder.svg"} 
-                        alt={name} 
-                        width={24} 
-                        height={24} 
-                        className="rounded"
-                      />
-                    </div>
-                    {popular && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                        <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                      </div>
+            {connectors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                <span className="text-xs">Loading wallets...</span>
+              </div>
+            ) : (
+              connectors.map((c) => {
+                const { name, logo, description, popular } = getWalletInfo(c.id)
+                const isConnecting = connectingWallet === c.id
+
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => handleConnect(c.id)}
+                    disabled={isConnecting}
+                    className={cn(
+                      "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+                      "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                      "focus:outline-none focus:ring-2 focus:ring-success/50",
+                      isConnecting && "opacity-70 cursor-wait",
                     )}
-                  </div>
-                  
-                  <div className="relative flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
-                        {name}
-                      </span>
+                  >
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
+                      </div>
                       {popular && (
-                        <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                          Popular
-                        </span>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                        </div>
                       )}
                     </div>
-                    <span className="text-xs text-muted-foreground truncate block">{description}</span>
-                  </div>
-                  
-                  <div className="relative flex-shrink-0">
-                    {isConnecting ? (
-                      <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
-                    )}
-                  </div>
-                </button>
-              )
-            })}
+
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
+                          {name}
+                        </span>
+                        {popular && (
+                          <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                            Popular
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      {isConnecting ? (
+                        <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
+                      )}
+                    </div>
+                  </button>
+                )
+              })
+            )}
           </div>
 
           {/* Footer */}

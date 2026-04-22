@@ -13,7 +13,6 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useDemoMode } from "@/lib/demo/DemoModeContext"
 
 interface NavItem {
   name: string
@@ -39,8 +38,6 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   const [activeTab, setActiveTab] = useState(items[0].name)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const mobileMenuRef = useRef<HTMLDivElement>(null)
-
-  const { isDemoMode, toggleDemoMode } = useDemoMode()
 
   useEffect(() => {
     if (pathname === "/portfolio") {
