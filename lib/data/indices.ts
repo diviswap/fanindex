@@ -4,7 +4,7 @@ import { FAN_TOKENS, getTokenBySymbol } from "@/lib/data/fan-tokens"
 export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: string; priceInCHZ: number }>): number {
   const token = getTokenBySymbol(symbol)
   if (!token) return 0
-  
+
   // Try to get live price from CoinGecko
   if (livePrices) {
     const livePrice = livePrices.find(p => p.symbol === symbol)
@@ -12,22 +12,22 @@ export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: strin
       return livePrice.priceInCHZ
     }
   }
-  
+
   // Fallback to static price
   const CHZ_PRICE_USD = 0.02984
   return parseFloat(token.price) / CHZ_PRICE_USD
 }
 
 export function calculateIndexPrice(
-  tokenSymbols: string[], 
+  tokenSymbols: string[],
   livePrices?: Array<{ symbol: string; priceInCHZ: number }>
 ): number {
   if (tokenSymbols.length === 0) return 0
-  
+
   const totalPrice = tokenSymbols.reduce((sum, symbol) => {
     return sum + getTokenPrice(symbol, livePrices)
   }, 0)
-  
+
   const avgPrice = totalPrice / tokenSymbols.length
   // Never return 0 — live prices will override this in the UI,
   // but a non-zero static fallback avoids "Minimum: 0 CHZ" flash.
@@ -136,7 +136,7 @@ export function getIndexAPY(
 export const INDICES: IndexData[] = [
   {
     id: "1",
-    name: "FanIndex Global ETF",
+    name: "FanIndex Global (Test)",
     description: "50% OG Esports + 50% Valencia CF — live on Chiliz Mainnet",
     type: "equal",
     tokens: ["OG", "VCF"],
