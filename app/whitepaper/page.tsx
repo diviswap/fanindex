@@ -14,7 +14,7 @@ export default function WhitepaperPage() {
           </Link>
           <div className="flex items-center gap-2">
             <Image
-              src="https://ipfs.io/ipfs/bafkreiey234lbopsftismqsmyqne6nyfgmold4nn3mbq2eec6hku3iyasi"
+              src="/images/fi-logo.png"
               alt="FanIndex Logo"
               width={28}
               height={28}

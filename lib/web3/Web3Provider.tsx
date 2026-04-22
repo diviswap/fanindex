@@ -14,7 +14,18 @@ const ssrSafeConfig: Config = createConfig({
 })
 
 export function Web3Provider({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient())
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // Keep wagmi reads fresh for 60 s — avoids cascading refetches on
+            // every re-render while still updating balances in a reasonable time.
+            staleTime: 60_000,
+          },
+        },
+      })
+  )
   const [config, setConfig] = useState<Config>(ssrSafeConfig)
 
   useEffect(() => {

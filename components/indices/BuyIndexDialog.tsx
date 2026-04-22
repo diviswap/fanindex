@@ -10,8 +10,7 @@ import { parseEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
-import { Loader2, CheckCircle2, XCircle, TrendingUp, Wallet, Info, Sparkles, ExternalLink, Trophy, Coins, AlertTriangle } from "lucide-react"
-import { useDemoMode } from "@/lib/demo/DemoModeContext"
+import { Loader2, CheckCircle2, XCircle, TrendingUp, Wallet, Info, ExternalLink, Trophy, Coins, AlertTriangle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 
@@ -22,32 +21,28 @@ interface BuyIndexDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess?: () => void
+  /** Live calculated price in CHZ — overrides the static index.price */
+  livePrice?: string
 }
 
-export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyIndexDialogProps) {
+export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice }: BuyIndexDialogProps) {
+  // Use live price when available; fall back to static index.price.
+  // Either way, ensure we never show "0" — use a sensible placeholder.
+  const effectivePrice = (() => {
+    const p = parseFloat(livePrice ?? index.price)
+    return p > 0 ? (livePrice ?? index.price) : index.price
+  })()
   const [amount, setAmount] = useState("")
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const { switchChain, isPending: isSwitching } = useSwitchChain()
-  const { writeContract, data: hash, isPending, error } = useWriteContract()
+  const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
-
-  const { isDemoMode, demoBalance, buyIndex: demoBuyIndex } = useDemoMode()
-  const [demoSuccess, setDemoSuccess] = useState(false)
-  const [demoError, setDemoError] = useState<string | null>(null)
-  const [demoLoading, setDemoLoading] = useState(false)
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
 
-  // Chain guard — only relevant for real (non-demo) wallets
-  const isWrongChain = isConnected && !isDemoMode && chainId !== CHILIZ_MAINNET_ID
-
-  useEffect(() => {
-    if (isSuccess && onSuccess) {
-      onSuccess()
-    }
-  }, [isSuccess, onSuccess])
+  const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
 
   const [purchaseDetails, setPurchaseDetails] = useState<{
     amount: string
@@ -57,65 +52,25 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
 
   const router = useRouter()
 
-  const handleBuy = async () => {
-    if (isDemoMode) {
-      if (!amount || Number.parseFloat(amount) <= 0) {
-        setDemoError("Please enter a valid amount")
-        return
-      }
-
-      const entryFee = Number.parseFloat(amount) * 0.01
-      const total = Number.parseFloat(amount) + entryFee
-
-      if (total > demoBalance) {
-        setDemoError("Insufficient demo balance")
-        return
-      }
-
-      setDemoLoading(true)
-      setDemoError(null)
-
+  // Set purchase details and call onSuccess only after on-chain confirmation
+  useEffect(() => {
+    if (isSuccess && amount) {
       setPurchaseDetails({
-        amount: amount,
-        units: Number.parseFloat(amount) / Number.parseFloat(index.price),
-        fee: entryFee,
+        amount,
+        units: Number.parseFloat(amount) / Number.parseFloat(effectivePrice),
+        fee: Number.parseFloat(amount) * 0.01,
       })
-
-      setTimeout(() => {
-        const success = demoBuyIndex(index.id, index.name, Number.parseFloat(amount), Number.parseFloat(index.price))
-        setDemoLoading(false)
-        if (success) {
-          setDemoSuccess(true)
-          onSuccess?.()
-          setTimeout(() => handleClose(), 3000)
-        } else {
-          setDemoError("Demo purchase failed")
-        }
-      }, 1500)
-
-      return
+      onSuccess?.()
     }
+  }, [isSuccess]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    if (!isConnected || !address) {
-      setDemoError("Please connect your wallet first")
-      return
-    }
+  const handleBuy = async () => {
+    if (!isConnected || !address) return
+    if (isWrongChain) return
+    if (!hasContracts || !contracts) return
+    if (!amount || Number.parseFloat(amount) <= 0) return
 
-    if (isWrongChain) {
-      setDemoError("Please switch to Chiliz Mainnet first")
-      return
-    }
-
-    if (!hasContracts || !contracts) {
-      setDemoError("This index is not yet deployed on Chiliz Mainnet. Use Demo Mode to try it out.")
-      return
-    }
-
-    setPurchaseDetails({
-      amount: amount,
-      units: Number.parseFloat(amount) / Number.parseFloat(index.price),
-      fee: Number.parseFloat(amount) * 0.01,
-    })
+    reset()
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
@@ -130,17 +85,15 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
         value: parseEther(amount),
         gas: BigInt(800_000),
       })
-    } catch (err) {
+    } catch {
       // handled by wagmi error state
     }
   }
 
   const handleClose = () => {
     setAmount("")
-    setDemoSuccess(false)
-    setDemoError(null)
-    setDemoLoading(false)
     setPurchaseDetails(null)
+    reset()
     onOpenChange(false)
   }
 
@@ -151,10 +104,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
 
   const entryFee = amount ? Number.parseFloat(amount) * 0.01 : 0
   const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
-  const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(index.price) : 0
-
-  const displayBalance = isDemoMode ? demoBalance : undefined
-  const showDemoSuccess = isDemoMode && demoSuccess
+  const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(effectivePrice) : 0
 
   // Composition: build token rows from index.tokens list
   const compositionRows = (index.tokens ?? []).map((symbol) => {
@@ -171,7 +121,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="bg-card border-border max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-        {(showDemoSuccess || isSuccess) && purchaseDetails ? (
+        {isSuccess && purchaseDetails ? (
           /* ─── Success screen ─────────────────────────────────────────── */
           <div className="relative">
             <div className="absolute inset-0 rounded-lg overflow-hidden opacity-80 dark:opacity-70">
@@ -226,7 +176,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                   </span>
                 </div>
 
-                {!isDemoMode && hash && (
+                {hash && (
                   <div className="pt-2 border-t border-border">
                     <a
                       href={`https://chiliscan.com/tx/${hash}`}
@@ -237,13 +187,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                       <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
                       View Transaction on Chiliscan
                     </a>
-                  </div>
-                )}
-
-                {isDemoMode && (
-                  <div className="pt-2 border-t border-border flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                    <Sparkles className="h-3 w-3" />
-                    Demo Mode - Simulated Transaction
                   </div>
                 )}
               </div>
@@ -275,19 +218,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
 
             <div className="space-y-3 sm:space-y-4 py-3 sm:py-4">
 
-              {/* Demo badge */}
-              {isDemoMode && (
-                <div className="flex items-center justify-between p-2 sm:p-3 rounded-lg bg-success/10 border border-success/30">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
-                    <span className="text-xs sm:text-sm font-medium">Demo Mode</span>
-                  </div>
-                  <span className="text-xs sm:text-sm text-success font-semibold">
-                    {displayBalance?.toFixed(2)} CHZ
-                  </span>
-                </div>
-              )}
-
               {/* Wrong chain warning + switch button */}
               {isWrongChain && (
                 <div className="flex flex-col gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/40">
@@ -313,11 +243,11 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
               )}
 
               {/* Not yet deployed warning */}
-              {!isDemoMode && !hasContracts && (
+              {!hasContracts && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 shrink-0" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This index is not yet deployed on Chiliz Mainnet. Use Demo Mode to try it out.
+                    This index is not yet deployed on Chiliz Mainnet.
                   </p>
                 </div>
               )}
@@ -380,14 +310,14 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     className="text-base sm:text-lg h-10 sm:h-12 pr-14 sm:pr-16"
-                    disabled={isPending || isConfirming || demoSuccess || demoLoading}
+                    disabled={isPending || isConfirming || isSuccess}
                   />
                   <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground text-sm sm:text-base font-medium">
                     CHZ
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <p className="text-muted-foreground">Minimum: {index.price} CHZ</p>
+                  <p className="text-muted-foreground">Minimum: {effectivePrice} CHZ</p>
                   {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
                 </div>
               </div>
@@ -396,7 +326,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-2">
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Price per unit</span>
-                  <span className="font-semibold">{index.price} CHZ</span>
+                  <span className="font-semibold">{effectivePrice} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Protocol fee (1%)</span>
@@ -426,13 +356,11 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                 </p>
               </div>
 
-              {/* Error states */}
-              {(isDemoMode ? demoError : error) && (
+              {/* Error state */}
+              {error && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
                   <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0" />
-                  <p className="text-xs sm:text-sm text-destructive">
-                    {isDemoMode ? demoError : "Transaction failed. Please try again."}
-                  </p>
+                  <p className="text-xs sm:text-sm text-destructive">Transaction failed. Please try again.</p>
                 </div>
               )}
 
@@ -441,24 +369,28 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                 <Button
                   onClick={handleBuy}
                   disabled={
-                    (!isDemoMode && !isConnected) ||
-                    (!isDemoMode && isWrongChain) ||
+                    !isConnected ||
+                    isWrongChain ||
+                    !hasContracts ||
                     isPending ||
                     isConfirming ||
                     isSuccess ||
-                    demoSuccess ||
-                    demoLoading ||
                     !amount ||
                     Number.parseFloat(amount) <= 0
                   }
                   className="flex-1 bg-success hover:bg-success/90 text-black font-bold text-sm sm:text-base h-9 sm:h-11"
                 >
-                  {isPending || isConfirming || demoLoading ? (
+                  {isPending ? (
                     <>
                       <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
-                      {isPending || demoLoading ? "Processing..." : "Confirming..."}
+                      Waiting for wallet...
                     </>
-                  ) : isSuccess || demoSuccess ? (
+                  ) : isConfirming ? (
+                    <>
+                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
+                      Confirming on-chain...
+                    </>
+                  ) : isSuccess ? (
                     <>
                       <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
                       Completed
@@ -470,7 +402,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess }: BuyInde
                 <Button
                   onClick={handleClose}
                   variant="outline"
-                  disabled={demoLoading || isPending || isConfirming}
+                  disabled={isPending || isConfirming}
                   className="text-sm sm:text-base h-9 sm:h-11 bg-transparent"
                 >
                   Cancel

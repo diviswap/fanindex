@@ -1,9 +1,7 @@
 "use client"
 
 import { ArrowDownRight, ArrowUpRight, ExternalLink, History } from "lucide-react"
-import { useDemoMode } from "@/lib/demo/DemoModeContext"
 import { useAccount } from "wagmi"
-
 
 interface OnChainTx {
   id: string
@@ -27,17 +25,12 @@ interface DisplayTransaction {
 }
 
 interface TransactionHistoryProps {
-  /** Called after a transaction to re-read portfolio state */
   refetchPortfolio?: () => void
-  /** Externally injected on-chain transactions (from parent after buy/sell) */
   onChainTxs?: OnChainTx[]
 }
 
-export function TransactionHistory({ refetchPortfolio, onChainTxs = [] }: TransactionHistoryProps) {
-  const { isDemoMode, demoTransactions } = useDemoMode()
-  const { address, isConnected } = useAccount()
-
-
+export function TransactionHistory({ onChainTxs = [] }: TransactionHistoryProps) {
+  const { isConnected } = useAccount()
 
   const formatDate = (date: Date | null) => {
     if (!date) return "Just now"
@@ -55,27 +48,16 @@ export function TransactionHistory({ refetchPortfolio, onChainTxs = [] }: Transa
     window.open(`https://chiliscan.com/tx/${txHash}`, "_blank")
   }
 
-  // ── Build display transactions ──────────────────────────────────────────
-  const displayTransactions: DisplayTransaction[] = isDemoMode
-    ? demoTransactions.map((tx) => ({
-        id: tx.id,
-        type: tx.type,
-        indexName: tx.indexName,
-        amount: tx.units,
-        total: tx.amount,
-        timestamp: new Date(tx.timestamp),
-        txHash: `0x${tx.id.slice(-8)}...${tx.id.slice(-4)}`,
-      }))
-    : onChainTxs.map((tx) => ({
-        id: tx.id,
-        type: (tx.type === "buy" ? "buy" : "sell") as "buy" | "sell",
-        indexName: `NFT Position #${tx.tokenId}`,
-        amount: 1,
-        total: tx.amountCHZ,
-        timestamp: null,
-        txHash: tx.txHash ?? "pending",
-        blockNumber: tx.blockNumber ?? undefined,
-      }))
+  const displayTransactions: DisplayTransaction[] = onChainTxs.map((tx) => ({
+    id: tx.id,
+    type: (tx.type === "buy" ? "buy" : "sell") as "buy" | "sell",
+    indexName: `NFT Position #${tx.tokenId}`,
+    amount: 1,
+    total: tx.amountCHZ,
+    timestamp: null,
+    txHash: tx.txHash ?? "pending",
+    blockNumber: tx.blockNumber ?? undefined,
+  }))
 
   return (
     <div className="border border-border bg-card backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm">
@@ -87,12 +69,10 @@ export function TransactionHistory({ refetchPortfolio, onChainTxs = [] }: Transa
           <p className="text-base text-muted-foreground">
             {displayTransactions.length > 0
               ? `${displayTransactions.length} transaction${displayTransactions.length !== 1 ? "s" : ""}`
-              : isConnected && !isDemoMode
-              ? "Transactions will appear here after you buy or sell"
-              : "No transactions yet"}
+              : "Transactions will appear here after you buy or sell"}
           </p>
         </div>
-        {isConnected && !isDemoMode && (
+        {isConnected && (
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
@@ -110,14 +90,10 @@ export function TransactionHistory({ refetchPortfolio, onChainTxs = [] }: Transa
               <History className="h-6 w-6 text-muted-foreground" />
             </div>
             <div className="text-base text-muted-foreground mb-2 font-medium">
-              {isConnected && !isDemoMode
-                ? "No transactions yet"
-                : "No transactions yet"}
+              No transactions yet
             </div>
             <div className="text-sm text-muted-foreground/70">
-              {isConnected && !isDemoMode
-                ? "Buy or sell a position to see your transaction history"
-                : "Start trading to see your transaction history"}
+              Buy or sell a position to see your transaction history
             </div>
           </div>
         ) : (
