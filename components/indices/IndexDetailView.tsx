@@ -32,12 +32,12 @@ interface HistoryResponse {
 
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
-// Helper to calculate return percentage from historical data
+// Slice the daily 90d dataset down to the requested period.
+// Returns the exact slice — no fallback to the full dataset.
 function sliceByDays(data: HistoricalDataPoint[], daysBack: number): HistoricalDataPoint[] {
+  if (!data || data.length === 0) return []
   const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
-  const sliced = data.filter(d => d.timestamp >= cutoff)
-  // Return sliced data for the requested period. API ensures at least 2 points for 24h.
-  return sliced.length > 0 ? sliced : data
+  return data.filter(d => d.timestamp >= cutoff)
 }
 
 function returnFromSlice(slice: HistoricalDataPoint[]): number | null {
@@ -54,9 +54,12 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  // Single 90-day fetch — slice client-side per period so the price is always
-  // derived from the same dataset (no price drift between period switches)
-  const { data: historyData, isLoading: historyLoading } = useSWR<HistoryResponse>(
+  // Two separate fetches:
+  //  - 90d daily data (used for 7d/30d/90d slices)
+  //  - 24h hourly data (API returns hourly points for days=1)
+  // This is necessary because 90d data only has daily granularity — slicing it
+  // to the last 24h would yield just 1 point and no chart line.
+  const { data: history90dData, isLoading: history90dLoading } = useSWR<HistoryResponse>(
     `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
     fetcher,
     {
@@ -66,30 +69,51 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     }
   )
 
+  const { data: history24hData, isLoading: history24hLoading } = useSWR<HistoryResponse>(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    fetcher,
+    {
+      refreshInterval: 300000, // 5 min — more frequent for 24h view
+      revalidateOnFocus: false,
+      dedupingInterval: 60000,
+    }
+  )
+
+  // Show loader only when the currently-selected period is still loading
+  const historyLoading =
+    timePeriod === "24h" ? history24hLoading : history90dLoading
+
   // Price is derived from the chart dataset so it always matches the last point.
-  // Fall back to liveTokenPrices average only while chart data is still loading.
+  // Prefer 24h (most recent hourly data) when available, fallback to 90d last daily,
+  // then fallback to live token prices, then static index.price.
   const displayPrice = useMemo(() => {
-    const chartData = historyData?.data
-    if (chartData && chartData.length > 0) {
-      return chartData[chartData.length - 1].price.toFixed(4)
+    const data24h = history24hData?.data
+    if (data24h && data24h.length > 0) {
+      return data24h[data24h.length - 1].price.toFixed(4)
+    }
+    const data90d = history90dData?.data
+    if (data90d && data90d.length > 0) {
+      return data90d[data90d.length - 1].price.toFixed(4)
     }
     if (liveTokenPrices && liveTokenPrices.length > 0) {
       return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
     }
     return Number.parseFloat(index.price).toFixed(4)
-  }, [historyData, liveTokenPrices, index.tokens, index.price])
+  }, [history24hData, history90dData, liveTokenPrices, index.tokens, index.price])
 
-  // Pre-compute all four slices from the single 90d dataset
+  // Pre-compute all four slices:
+  //  - 24h uses its own hourly dataset
+  //  - 7d/30d/90d are sliced from the 90d daily dataset
   const slices = useMemo(() => {
-    const all = historyData?.data
-    if (!all || all.length === 0) return { "24h": [], "7d": [], "30d": [], "90d": [] }
+    const daily = history90dData?.data ?? []
+    const hourly = history24hData?.data ?? []
     return {
-      "24h": sliceByDays(all, 1),
-      "7d":  sliceByDays(all, 7),
-      "30d": sliceByDays(all, 30),
-      "90d": sliceByDays(all, 90),
+      "24h": hourly,
+      "7d":  sliceByDays(daily, 7),
+      "30d": sliceByDays(daily, 30),
+      "90d": sliceByDays(daily, 90),
     }
-  }, [historyData])
+  }, [history90dData, history24hData])
 
   // Chart uses the slice for the selected period
   const filteredData = slices[timePeriod]
