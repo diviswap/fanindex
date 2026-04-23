@@ -156,14 +156,26 @@ export async function GET(request: NextRequest) {
       })
       .sort((a, b) => a.timestamp - b.timestamp)
 
-    // For 24h data, ensure we have at least a 24h window by filtering old data
+    // For 24h data, ensure we have at least 2 data points (beginning and end of 24h period)
     if (days === 1 && chartData.length > 0) {
       const now = Date.now()
       const oneDayAgo = now - 24 * 60 * 60 * 1000
       const recentData = chartData.filter(d => d.timestamp >= oneDayAgo)
       
-      // If we have recent data, use it; otherwise use what we have
+      // If we have recent data, use it
       if (recentData.length > 0) {
+        // Ensure at least 2 points: one from 24h ago and one current
+        if (recentData.length === 1) {
+          // If only 1 point, add a synthetic point from 24h ago using the same price
+          // This ensures we have a graph line to display
+          const earliestPoint = {
+            ...recentData[0],
+            timestamp: oneDayAgo,
+            date: new Date(oneDayAgo).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+          }
+          recentData.unshift(earliestPoint)
+        }
+        
         return NextResponse.json({
           tokens: tokenSymbols,
           days,

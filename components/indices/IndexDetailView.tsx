@@ -36,8 +36,7 @@ const fetcher = (url: string) => fetch(url).then(res => res.json())
 function sliceByDays(data: HistoricalDataPoint[], daysBack: number): HistoricalDataPoint[] {
   const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
   const sliced = data.filter(d => d.timestamp >= cutoff)
-  // Always return the sliced data for the requested period, even if it's less than expected
-  // This ensures 24h shows 24h data, not 90d fallback
+  // Return sliced data for the requested period. API ensures at least 2 points for 24h.
   return sliced.length > 0 ? sliced : data
 }
 
