@@ -104,14 +104,30 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   // Pre-compute all four slices:
   //  - 24h uses its own hourly dataset
   //  - 7d/30d/90d are sliced from the 90d daily dataset
+  //
+  // IMPORTANT: 24h and 90d come from different CoinGecko endpoints with
+  // different granularity, so their last points don't match. To keep a single
+  // "current price" across all tabs, we replace the last daily point with the
+  // most recent hourly point (which is the freshest price available).
   const slices = useMemo(() => {
     const daily = history90dData?.data ?? []
     const hourly = history24hData?.data ?? []
+
+    // Most recent point from the 24h (hourly) dataset — this is the "now" price
+    const latestHourly = hourly.length > 0 ? hourly[hourly.length - 1] : null
+
+    // Replace the last point of the daily dataset with the latest hourly point
+    // so 7d / 30d / 90d slices all end at the same price as 24h.
+    const dailySynced =
+      latestHourly && daily.length > 0
+        ? [...daily.slice(0, -1), { ...daily[daily.length - 1], price: latestHourly.price }]
+        : daily
+
     return {
       "24h": hourly,
-      "7d":  sliceByDays(daily, 7),
-      "30d": sliceByDays(daily, 30),
-      "90d": sliceByDays(daily, 90),
+      "7d":  sliceByDays(dailySynced, 7),
+      "30d": sliceByDays(dailySynced, 30),
+      "90d": sliceByDays(dailySynced, 90),
     }
   }, [history90dData, history24hData])
 
