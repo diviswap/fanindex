@@ -75,7 +75,10 @@ export async function GET(request: NextRequest) {
   }
 
   const tokenSymbols = tokensParam.split(",").map(t => t.trim().toUpperCase())
-  const days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
+  let days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
+  
+  // For 24h chart, fetch 2 days of data to ensure we have points from both ayer and hoy
+  const fetchDays = days === 1 ? 2 : days
 
   // Get CoinGecko IDs for the requested tokens
   const tokensWithCgId = tokenSymbols
@@ -94,16 +97,16 @@ export async function GET(request: NextRequest) {
     // Fetch CHZ price history for conversion
     const chzHistory = await getChzHistory(days)
     
-    // Fetch history for all tokens in parallel
-    const tokenHistories = await Promise.all(
-      tokensWithCgId.map(async (token) => {
-        const data = await fetchTokenHistory(token!.cgId!, days)
-        return { symbol: token!.symbol, data, staticPrice: parseFloat(token!.price) }
-      })
-    )
+  // Fetch history for all tokens in parallel
+  const tokenHistories = await Promise.all(
+    tokensWithCgId.map(async (token) => {
+      const data = await fetchTokenHistory(token!.cgId!, fetchDays)
+      return { symbol: token!.symbol, data, staticPrice: parseFloat(token!.price) }
+    })
+  )
 
-    // Check if we got any real data
-    const hasRealData = tokenHistories.some(t => t.data?.prices && t.data.prices.length > 0)
+  // Check if we got any real data
+  const hasRealData = tokenHistories.some(t => t.data?.prices && t.data.prices.length > 0)
 
     // If no real data, generate fallback based on static prices
     if (!hasRealData) {
@@ -156,26 +159,14 @@ export async function GET(request: NextRequest) {
       })
       .sort((a, b) => a.timestamp - b.timestamp)
 
-    // For 24h data, ensure we have at least 2 data points (beginning and end of 24h period)
+    // For 24h data, filter to last 24 hours from the 2 days of data fetched
     if (days === 1 && chartData.length > 0) {
       const now = Date.now()
       const oneDayAgo = now - 24 * 60 * 60 * 1000
       const recentData = chartData.filter(d => d.timestamp >= oneDayAgo)
       
-      // If we have recent data, use it
+      // Return only last 24h of data
       if (recentData.length > 0) {
-        // Ensure at least 2 points: one from 24h ago and one current
-        if (recentData.length === 1) {
-          // If only 1 point, add a synthetic point from 24h ago using the same price
-          // This ensures we have a graph line to display
-          const earliestPoint = {
-            ...recentData[0],
-            timestamp: oneDayAgo,
-            date: new Date(oneDayAgo).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-          }
-          recentData.unshift(earliestPoint)
-        }
-        
         return NextResponse.json({
           tokens: tokenSymbols,
           days,
