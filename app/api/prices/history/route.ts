@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate average index price for each timestamp
-    const chartData = Array.from(priceDataMap.entries())
+    let chartData = Array.from(priceDataMap.entries())
       .filter(([_, data]) => data.prices.length > 0)
       .map(([timestamp, data]) => {
         const avgPrice = data.prices.reduce((a, b) => a + b, 0) / data.prices.length
@@ -155,6 +155,11 @@ export async function GET(request: NextRequest) {
         }
       })
       .sort((a, b) => a.timestamp - b.timestamp)
+
+    // For 24h data, interpolate if we have fewer than 6 points to ensure visible chart
+    if (days === 1 && chartData.length > 1 && chartData.length < 6) {
+      chartData = interpolateData(chartData, 6)
+    }
 
     // For 24h data, ensure we have at least a 24h window by filtering old data
     if (days === 1 && chartData.length > 0) {
@@ -223,8 +228,41 @@ function generateFallbackFromTokens(
   return generateHistoricalPoints(avgPrice, days)
 }
 
-// Generate realistic historical price points with some variance
-function generateHistoricalPoints(basePrice: number, days: number) {
+// Interpolate data points to ensure minimum number of data points for chart visibility
+function interpolateData(data: { timestamp: number; date: string; price: number; volume: number }[], minPoints: number) {
+  if (data.length < 2) return data
+  
+  const interpolated: typeof data = []
+  
+  for (let i = 0; i < data.length; i++) {
+    interpolated.push(data[i])
+    
+    // Interpolate between current and next point
+    if (i < data.length - 1) {
+      const current = data[i]
+      const next = data[i + 1]
+      const gap = next.timestamp - current.timestamp
+      
+      // Calculate how many intermediate points we need
+      const numInterpolated = Math.floor(gap / (gap / (minPoints - data.length)))
+      
+      for (let j = 1; j < numInterpolated + 1; j++) {
+        const t = j / (numInterpolated + 1) // 0 to 1
+        const interpolatedTimestamp = current.timestamp + t * gap
+        const interpolatedPrice = current.price + t * (next.price - current.price)
+        
+        interpolated.push({
+          timestamp: interpolatedTimestamp,
+          date: formatDate(interpolatedTimestamp, 1),
+          price: Number(interpolatedPrice.toFixed(6)),
+          volume: 0
+        })
+      }
+    }
+  }
+  
+  return interpolated.sort((a, b) => a.timestamp - b.timestamp)
+}
   const points: { timestamp: number; date: string; price: number; volume: number }[] = []
   const now = Date.now()
   const interval = days <= 1 ? 3600000 : 86400000 // hourly or daily
