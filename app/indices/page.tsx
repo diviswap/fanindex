@@ -14,10 +14,10 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  // Only FTLX, FGMX and FFLX have contracts deployed on Chiliz Mainnet.
+  // Only these indices have contracts deployed on Chiliz Mainnet.
   // Keep this list in sync with ETF_CONTRACTS in lib/contracts/abis.ts.
   const deployedIndices = INDICES.filter((index) =>
-    ["FTLX", "FGMX", "FFLX"].includes(index.id),
+    ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"].includes(index.id),
   )
 
   return (
