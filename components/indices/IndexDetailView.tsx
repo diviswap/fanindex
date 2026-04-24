@@ -196,6 +196,23 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   }
 
   const tokensWithWeights = useMemo(() => {
+    // ── 1. Explicit weights defined on the index take absolute priority ──
+    // (e.g. FTLX has on-chain weights that should always be reflected in
+    // the UI regardless of live prices).
+    if (index.weights && index.weights.length === index.tokens.length) {
+      return index.tokens
+        .map((tokenSymbol, i) => {
+          const priceData = liveTokenPrices?.find((p) => p.symbol === tokenSymbol)
+          return {
+            tokenSymbol,
+            weight: index.weights![i],
+            price: priceData?.priceInCHZ ?? null,
+          }
+        })
+        .sort((a, b) => b.weight - a.weight)
+    }
+
+    // ── 2. No live prices yet: fall back to equal weighting ──
     if (!liveTokenPrices || liveTokenPrices.length === 0) {
       const equalWeight = 100 / index.tokens.length
       return index.tokens.map((tokenSymbol) => ({
@@ -240,7 +257,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         weight: ((t.price || 0) / totalPrice) * 100,
       }))
       .sort((a, b) => b.weight - a.weight)
-  }, [liveTokenPrices, index.tokens, index.type])
+  }, [liveTokenPrices, index.tokens, index.type, index.weights])
 
   // Helper to render return value
   const renderReturn = (value: number | null, label: string) => {

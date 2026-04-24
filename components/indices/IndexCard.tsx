@@ -23,6 +23,12 @@ export interface IndexData {
   description: string
   type: "weighted" | "equal" | "managed"
   tokens: string[]
+  /**
+   * Optional explicit weights (in %) parallel to `tokens`.
+   * When present, the UI shows these exact values instead of deriving
+   * weights from live prices. Must sum to ~100.
+   */
+  weights?: number[]
   price: string
   apy: string
   totalValue: string

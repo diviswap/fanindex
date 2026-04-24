@@ -5,20 +5,22 @@ export { EtfVaultABI, SimplePositionsNFTABI }
 
 // Mainnet Contract Addresses (Chiliz Chain)
 export const MAINNET_CONTRACTS = {
-  ETF_VAULT: "0x0bDe1d6a9d4dF032B7e7f0615dac6EB7fe74D52f" as `0x${string}`,
-  BATCH_BUYER: "0x0078cE480C41B058ed8a5Ca0d814F810550dbA8C" as `0x${string}`,
-  NFT: "0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9" as `0x${string}`,
+  ETF_VAULT: "0xFae0b5AC695fa682a2378fB3c144b4B78C0F3c2a" as `0x${string}`,
+  BATCH_BUYER: "0x72cE310ef6eC32c14C299e235C471A8779Aab75e" as `0x${string}`,
+  NFT: "0x8016f276183D29C0c910239b144793Ef7B977B65" as `0x${string}`,
 } as const
 
-// Currently only the Global ETF is deployed on mainnet
+// Currently only the FTLX index is deployed on mainnet
 export const ETF_CONTRACTS = {
-  // FanIndex Global ETF (id: "1") -> Main Mainnet ETF (50% OG, 50% VCF)
+  // FTLX — Fan Token Leaders Index (id: "1")
+  // Tracks the 10 largest / most liquid fan tokens (GAL, ARG, OG, PSG, BAR,
+  // ASR, CITY, ATM, POR, JUV) with market-cap weighted allocation.
   "1": {
     vault: MAINNET_CONTRACTS.ETF_VAULT,
     nft: MAINNET_CONTRACTS.NFT,
     batchBuyer: MAINNET_CONTRACTS.BATCH_BUYER,
-    name: "FanIndex Global ETF",
-    tokens: 2, // OG and VCF
+    name: "FTLX — Fan Token Leaders Index",
+    tokens: 10, // GAL, ARG, OG, PSG, BAR, ASR, CITY, ATM, POR, JUV
   },
 } as const
 

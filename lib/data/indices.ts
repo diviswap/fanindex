@@ -136,14 +136,27 @@ export function getIndexAPY(
 export const INDICES: IndexData[] = [
   {
     id: "1",
-    name: "FanIndex Global (Test)",
-    description: "50% OG Esports + 50% Valencia CF — live on Chiliz Mainnet",
-    type: "equal",
-    tokens: ["OG", "VCF"],
-    price: calculateIndexPrice(["OG", "VCF"]).toFixed(2),
+    name: "FTLX — Fan Token Leaders Index",
+    description:
+      "The benchmark index of the fan token market. Tracks the 10 largest and most liquid fan tokens, representing the overall performance of the ecosystem.",
+    type: "weighted",
+    tokens: ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"],
+    weights: [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49],
+    price: calculateIndexPrice([
+      "GAL",
+      "ARG",
+      "OG",
+      "PSG",
+      "BAR",
+      "ASR",
+      "CITY",
+      "ATM",
+      "POR",
+      "JUV",
+    ]).toFixed(2),
     apy: "14.2%",
     totalValue: "2.8M",
-    holders: 456,
+    holders: 0,
   },
   {
     id: "2",

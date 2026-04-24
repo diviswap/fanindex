@@ -106,10 +106,18 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
   const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(effectivePrice) : 0
 
-  // Composition: build token rows from index.tokens list
-  const compositionRows = (index.tokens ?? []).map((symbol) => {
+  // Composition: build token rows from index.tokens list.
+  // If the index defines explicit weights (e.g. FTLX), use them — otherwise
+  // distribute 100% equally across all tokens.
+  const compositionRows = (index.tokens ?? []).map((symbol, i) => {
     const token = getTokenBySymbol(symbol)
-    const weightPct = index.tokens.length > 0 ? 100 / index.tokens.length : 0
+    const hasExplicitWeights =
+      index.weights && index.weights.length === index.tokens.length
+    const weightPct = hasExplicitWeights
+      ? index.weights![i]
+      : index.tokens.length > 0
+        ? 100 / index.tokens.length
+        : 0
     return {
       symbol,
       name: token?.name ?? symbol,
@@ -280,7 +288,9 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                         <span className="text-xs font-bold font-mono text-foreground truncate">{row.symbol}</span>
                       </div>
                       <div className="text-center">
-                        <span className="text-xs font-mono text-success font-semibold">{row.weightPct.toFixed(0)}%</span>
+                        <span className="text-xs font-mono text-success font-semibold">
+                          {row.weightPct % 1 === 0 ? row.weightPct.toFixed(0) : row.weightPct.toFixed(2)}%
+                        </span>
                       </div>
                       <div className="text-right">
                         {amount && Number.parseFloat(amount) > 0 ? (
