@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 
 const CHILIZ_MAINNET_ID = chiliz.id // 88888
+const MIN_INVESTMENT_CHZ = 100
 
 interface BuyIndexDialogProps {
   index: IndexData
@@ -68,7 +69,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     if (!isConnected || !address) return
     if (isWrongChain) return
     if (!hasContracts || !contracts) return
-    if (!amount || Number.parseFloat(amount) <= 0) return
+    if (!amount || Number.parseFloat(amount) < MIN_INVESTMENT_CHZ) return
 
     reset()
 
@@ -327,7 +328,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <p className="text-muted-foreground">Minimum: {effectivePrice} CHZ</p>
+                  <p className="text-muted-foreground">Minimum: {MIN_INVESTMENT_CHZ} CHZ</p>
                   {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
                 </div>
               </div>
@@ -386,7 +387,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                     isConfirming ||
                     isSuccess ||
                     !amount ||
-                    Number.parseFloat(amount) <= 0
+                    Number.parseFloat(amount) < MIN_INVESTMENT_CHZ
                   }
                   className="flex-1 bg-success hover:bg-success/90 text-black font-bold text-sm sm:text-base h-9 sm:h-11"
                 >
