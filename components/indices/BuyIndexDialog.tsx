@@ -13,7 +13,7 @@ import {
   useSwitchChain,
   useReadContract,
 } from "wagmi"
-import { parseEther } from "viem"
+import { parseEther, formatEther, BaseError, ContractFunctionRevertedError } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
@@ -22,7 +22,22 @@ import { useRouter } from "next/navigation"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 
 const CHILIZ_MAINNET_ID = chiliz.id // 88888
-const MIN_INVESTMENT_CHZ = 100
+const FALLBACK_MIN_INVESTMENT_CHZ = 100
+
+// Human-readable messages for every custom error defined in EtfVault.sol.
+// When the wallet returns a revert, we decode the 4-byte selector and show
+// something actionable instead of the generic "Transaction failed".
+const CONTRACT_ERROR_MESSAGES: Record<string, string> = {
+  InvestmentTooLow: "Investment is below the minimum allowed by the ETF.",
+  EnforcedPause: "This ETF is currently paused and cannot accept new buys.",
+  MaxPositionsReached: "This ETF has reached its maximum number of active positions.",
+  InvalidSlippage: "Slippage parameters were rejected by the vault.",
+  OutputInsufficient: "One of the DEX swaps returned less than the minimum output.",
+  BuyerLengthMismatch: "minOuts length does not match the number of constituents.",
+  ArraysLengthMismatch: "Vault configuration mismatch — please try again.",
+  NativeTransferFailed: "CHZ transfer to the vault failed.",
+  ZeroAmount: "Investment amount must be greater than zero.",
+}
 
 interface BuyIndexDialogProps {
   index: IndexData
@@ -70,6 +85,37 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     ? (etfInfo[0] as readonly `0x${string}`[] | undefined)?.length ?? 0
     : 0
 
+  // Read the on-chain minimum investment (in wei). This is the source of
+  // truth — for FTLX the floor may be higher than the UI default because
+  // splitting CHZ across 10 tokens with fees & DEX minimums needs a higher
+  // initial amount. A buy under this floor reverts with `InvestmentTooLow`.
+  const { data: minInvestmentWei } = useReadContract({
+    address: contracts?.vault,
+    abi: EtfVaultABI,
+    functionName: "minInvestment",
+    chainId: CHILIZ_MAINNET_ID,
+    query: { enabled: hasContracts && !!contracts },
+  })
+
+  const { data: isPausedOnChain } = useReadContract({
+    address: contracts?.vault,
+    abi: EtfVaultABI,
+    functionName: "paused",
+    chainId: CHILIZ_MAINNET_ID,
+    query: { enabled: hasContracts && !!contracts },
+  })
+
+  // Normalise minimum investment to CHZ (number). Always enforce at least
+  // FALLBACK_MIN_INVESTMENT_CHZ to cover the common case where small buys
+  // fail due to DEX per-swap minimums even when minInvestment() returns 0.
+  const minInvestmentChz = (() => {
+    if (typeof minInvestmentWei === "bigint" && minInvestmentWei > BigInt(0)) {
+      const chz = Number(formatEther(minInvestmentWei))
+      return Math.max(chz, FALLBACK_MIN_INVESTMENT_CHZ)
+    }
+    return FALLBACK_MIN_INVESTMENT_CHZ
+  })()
+
   const [purchaseDetails, setPurchaseDetails] = useState<{
     amount: string
     units: number
@@ -94,7 +140,8 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     if (!isConnected || !address) return
     if (isWrongChain) return
     if (!hasContracts || !contracts) return
-    if (!amount || Number.parseFloat(amount) < MIN_INVESTMENT_CHZ) return
+    if (isPausedOnChain) return
+    if (!amount || Number.parseFloat(amount) < minInvestmentChz) return
 
     reset()
 
@@ -104,10 +151,11 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         return
       }
 
-      // Prefer the on-chain token count (source of truth). Fall back to the
-      // configured value only if the read hasn't resolved yet.
-      const tokenCount = onChainTokenCount > 0 ? onChainTokenCount : contractConfig.tokens
-      if (tokenCount <= 0) return
+      // Require the on-chain token count to be known so minOuts length
+      // exactly matches what the vault expects — a mismatch reverts with
+      // `BuyerLengthMismatch`. We no longer fall back to the config value.
+      if (onChainTokenCount <= 0) return
+      const tokenCount = onChainTokenCount
 
       const minOuts = Array(tokenCount).fill(BigInt(0))
 
@@ -151,6 +199,25 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const entryFee = amount ? Number.parseFloat(amount) * 0.01 : 0
   const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
   const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(effectivePrice) : 0
+
+  // Decode the wallet / contract error into a user-facing message by
+  // walking the viem error chain for a `ContractFunctionRevertedError`
+  // and mapping its name to our dictionary.
+  const friendlyError = (() => {
+    if (!error) return null
+    if (error instanceof BaseError) {
+      const revert = error.walk((err) => err instanceof ContractFunctionRevertedError) as
+        | ContractFunctionRevertedError
+        | null
+      const name = revert?.data?.errorName
+      if (name && CONTRACT_ERROR_MESSAGES[name]) {
+        return CONTRACT_ERROR_MESSAGES[name]
+      }
+      if (name) return `Contract reverted: ${name}`
+      if (error.shortMessage) return error.shortMessage
+    }
+    return "Transaction failed. Please try again."
+  })()
 
   // Composition: build token rows from index.tokens list.
   // If the index defines explicit weights (e.g. FTLX), use them — otherwise
@@ -373,7 +440,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <p className="text-muted-foreground">Minimum: {MIN_INVESTMENT_CHZ} CHZ</p>
+                  <p className="text-muted-foreground">Minimum: {minInvestmentChz.toLocaleString()} CHZ</p>
                   {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
                 </div>
               </div>
@@ -416,7 +483,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
               {error && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
                   <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0" />
-                  <p className="text-xs sm:text-sm text-destructive">Transaction failed. Please try again.</p>
+                      <p className="text-xs sm:text-sm text-destructive">{friendlyError ?? "Transaction failed. Please try again."}</p>
                 </div>
               )}
 
@@ -432,7 +499,9 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                     isConfirming ||
                     isSuccess ||
                     !amount ||
-                    Number.parseFloat(amount) < MIN_INVESTMENT_CHZ
+                    Number.parseFloat(amount) < minInvestmentChz ||
+                    Boolean(isPausedOnChain) ||
+                    onChainTokenCount === 0
                   }
                   className="flex-1 bg-success hover:bg-success/90 text-black font-bold text-sm sm:text-base h-9 sm:h-11"
                 >
