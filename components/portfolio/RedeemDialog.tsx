@@ -8,10 +8,8 @@ import {
   useWaitForTransactionReceipt,
   useChainId,
   useSwitchChain,
-  usePublicClient,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
-import { parseGwei } from "viem"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { XCircle, ArrowDownToLine, AlertTriangle, Info, ExternalLink, Coins, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -58,7 +56,6 @@ export function RedeemDialog({
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
-  const publicClient = usePublicClient({ chainId: CHILIZ_MAINNET_ID })
 
   const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
   const [redemptionType, setRedemptionType] = useState<"chz" | "tokens">("chz")
@@ -100,67 +97,15 @@ export function RedeemDialog({
     reset()
 
     try {
-      // Scale gas limit to the number of tokens in the index.
-      // - redeemAllToCHZNative: swaps each position back to CHZ → ~400k / token
-      // - withdrawTokens: pure ERC-20 transfers → ~80k / token
-      // We look up the registered token count (fallback to a safe FTLX-sized
-      // estimate of 10). Capped at 10M to stay well under block gas.
-      const tokenCount = tokenRows.length || 10
-
-      // Gas limit strategy: estimate on-chain with a 25% buffer. Fall back
-      // to a formula calibrated to observed mainnet usage if estimation
-      // fails. A massively oversized gas limit can cause some RPCs to
-      // reject/mis-price the tx (we saw this with the prior 400k/token
-      // estimate).
-      let gasLimit: bigint
-      try {
-        if (redemptionType === "chz") {
-          const estimated = await publicClient!.estimateContractGas({
-            address: contracts.vault,
-            abi: EtfVaultABI.abi,
-            functionName: "redeemAllToCHZNative",
-            args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
-            account: address,
-          })
-          gasLimit = (estimated * 125n) / 100n
-        } else {
-          const estimated = await publicClient!.estimateContractGas({
-            address: contracts.vault,
-            abi: EtfVaultABI.abi,
-            functionName: "withdrawTokens",
-            args: [BigInt(nftId), address, redemptionPercentage],
-            account: address,
-          })
-          gasLimit = (estimated * 125n) / 100n
-        }
-      } catch {
-        // Fallback: per-swap redeem ~220k, per-transfer withdraw ~80k.
-        gasLimit = BigInt(
-          Math.min(
-            10_000_000,
-            redemptionType === "chz"
-              ? 400_000 + tokenCount * 220_000
-              : 150_000 + tokenCount * 80_000,
-          ),
-        )
-      }
-
-      // Chiliz Chain requires a much higher priority fee (miner tip) than
-      // what wallets auto-suggest via RPC. Without it, the tx gets included
-      // but reverts early. Successful txs on Chiliz use ~500 Gwei priority;
-      // we set 600 Gwei of tip and 4000 Gwei maxFee to absorb base-fee spikes.
-      const maxPriorityFeePerGas = parseGwei("600")
-      const maxFeePerGas = parseGwei("4000")
-
+      // Let the wallet handle gas limit and fee estimation — this matches
+      // the working script pattern and produces correct Chiliz Chain fees
+      // automatically via MetaMask's estimator.
       if (redemptionType === "chz") {
         writeContract({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
           args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
-          gas: gasLimit,
-          maxPriorityFeePerGas,
-          maxFeePerGas,
         })
       } else {
         writeContract({
@@ -168,9 +113,6 @@ export function RedeemDialog({
           abi: EtfVaultABI.abi,
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
-          gas: gasLimit,
-          maxPriorityFeePerGas,
-          maxFeePerGas,
         })
       }
     } catch {

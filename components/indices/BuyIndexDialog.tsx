@@ -12,9 +12,8 @@ import {
   useChainId,
   useSwitchChain,
   useReadContracts,
-  usePublicClient,
 } from "wagmi"
-import { parseEther, formatEther, parseGwei } from "viem"
+import { parseEther, formatEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
@@ -46,7 +45,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
-  const publicClient = usePublicClient({ chainId: CHILIZ_MAINNET_ID })
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -78,21 +76,45 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
             abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "getEtfInfo",
           },
+          {
+            address: contracts.vault,
+            abi: EtfVaultABI.abi as readonly unknown[],
+            functionName: "WCHZ",
+          },
         ]
       : [],
     query: { enabled: open && hasContracts },
   })
 
-  // Live token count from getEtfInfo() — this is the source of truth for the
-  // length of the `minOuts` array. Using a stale/hardcoded value causes the
-  // contract to revert with BuyerLengthMismatch.
-  const onChainTokenCount = useMemo(() => {
-    const r = vaultConfigData?.[2]
-    if (r?.status === "success" && Array.isArray(r.result)) {
-      const tokensArr = (r.result as unknown as readonly unknown[][])[0]
-      if (Array.isArray(tokensArr)) return tokensArr.length
+  // Live basket from getEtfInfo() → (tokens[], weights[]). Following the
+  // working purchase script, the `minOuts` array we pass to buyNative must
+  // have ONE entry per token that is actually swapped — i.e. weight > 0
+  // and address != WCHZ (WCHZ is skipped because CHZ is the input asset).
+  const { buyableCount } = useMemo(() => {
+    const info = vaultConfigData?.[2]
+    const wchzRes = vaultConfigData?.[3]
+    if (
+      info?.status !== "success" ||
+      !Array.isArray(info.result) ||
+      wchzRes?.status !== "success"
+    ) {
+      return { buyableCount: undefined as number | undefined }
     }
-    return undefined
+    const [tokensArr, weightsArr] = info.result as unknown as [
+      readonly string[],
+      readonly bigint[],
+    ]
+    const wchz = String(wchzRes.result ?? "").toLowerCase()
+    if (!Array.isArray(tokensArr) || !Array.isArray(weightsArr)) {
+      return { buyableCount: undefined }
+    }
+    let count = 0
+    for (let i = 0; i < tokensArr.length; i++) {
+      const addr = String(tokensArr[i] ?? "").toLowerCase()
+      const w = weightsArr[i] ?? 0n
+      if (w > 0n && addr !== wchz) count++
+    }
+    return { buyableCount: count }
   }, [vaultConfigData])
 
   const feeBps = useMemo(() => {
@@ -160,58 +182,27 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
-      // ALWAYS prefer the live on-chain token count. The contract's
-      // BatchBuyer reverts with BuyerLengthMismatch if minOuts.length
-      // doesn't match the registered token list exactly.
+
+      // Match the working purchase script exactly:
+      //   - minOuts has ONE entry per actually-swapped token
+      //     (weight > 0 AND address != WCHZ), computed above as `buyableCount`
+      //   - each entry is a SYMBOLIC minimum (0.0001 CHZ-equivalent), NOT 0.
+      //     A zero min-out causes the DEX router to revert with
+      //     "INSUFFICIENT_OUTPUT_AMOUNT", which is what was making our buys
+      //     fail even though the tx was being included and gas-priced fine.
       const buyTokenCount =
-        onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
-      const minOuts = Array(buyTokenCount).fill(BigInt(0))
+        buyableCount ?? contractConfig?.tokens ?? index.tokens.length
+      const minOuts = Array(buyTokenCount).fill(parseEther("0.0001"))
 
-      // Gas limit strategy: try to estimate the real cost on-chain and add
-      // a 25% buffer. If estimation fails, fall back to a formula calibrated
-      // to real Chiliz mainnet usage (~177k gas / swap, observed in
-      // successful txs) instead of overshooting. A massively oversized gas
-      // limit — like our earlier 4.6M — can itself cause some wallets/RPCs
-      // to reject or mis-price the tx.
-      let gasLimit: bigint
-      try {
-        const estimated = await publicClient!.estimateContractGas({
-          address: contracts.vault,
-          abi: EtfVaultABI.abi,
-          functionName: "buyNative",
-          args: [address, minOuts],
-          value: parseEther(amount),
-          account: address,
-        })
-        // +25% buffer
-        gasLimit = (estimated * 125n) / 100n
-      } catch {
-        // Fallback: 400k overhead (fee transfer + NFT mint + routing)
-        // plus ~220k per swap (a bit above the ~177k observed to leave
-        // headroom for slippage paths and warm/cold storage variance).
-        gasLimit = BigInt(
-          Math.min(10_000_000, 400_000 + buyTokenCount * 220_000),
-        )
-      }
-
-      // Chiliz Chain requires a much higher priority fee (miner tip) than
-      // what wallets auto-suggest via RPC. Without it, the tx gets included
-      // but reverts early (~6% gas used) — matching the symptom we saw.
-      // Successful txs on Chiliz use ~500 Gwei priority. We set 600 Gwei to
-      // leave headroom and a maxFeePerGas comfortably above a 2500 Gwei
-      // base fee (2500 base + 600 tip = 3100; we set 4000 to absorb spikes).
-      const maxPriorityFeePerGas = parseGwei("600")
-      const maxFeePerGas = parseGwei("4000")
-
+      // Let the wallet handle gas limit AND fee suggestion — that's how the
+      // script works (no explicit gas params) and what produces Chiliz's
+      // correct ~500 Gwei priority fee via MetaMask's fee estimator.
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
         args: [address, minOuts],
         value: parseEther(amount),
-        gas: gasLimit,
-        maxPriorityFeePerGas,
-        maxFeePerGas,
       })
     } catch {
       // handled by wagmi error state
