@@ -109,7 +109,7 @@ function AvailableIndexCard({
 
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
     }
     const data = history24h?.data
     if (data && data.length > 0) {

@@ -20,9 +20,25 @@ export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: strin
 
 export function calculateIndexPrice(
   tokenSymbols: string[],
-  livePrices?: Array<{ symbol: string; priceInCHZ: number }>
+  livePrices?: Array<{ symbol: string; priceInCHZ: number }>,
+  /**
+   * Optional per-token weights (percentages). When provided, the price is the
+   * weighted average; otherwise it falls back to equal-weight average.
+   */
+  weights?: number[]
 ): number {
   if (tokenSymbols.length === 0) return 0
+
+  // Weighted average when weights are provided and valid
+  if (weights && weights.length === tokenSymbols.length) {
+    const weightSum = weights.reduce((s, w) => s + w, 0)
+    if (weightSum > 0) {
+      const weighted = tokenSymbols.reduce((sum, symbol, i) => {
+        return sum + getTokenPrice(symbol, livePrices) * (weights[i] / weightSum)
+      }, 0)
+      return weighted > 0 ? weighted : 1
+    }
+  }
 
   const totalPrice = tokenSymbols.reduce((sum, symbol) => {
     return sum + getTokenPrice(symbol, livePrices)
@@ -133,17 +149,25 @@ export function getIndexAPY(
   return `${sign}${apy.toFixed(1)}%`
 }
 
+// FTLX — Fan Token Leaders Index
+// Target composition (weighted): GAL, ARG, OG, PSG, BAR, ASR, CITY, ATM, POR, JUV
+const FTLX_TOKENS = ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"] as const
+const FTLX_WEIGHTS = [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49] as const
+
 export const INDICES: IndexData[] = [
   {
     id: "1",
-    name: "FanIndex Global (Test)",
-    description: "50% OG Esports + 50% Valencia CF — live on Chiliz Mainnet",
-    type: "equal",
-    tokens: ["OG", "VCF"],
-    price: calculateIndexPrice(["OG", "VCF"]).toFixed(2),
+    name: "FTLX — Fan Token Leaders Index",
+    symbol: "FTLX",
+    description:
+      "The benchmark index of the fan token market. It tracks the largest and most liquid fan tokens, representing the overall performance of the ecosystem.",
+    type: "weighted",
+    tokens: [...FTLX_TOKENS],
+    weights: [...FTLX_WEIGHTS],
+    price: calculateIndexPrice([...FTLX_TOKENS], undefined, [...FTLX_WEIGHTS]).toFixed(2),
     apy: "14.2%",
-    totalValue: "2.8M",
-    holders: 456,
+    totalValue: "—",
+    holders: 0,
   },
   {
     id: "2",

@@ -11,6 +11,8 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tool
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { calculateIndexPrice } from "@/lib/data/indices"
+import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
+import { useReadContract } from "wagmi"
 import useSWR from "swr"
 
 interface IndexDetailViewProps {
@@ -54,6 +56,24 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
+  // ── Dynamic fee from the on-chain vault ────────────────────────────────
+  const contracts = getContractAddresses(index.id)
+  const { data: feeBpsRaw } = useReadContract({
+    address: contracts?.vault,
+    abi: EtfVaultABI.abi,
+    functionName: "buyFeeBps",
+    query: {
+      enabled: hasDeployedContracts(index.id),
+      refetchInterval: 60000,
+    },
+  })
+  const feeBps = typeof feeBpsRaw === "number"
+    ? feeBpsRaw
+    : typeof feeBpsRaw === "bigint"
+      ? Number(feeBpsRaw)
+      : 100
+  const feePctLabel = `${(feeBps / 100).toFixed(feeBps % 10 === 0 ? 1 : 2)}%`
+
   // Two separate fetches:
   //  - 90d daily data (used for 7d/30d/90d slices)
   //  - 24h hourly data (API returns hourly points for days=1)
@@ -96,7 +116,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       return data90d[data90d.length - 1].price.toFixed(4)
     }
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
     }
     return Number.parseFloat(index.price).toFixed(4)
   }, [history24hData, history90dData, liveTokenPrices, index.tokens, index.price])
@@ -196,6 +216,26 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   }
 
   const tokensWithWeights = useMemo(() => {
+    // Normalize target weights (if any) so they always sum to 100.
+    const weightSum = (index.weights ?? []).reduce((s, w) => s + w, 0)
+    const hasTargetWeights = !!index.weights && index.weights.length === index.tokens.length && weightSum > 0
+
+    const priceOf = (symbol: string) =>
+      liveTokenPrices?.find((p) => p.symbol === symbol)?.priceInCHZ ?? null
+
+    // If the index has explicit target weights (e.g. FTLX), always use them —
+    // these are the authoritative on-chain allocations, not a price-derived
+    // estimate.
+    if (hasTargetWeights) {
+      return index.tokens
+        .map((tokenSymbol, i) => ({
+          tokenSymbol,
+          weight: (index.weights![i] / weightSum) * 100,
+          price: priceOf(tokenSymbol),
+        }))
+        .sort((a, b) => b.weight - a.weight)
+    }
+
     if (!liveTokenPrices || liveTokenPrices.length === 0) {
       const equalWeight = 100 / index.tokens.length
       return index.tokens.map((tokenSymbol) => ({
@@ -206,13 +246,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     }
 
     const tokensData = index.tokens
-      .map((tokenSymbol) => {
-        const priceData = liveTokenPrices.find((p) => p.symbol === tokenSymbol)
-        return {
-          tokenSymbol,
-          price: priceData?.priceInCHZ || null,
-        }
-      })
+      .map((tokenSymbol) => ({ tokenSymbol, price: priceOf(tokenSymbol) }))
       .filter((t) => t.price !== null)
 
     const totalPrice = tokensData.reduce((sum, t) => sum + (t.price || 0), 0)
@@ -222,25 +256,19 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       return index.tokens.map((tokenSymbol) => ({
         tokenSymbol,
         weight: equalWeight,
-        price: liveTokenPrices.find((p) => p.symbol === tokenSymbol)?.priceInCHZ || null,
+        price: priceOf(tokenSymbol),
       }))
     }
 
     if (index.type === "equal") {
       const equalWeight = 100 / tokensData.length
-      return tokensData.map((t) => ({
-        ...t,
-        weight: equalWeight,
-      }))
+      return tokensData.map((t) => ({ ...t, weight: equalWeight }))
     }
 
     return tokensData
-      .map((t) => ({
-        ...t,
-        weight: ((t.price || 0) / totalPrice) * 100,
-      }))
+      .map((t) => ({ ...t, weight: ((t.price || 0) / totalPrice) * 100 }))
       .sort((a, b) => b.weight - a.weight)
-  }, [liveTokenPrices, index.tokens, index.type])
+  }, [liveTokenPrices, index.tokens, index.type, index.weights])
 
   // Helper to render return value
   const renderReturn = (value: number | null, label: string) => {
@@ -564,7 +592,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
               </div>
               <div className="flex justify-between py-2 border-b border-border">
                 <span className="text-muted-foreground font-medium">Entry Fee</span>
-                <span className="text-foreground font-semibold">1%</span>
+                <span className="text-foreground font-semibold">{feePctLabel}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-border">
                 <span className="text-muted-foreground font-medium">Exit Fee</span>

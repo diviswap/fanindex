@@ -14,7 +14,7 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  // Only index "1" (FanIndex Global ETF) is deployed on mainnet
+  // Only index "1" (FTLX — Fan Token Leaders Index) is deployed on mainnet
   const deployedIndices = INDICES.filter((index) => ["1"].includes(index.id))
 
   return (

@@ -4,9 +4,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useState, useEffect } from "react"
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi"
-import { parseEther } from "viem"
+import { useState, useEffect, useMemo } from "react"
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain, useReadContracts } from "wagmi"
+import { parseEther, formatEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
@@ -44,10 +44,69 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
   const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
 
+  // ── Dynamic fee & minimum investment (read live from the vault) ────────
+  // The contract exposes:
+  //   buyFeeBps()       -> uint16 (e.g. 100 = 1%)
+  //   minInvestment()   -> uint256 (wei) — enforced on-chain
+  // Reading these gives us a true dynamic fee system: if the owner changes
+  // the fee or minimum on-chain, the UI reflects it automatically and
+  // prevents "InvestmentTooLow" reverts.
+  const { data: vaultConfigData } = useReadContracts({
+    contracts: hasContracts && contracts
+      ? [
+          {
+            address: contracts.vault,
+            abi: EtfVaultABI.abi as readonly unknown[],
+            functionName: "buyFeeBps",
+          },
+          {
+            address: contracts.vault,
+            abi: EtfVaultABI.abi as readonly unknown[],
+            functionName: "minInvestment",
+          },
+        ]
+      : [],
+    query: { enabled: open && hasContracts },
+  })
+
+  const feeBps = useMemo(() => {
+    const r = vaultConfigData?.[0]
+    if (r?.status === "success" && typeof r.result === "number") return r.result
+    if (r?.status === "success" && typeof r.result === "bigint") return Number(r.result)
+    return 100 // default: 1%
+  }, [vaultConfigData])
+
+  const feePct = feeBps / 10000 // e.g. 0.01 for 1%
+  const feePctLabel = (feePct * 100).toFixed(feeBps % 10 === 0 ? 1 : 2) // "1.0" or "1.25"
+
+  // On-chain enforced minimum (in CHZ). May be 0 if unset.
+  const onChainMinCHZ = useMemo(() => {
+    const r = vaultConfigData?.[1]
+    if (r?.status === "success" && typeof r.result === "bigint") {
+      try {
+        return Number(formatEther(r.result))
+      } catch {
+        return 0
+      }
+    }
+    return 0
+  }, [vaultConfigData])
+
+  // UI-side safety floor: for a 10-token weighted index, a 1 CHZ investment
+  // would leave ~0.1 CHZ per token which often fails on DEX min-output checks.
+  // We recommend at least 1 CHZ per token *after* the fee.
+  const tokenCount = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]?.tokens ?? index.tokens.length
+  const uiRecommendedMin = Math.max(
+    Number.parseFloat(effectivePrice) || 0,
+    tokenCount / (1 - feePct || 1), // so that net (after fee) ≥ tokenCount CHZ
+  )
+  const effectiveMinCHZ = Math.max(onChainMinCHZ, uiRecommendedMin)
+
   const [purchaseDetails, setPurchaseDetails] = useState<{
     amount: string
     units: number
     fee: number
+    feePctLabel: string
   } | null>(null)
 
   const router = useRouter()
@@ -58,7 +117,8 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       setPurchaseDetails({
         amount,
         units: Number.parseFloat(amount) / Number.parseFloat(effectivePrice),
-        fee: Number.parseFloat(amount) * 0.01,
+        fee: Number.parseFloat(amount) * feePct,
+        feePctLabel,
       })
       onSuccess?.()
     }
@@ -74,8 +134,8 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
-      const tokenCount = contractConfig?.tokens || 2
-      const minOuts = Array(tokenCount).fill(BigInt(0))
+      const buyTokenCount = contractConfig?.tokens ?? index.tokens.length
+      const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
       writeContract({
         address: contracts.vault,
@@ -102,14 +162,22 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     router.push("/portfolio")
   }
 
-  const entryFee = amount ? Number.parseFloat(amount) * 0.01 : 0
-  const netInvestment = amount ? Number.parseFloat(amount) * 0.99 : 0
+  const entryFee = amount ? Number.parseFloat(amount) * feePct : 0
+  const netInvestment = amount ? Number.parseFloat(amount) * (1 - feePct) : 0
   const estimatedUnits = amount ? Number.parseFloat(amount) / Number.parseFloat(effectivePrice) : 0
 
-  // Composition: build token rows from index.tokens list
-  const compositionRows = (index.tokens ?? []).map((symbol) => {
+  // Composition: prefer the index's target weights (e.g. FTLX: GAL 16.42%, …).
+  // Fall back to equal-weight when no weights are defined.
+  const weightSum = (index.weights ?? []).reduce((s, w) => s + w, 0)
+  const compositionRows = (index.tokens ?? []).map((symbol, i) => {
     const token = getTokenBySymbol(symbol)
-    const weightPct = index.tokens.length > 0 ? 100 / index.tokens.length : 0
+    const targetWeight = index.weights?.[i]
+    const weightPct =
+      targetWeight !== undefined && weightSum > 0
+        ? (targetWeight / weightSum) * 100
+        : index.tokens.length > 0
+          ? 100 / index.tokens.length
+          : 0
     return {
       symbol,
       name: token?.name ?? symbol,
@@ -117,6 +185,9 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       weightPct,
     }
   })
+
+  const amountNum = Number.parseFloat(amount || "0")
+  const belowMinimum = amountNum > 0 && amountNum < effectiveMinCHZ
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -160,7 +231,9 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   <span className="text-sm font-semibold text-success">{purchaseDetails.units.toFixed(4)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-muted-foreground">Protocol Fee (1%)</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">
+                    Protocol Fee ({purchaseDetails.feePctLabel}%)
+                  </span>
                   <span className="text-sm font-semibold">- {purchaseDetails.fee.toFixed(4)} CHZ</span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -280,12 +353,14 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                         <span className="text-xs font-bold font-mono text-foreground truncate">{row.symbol}</span>
                       </div>
                       <div className="text-center">
-                        <span className="text-xs font-mono text-success font-semibold">{row.weightPct.toFixed(0)}%</span>
+                        <span className="text-xs font-mono text-success font-semibold">
+                          {row.weightPct.toFixed(row.weightPct >= 10 ? 1 : 2)}%
+                        </span>
                       </div>
                       <div className="text-right">
                         {amount && Number.parseFloat(amount) > 0 ? (
                           <span className="text-xs font-mono text-foreground tabular-nums">
-                            {((Number.parseFloat(amount) * 0.99 * row.weightPct) / 100).toFixed(2)}
+                            {((Number.parseFloat(amount) * (1 - feePct) * row.weightPct) / 100).toFixed(2)}
                           </span>
                         ) : (
                           <span className="text-xs text-muted-foreground">--</span>
@@ -317,9 +392,22 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <p className="text-muted-foreground">Minimum: {effectivePrice} CHZ</p>
+                  <p className="text-muted-foreground">
+                    Minimum: {effectiveMinCHZ.toFixed(effectiveMinCHZ >= 100 ? 0 : 2)} CHZ
+                    {tokenCount >= 5 && (
+                      <span className="ml-1 text-muted-foreground/70">
+                        ({tokenCount} tokens)
+                      </span>
+                    )}
+                  </p>
                   {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
                 </div>
+                {belowMinimum && (
+                  <p className="text-xs text-yellow-500 flex items-center gap-1">
+                    <AlertTriangle className="h-3 w-3" />
+                    Amount is below the recommended minimum. The transaction may revert if liquidity per token is too thin.
+                  </p>
+                )}
               </div>
 
               {/* Summary */}
@@ -329,7 +417,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   <span className="font-semibold">{effectivePrice} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Protocol fee (1%)</span>
+                  <span className="text-muted-foreground">Protocol fee ({feePctLabel}%)</span>
                   <span className="font-semibold">- {entryFee.toFixed(4)} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">

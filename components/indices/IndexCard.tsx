@@ -23,10 +23,18 @@ export interface IndexData {
   description: string
   type: "weighted" | "equal" | "managed"
   tokens: string[]
+  /**
+   * Optional target weights for each token (percentages, summing to 100).
+   * Must be the same length as `tokens`. If omitted, the UI falls back to
+   * equal-weight for display (live on-chain weights may still override).
+   */
+  weights?: number[]
   price: string
   apy: string
   totalValue: string
   holders: number
+  /** Optional short ticker (e.g. "FTLX") rendered alongside the name */
+  symbol?: string
 }
 
 interface IndexCardProps {
@@ -55,7 +63,7 @@ export function IndexCard({ index }: IndexCardProps) {
       return data24h[data24h.length - 1].price.toFixed(4)
     }
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
     }
     return Number.parseFloat(index.price).toFixed(4)
   }, [history24h, liveTokenPrices, index.tokens, index.price])
