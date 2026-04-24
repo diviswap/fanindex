@@ -5,7 +5,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState, useEffect } from "react"
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi"
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+  useReadContract,
+} from "wagmi"
 import { parseEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
@@ -45,6 +52,24 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
   const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
 
+  // ── Read the real on-chain token list so minOuts always matches the
+  // actual constituents of the ETF. Relying on a hardcoded count causes
+  // reverts if the deployed index has a different size than expected.
+  const { data: etfInfo } = useReadContract({
+    address: contracts?.vault,
+    abi: EtfVaultABI,
+    functionName: "getEtfInfo",
+    chainId: CHILIZ_MAINNET_ID,
+    query: {
+      enabled: hasContracts && !!contracts,
+    },
+  })
+
+  // getEtfInfo returns [address[] tokens, uint256[] weights]
+  const onChainTokenCount = Array.isArray(etfInfo)
+    ? (etfInfo[0] as readonly `0x${string}`[] | undefined)?.length ?? 0
+    : 0
+
   const [purchaseDetails, setPurchaseDetails] = useState<{
     amount: string
     units: number
@@ -79,8 +104,18 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         return
       }
 
-      const tokenCount = contractConfig.tokens
+      // Prefer the on-chain token count (source of truth). Fall back to the
+      // configured value only if the read hasn't resolved yet.
+      const tokenCount = onChainTokenCount > 0 ? onChainTokenCount : contractConfig.tokens
+      if (tokenCount <= 0) return
+
       const minOuts = Array(tokenCount).fill(BigInt(0))
+
+      // Gas budget: each constituent triggers a DEX swap (~250k gas) plus
+      // NFT mint + bookkeeping (~300k). Scale with the number of tokens
+      // and add a comfortable buffer so 10-token indices like FTLX don't
+      // revert with out-of-gas.
+      const gasLimit = BigInt(500_000 + tokenCount * 300_000)
 
       writeContract({
         address: contracts.vault,
@@ -88,7 +123,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         functionName: "buyNative",
         args: [address, minOuts],
         value: parseEther(amount),
-        gas: BigInt(800_000),
+        gas: gasLimit,
       })
     } catch (e) {
       // handled by wagmi error state
