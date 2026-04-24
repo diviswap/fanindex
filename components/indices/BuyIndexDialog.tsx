@@ -483,10 +483,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   <span className="text-muted-foreground">Net investment</span>
                   <span className="font-semibold text-success">{netInvestment.toFixed(4)} CHZ</span>
                 </div>
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Expected APY</span>
-                  <span className="text-success font-semibold">{index.apy}</span>
-                </div>
                 <div className="border-t pt-2 flex justify-between items-center">
                   <span className="text-sm font-bold">You send</span>
                   <span className="text-success font-bold text-base sm:text-lg">

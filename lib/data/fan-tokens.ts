@@ -684,6 +684,7 @@ export const FAN_TOKENS: FanToken[] = [
     totalSupply: "1750000",
     percentOfSupply: "0.03",
     category: "esports",
+    icon: "/images/tokens/navi.png",
     unwrapped: "0xfef1F4BA8d8f3C0be2C36a1Df9f7A8F6E5D4c3B2",
     wrapped: "0x1D2e3F4a5B6c7D8e9F0a1B2c3D4e5F6a7B8c9D0e",
     cgId: "natus-vincere-fan-token",
@@ -782,6 +783,7 @@ export const FAN_TOKENS: FanToken[] = [
     totalSupply: "3080000",
     percentOfSupply: "0.02",
     category: "esports",
+    icon: "/images/tokens/all.svg",
     cgId: "alliance-fan-token",
   },
   {
