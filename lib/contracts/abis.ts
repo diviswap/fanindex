@@ -35,6 +35,24 @@ export const ETF_CONTRACTS = {
     name: "FFLX — Fan Fight Index",
     tokens: 2,
   },
+  // FELX — Fan English League Index (weighted, 5 tokens)
+  // Composition: CITY 46%, AFC 36%, SPURS 9%, AVL 6%, EFC 3%
+  FELX: {
+    vault: "0xC2FFf92859f9Dd060C91755410a0C45b2a8BEB43" as `0x${string}`,
+    nft: "0xED6be7d9A85C708EBa45EBa2cebB8BC27Be97742" as `0x${string}`,
+    batchBuyer: "0xd1C88C8EB53409A2a200B3c02c9AC3B83877A654" as `0x${string}`,
+    name: "FELX — Fan English League Index",
+    tokens: 5,
+  },
+  // FSLX — Fan Spanish League Index (weighted, 4 tokens)
+  // Composition: BAR 53%, ATM 41%, SEVILLA 3%, VCF 3%
+  FSLX: {
+    vault: "0x6A0D2B19C7fbd10778d31A063869771F96D538f1" as `0x${string}`,
+    nft: "0x6598F5D9C8B30aa79A9c1F7eC6bae892296aa9D7" as `0x${string}`,
+    batchBuyer: "0xcdb46296B007ccE24AB19e6c5E16EB02b5Ea1ED0" as `0x${string}`,
+    name: "FSLX — Fan Spanish League Index",
+    tokens: 4,
+  },
 } as const
 
 // Backwards-compat alias — some components still reference MAINNET_CONTRACTS

@@ -8,7 +8,7 @@ import { INDICES } from "@/lib/data/indices"
 
 // Only the indices that have deployed contracts on Chiliz Mainnet.
 // Keep this in sync with the keys of ETF_CONTRACTS.
-const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX"] as const
+const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"] as const
 
 export interface NFTHolding {
   /** The raw NFT token ID from the blockchain */
