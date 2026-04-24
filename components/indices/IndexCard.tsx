@@ -19,6 +19,11 @@ const fetcher = (url: string) => fetch(url).then(r => r.json())
 
 export interface IndexData {
   id: string
+  /**
+   * Optional short ticker code (e.g. "FTLX", "FGMX"). Used for compact
+   * display in badges where the full name would overflow.
+   */
+  ticker?: string
   name: string
   description: string
   type: "weighted" | "equal" | "managed"
@@ -48,8 +53,14 @@ export function IndexCard({ index }: IndexCardProps) {
   // Dedicated 24h fetch (hourly granularity) — CoinGecko returns daily points
   // for days=90, so we can't slice that to 24h and get a real return.
   // This matches the same pattern used in IndexDetailView.
+  // If the index defines explicit weights, forward them so the aggregated
+  // series reflects the real composition instead of an equal average.
+  const weightsQuery =
+    index.weights && index.weights.length === index.tokens.length
+      ? `&weights=${index.weights.join(",")}`
+      : ""
   const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
@@ -113,10 +124,17 @@ export function IndexCard({ index }: IndexCardProps) {
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
                 <div className="mb-8">
-                  <div
-                    className={`mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${typeBgColors[index.type]}`}
-                  >
-                    <span className={typeColors[index.type]}>{typeLabels[index.type]}</span>
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <div
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${typeBgColors[index.type]}`}
+                    >
+                      <span className={typeColors[index.type]}>{typeLabels[index.type]}</span>
+                    </div>
+                    {!hasContracts && (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-xs font-semibold text-amber-500">
+                        Coming soon
+                      </div>
+                    )}
                   </div>
                   <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 text-balance group-hover:text-success transition-colors">
                     {index.name}
@@ -194,9 +212,13 @@ export function IndexCard({ index }: IndexCardProps) {
                     e.stopPropagation()
                     setShowBuyDialog(true)
                   }}
-                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-12 text-base rounded-xl group/btn"
+                  className={`flex-1 font-semibold h-12 text-base rounded-xl group/btn ${
+                    hasContracts
+                      ? "bg-success hover:bg-success/90 text-success-foreground"
+                      : "bg-muted hover:bg-muted/80 text-foreground border border-border"
+                  }`}
                 >
-                  <span>Invest Now</span>
+                  <span>{hasContracts ? "Invest Now" : "View Details"}</span>
                   <ArrowUpRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                 </Button>
                 <Button

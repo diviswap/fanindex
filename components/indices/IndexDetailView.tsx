@@ -59,8 +59,17 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   //  - 24h hourly data (API returns hourly points for days=1)
   // This is necessary because 90d data only has daily granularity — slicing it
   // to the last 24h would yield just 1 point and no chart line.
+  //
+  // If the index defines explicit weights, forward them to the API so the
+  // aggregated index series reflects the real composition (e.g. FTLX weights
+  // GAL 16.42% / ARG 12.73% / …) instead of an equal-weight average.
+  const weightsQuery =
+    index.weights && index.weights.length === index.tokens.length
+      ? `&weights=${index.weights.join(",")}`
+      : ""
+
   const { data: history90dData, isLoading: history90dLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsQuery}`,
     fetcher,
     {
       refreshInterval: 600000,
@@ -70,7 +79,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   )
 
   const { data: history24hData, isLoading: history24hLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
     fetcher,
     {
       refreshInterval: 300000, // 5 min — more frequent for 24h view

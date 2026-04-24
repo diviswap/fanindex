@@ -10,11 +10,17 @@ export const MAINNET_CONTRACTS = {
   NFT: "0x8016f276183D29C0c910239b144793Ef7B977B65" as `0x${string}`,
 } as const
 
-// Currently only the FTLX index is deployed on mainnet
+// Currently only the FTLX index is deployed on mainnet.
+// Additional indices (FGMX, FFLX, FELX, FSLX) are defined in
+// `lib/data/indices.ts` and ready to be wired up here once their
+// addresses are supplied. To enable one, add an entry keyed by its
+// index id with { vault, nft, batchBuyer, name, tokens } — the UI
+// will automatically pick it up via `hasDeployedContracts()` and
+// `getContractAddresses()`.
 export const ETF_CONTRACTS = {
-  // FTLX — Fan Token Leaders Index (id: "1")
-  // Tracks the 10 largest / most liquid fan tokens (GAL, ARG, OG, PSG, BAR,
-  // ASR, CITY, ATM, POR, JUV) with market-cap weighted allocation.
+  // ── FTLX — Fan Token Leaders Index (id: "1") ─────────────────────────
+  // Tracks the 10 largest / most liquid fan tokens (GAL, ARG, OG, PSG,
+  // BAR, ASR, CITY, ATM, POR, JUV) with market-cap weighted allocation.
   "1": {
     vault: MAINNET_CONTRACTS.ETF_VAULT,
     nft: MAINNET_CONTRACTS.NFT,
@@ -22,6 +28,38 @@ export const ETF_CONTRACTS = {
     name: "FTLX — Fan Token Leaders Index",
     tokens: 10, // GAL, ARG, OG, PSG, BAR, ASR, CITY, ATM, POR, JUV
   },
+
+  // ── Pending deployments ──────────────────────────────────────────────
+  // When contract addresses arrive, uncomment and fill the entries below.
+  //
+  // "2": {  // FGMX — Fan Gaming Index (4 tokens: OG, NAVI, ALL, MIBR)
+  //   vault:      "0x..." as `0x${string}`,
+  //   nft:        "0x..." as `0x${string}`,
+  //   batchBuyer: "0x..." as `0x${string}`,
+  //   name: "FGMX — Fan Gaming Index",
+  //   tokens: 4,
+  // },
+  // "3": {  // FFLX — Fan Fight Index (2 tokens: UFC, PFL)
+  //   vault:      "0x..." as `0x${string}`,
+  //   nft:        "0x..." as `0x${string}`,
+  //   batchBuyer: "0x..." as `0x${string}`,
+  //   name: "FFLX — Fan Fight Index",
+  //   tokens: 2,
+  // },
+  // "4": {  // FELX — Fan English League Index (5 tokens: CITY, AFC, SPURS, AVL, EFC)
+  //   vault:      "0x..." as `0x${string}`,
+  //   nft:        "0x..." as `0x${string}`,
+  //   batchBuyer: "0x..." as `0x${string}`,
+  //   name: "FELX — Fan English League Index",
+  //   tokens: 5,
+  // },
+  // "5": {  // FSLX — Fan Spanish League Index (4 tokens: BAR, ATM, SEVILLA, VCF)
+  //   vault:      "0x..." as `0x${string}`,
+  //   nft:        "0x..." as `0x${string}`,
+  //   batchBuyer: "0x..." as `0x${string}`,
+  //   name: "FSLX — Fan Spanish League Index",
+  //   tokens: 4,
+  // },
 } as const
 
 export function getContractAddresses(indexId: string) {

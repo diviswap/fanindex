@@ -69,12 +69,29 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const tokensParam = searchParams.get("tokens")
   const daysParam = searchParams.get("days")
+  const weightsParam = searchParams.get("weights")
 
   if (!tokensParam) {
     return NextResponse.json({ error: "Missing tokens parameter" }, { status: 400 })
   }
 
   const tokenSymbols = tokensParam.split(",").map(t => t.trim().toUpperCase())
+
+  // Optional explicit weights (percentages, parallel to tokenSymbols).
+  // If absent or malformed, fall back to equal weighting.
+  let weights: number[] | null = null
+  if (weightsParam) {
+    const parsed = weightsParam
+      .split(",")
+      .map(w => parseFloat(w.trim()))
+      .filter(n => Number.isFinite(n) && n >= 0)
+    if (parsed.length === tokenSymbols.length) {
+      const total = parsed.reduce((s, w) => s + w, 0)
+      // Normalise to 0..1 (supports inputs as % or as fractions)
+      weights = total > 0 ? parsed.map(w => w / total) : null
+    }
+  }
+
   let days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
   
   // For 24h chart, fetch 2 days of data to ensure we have points from both ayer and hoy
@@ -119,42 +136,64 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Build combined price data
-    // We'll create data points for each timestamp where we have data
-    const priceDataMap = new Map<number, { prices: number[]; chzPrice: number }>()
-    
-    for (const { data } of tokenHistories) {
+    // Build combined price data per timestamp, tracking which symbol each
+    // price came from so we can apply explicit weights when provided.
+    const priceDataMap = new Map<
+      number,
+      { bySymbol: Map<string, number>; chzPrice: number }
+    >()
+
+    for (const { symbol, data } of tokenHistories) {
       if (!data?.prices) continue
-      
+
       for (const [timestamp, usdPrice] of data.prices) {
         // Round timestamp for matching
-        const roundedTs = days <= 1 
+        const roundedTs = days <= 1
           ? Math.round(timestamp / 3600000) * 3600000
           : Math.round(timestamp / 86400000) * 86400000
-        
+
         const chzPrice = chzHistory.get(roundedTs) || 0.07 // Default CHZ price if not found
-        
+
         if (!priceDataMap.has(roundedTs)) {
-          priceDataMap.set(roundedTs, { prices: [], chzPrice })
+          priceDataMap.set(roundedTs, { bySymbol: new Map(), chzPrice })
         }
-        
+
         const entry = priceDataMap.get(roundedTs)!
         // Convert USD price to CHZ
         const chzTokenPrice = chzPrice > 0 ? usdPrice / chzPrice : 0
-        entry.prices.push(chzTokenPrice)
+        entry.bySymbol.set(symbol, chzTokenPrice)
       }
     }
 
-    // Calculate average index price for each timestamp
+    // Build a symbol → weight lookup (normalised to 0..1). If no explicit
+    // weights were provided, use equal weighting across all input symbols.
+    const weightBySymbol = new Map<string, number>()
+    if (weights) {
+      tokenSymbols.forEach((sym, i) => weightBySymbol.set(sym, weights![i]))
+    } else {
+      const equal = 1 / tokenSymbols.length
+      tokenSymbols.forEach(sym => weightBySymbol.set(sym, equal))
+    }
+
+    // Calculate weighted index price for each timestamp. If a constituent
+    // is missing for a given timestamp, its weight is redistributed across
+    // the tokens that DO have data, so the series never has gaps.
     const chartData = Array.from(priceDataMap.entries())
-      .filter(([_, data]) => data.prices.length > 0)
-      .map(([timestamp, data]) => {
-        const avgPrice = data.prices.reduce((a, b) => a + b, 0) / data.prices.length
+      .filter(([_, d]) => d.bySymbol.size > 0)
+      .map(([timestamp, d]) => {
+        let weightedSum = 0
+        let usedWeight = 0
+        for (const [sym, price] of d.bySymbol) {
+          const w = weightBySymbol.get(sym) ?? 0
+          weightedSum += price * w
+          usedWeight += w
+        }
+        const indexPrice = usedWeight > 0 ? weightedSum / usedWeight : 0
         return {
           timestamp,
           date: formatDate(timestamp, days),
-          price: Number(avgPrice.toFixed(6)),
-          volume: 0 // Volume data not aggregated
+          price: Number(indexPrice.toFixed(6)),
+          volume: 0, // Volume data not aggregated
         }
       })
       .sort((a, b) => a.timestamp - b.timestamp)

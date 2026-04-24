@@ -14,8 +14,11 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  // Only index "1" (FTLX — Fan Token Leaders Index) is deployed on mainnet
-  const deployedIndices = INDICES.filter((index) => ["1"].includes(index.id))
+  // All indices are shown on the catalogue. Only those with an entry in
+  // `ETF_CONTRACTS` (currently FTLX, id "1") allow actual on-chain buys;
+  // the rest show a "not yet deployed" notice inside the Buy dialog.
+  // FGMX / FFLX / FELX / FSLX (ids "2"-"5") are waiting on contract addresses.
+  const displayedIndices = INDICES
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
@@ -38,7 +41,7 @@ export default function IndicesPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch mb-16 sm:mb-20 md:mb-24">
-          {deployedIndices.map((index) => (
+          {displayedIndices.map((index) => (
             <IndexCard key={index.id} index={index} />
           ))}
         </div>
