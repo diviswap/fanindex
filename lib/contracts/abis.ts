@@ -71,6 +71,13 @@ export function hasDeployedContracts(indexId: string): boolean {
   return indexId in ETF_CONTRACTS
 }
 
+// Canonical list of indices with deployed contracts on Chiliz Mainnet.
+// Derived directly from ETF_CONTRACTS so adding a new vault auto-shows up
+// in the UI (Portfolio's "Available Indices", /indices list, etc).
+export const DEPLOYED_INDEX_IDS = Object.keys(ETF_CONTRACTS) as Array<
+  keyof typeof ETF_CONTRACTS
+>
+
 export const CompetitionVaultABI = EtfVaultABI
 export const CompetitionNFTABI = SimplePositionsNFTABI
 
