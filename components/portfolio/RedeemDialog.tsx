@@ -8,6 +8,7 @@ import {
   useWaitForTransactionReceipt,
   useChainId,
   useSwitchChain,
+  usePublicClient,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
 import { parseGwei } from "viem"
@@ -57,6 +58,7 @@ export function RedeemDialog({
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+  const publicClient = usePublicClient({ chainId: CHILIZ_MAINNET_ID })
 
   const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
   const [redemptionType, setRedemptionType] = useState<"chz" | "tokens">("chz")
@@ -104,14 +106,44 @@ export function RedeemDialog({
       // We look up the registered token count (fallback to a safe FTLX-sized
       // estimate of 10). Capped at 10M to stay well under block gas.
       const tokenCount = tokenRows.length || 10
-      const gasLimit = BigInt(
-        Math.min(
-          10_000_000,
-          redemptionType === "chz"
-            ? 600_000 + tokenCount * 400_000
-            : 200_000 + tokenCount * 80_000,
-        ),
-      )
+
+      // Gas limit strategy: estimate on-chain with a 25% buffer. Fall back
+      // to a formula calibrated to observed mainnet usage if estimation
+      // fails. A massively oversized gas limit can cause some RPCs to
+      // reject/mis-price the tx (we saw this with the prior 400k/token
+      // estimate).
+      let gasLimit: bigint
+      try {
+        if (redemptionType === "chz") {
+          const estimated = await publicClient!.estimateContractGas({
+            address: contracts.vault,
+            abi: EtfVaultABI.abi,
+            functionName: "redeemAllToCHZNative",
+            args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
+            account: address,
+          })
+          gasLimit = (estimated * 125n) / 100n
+        } else {
+          const estimated = await publicClient!.estimateContractGas({
+            address: contracts.vault,
+            abi: EtfVaultABI.abi,
+            functionName: "withdrawTokens",
+            args: [BigInt(nftId), address, redemptionPercentage],
+            account: address,
+          })
+          gasLimit = (estimated * 125n) / 100n
+        }
+      } catch {
+        // Fallback: per-swap redeem ~220k, per-transfer withdraw ~80k.
+        gasLimit = BigInt(
+          Math.min(
+            10_000_000,
+            redemptionType === "chz"
+              ? 400_000 + tokenCount * 220_000
+              : 150_000 + tokenCount * 80_000,
+          ),
+        )
+      }
 
       // Chiliz Chain requires a much higher priority fee (miner tip) than
       // what wallets auto-suggest via RPC. Without it, the tx gets included

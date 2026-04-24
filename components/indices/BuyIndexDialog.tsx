@@ -12,6 +12,7 @@ import {
   useChainId,
   useSwitchChain,
   useReadContracts,
+  usePublicClient,
 } from "wagmi"
 import { parseEther, formatEther, parseGwei } from "viem"
 import { chiliz } from "wagmi/chains"
@@ -45,6 +46,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+  const publicClient = usePublicClient({ chainId: CHILIZ_MAINNET_ID })
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -165,12 +167,32 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
       const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
-      // Scale gas limit to the number of swaps. Each Uniswap-style swap on
-      // Chiliz costs ~400k gas; add overhead for fee transfer + NFT mint.
-      // 10 swaps → ~4.2M gas. We cap at 10M to stay well under block gas.
-      const gasLimit = BigInt(
-        Math.min(10_000_000, 600_000 + buyTokenCount * 400_000),
-      )
+      // Gas limit strategy: try to estimate the real cost on-chain and add
+      // a 25% buffer. If estimation fails, fall back to a formula calibrated
+      // to real Chiliz mainnet usage (~177k gas / swap, observed in
+      // successful txs) instead of overshooting. A massively oversized gas
+      // limit — like our earlier 4.6M — can itself cause some wallets/RPCs
+      // to reject or mis-price the tx.
+      let gasLimit: bigint
+      try {
+        const estimated = await publicClient!.estimateContractGas({
+          address: contracts.vault,
+          abi: EtfVaultABI.abi,
+          functionName: "buyNative",
+          args: [address, minOuts],
+          value: parseEther(amount),
+          account: address,
+        })
+        // +25% buffer
+        gasLimit = (estimated * 125n) / 100n
+      } catch {
+        // Fallback: 400k overhead (fee transfer + NFT mint + routing)
+        // plus ~220k per swap (a bit above the ~177k observed to leave
+        // headroom for slippage paths and warm/cold storage variance).
+        gasLimit = BigInt(
+          Math.min(10_000_000, 400_000 + buyTokenCount * 220_000),
+        )
+      }
 
       // Chiliz Chain requires a much higher priority fee (miner tip) than
       // what wallets auto-suggest via RPC. Without it, the tx gets included
