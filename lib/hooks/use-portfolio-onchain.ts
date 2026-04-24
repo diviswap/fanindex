@@ -6,8 +6,9 @@ import { formatUnits } from "viem"
 import { SimplePositionsNFTABI, EtfVaultABI, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import { INDICES } from "@/lib/data/indices"
 
-// Only the indices that have deployed contracts on Chiliz Mainnet
-const DEPLOYED_INDICES = ["1"] as const
+// Only the indices that have deployed contracts on Chiliz Mainnet.
+// Keep this in sync with the keys of ETF_CONTRACTS.
+const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX"] as const
 
 export interface NFTHolding {
   /** The raw NFT token ID from the blockchain */

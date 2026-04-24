@@ -5,9 +5,21 @@ import { IndexDetailView } from "@/components/indices/IndexDetailView"
 import { notFound } from "next/navigation"
 import { INDICES } from "@/lib/data/indices"
 
-export default async function IndexDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const index = INDICES.find((i) => i.id === id)
+export default async function IndexDetailPage({
+  params,
+}: {
+  params: Promise<{ symbol: string }>
+}) {
+  const { symbol } = await params
+
+  // Match on ticker symbol (e.g. "FTLX") case-insensitively. We also match
+  // against `id` as a fallback so legacy links like /indices/FTLX still
+  // resolve when the id and symbol are identical (which is the case for all
+  // deployed indices).
+  const normalized = symbol.toUpperCase()
+  const index = INDICES.find(
+    (i) => i.symbol?.toUpperCase() === normalized || i.id.toUpperCase() === normalized,
+  )
 
   if (!index) {
     notFound()

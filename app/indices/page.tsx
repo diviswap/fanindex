@@ -14,8 +14,11 @@ export default function IndicesPage() {
     window.scrollTo(0, 0)
   }, [])
 
-  // Only index "1" (FTLX — Fan Token Leaders Index) is deployed on mainnet
-  const deployedIndices = INDICES.filter((index) => ["1"].includes(index.id))
+  // Only FTLX, FGMX and FFLX have contracts deployed on Chiliz Mainnet.
+  // Keep this list in sync with ETF_CONTRACTS in lib/contracts/abis.ts.
+  const deployedIndices = INDICES.filter((index) =>
+    ["FTLX", "FGMX", "FFLX"].includes(index.id),
+  )
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">

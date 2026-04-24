@@ -149,14 +149,23 @@ export function getIndexAPY(
   return `${sign}${apy.toFixed(1)}%`
 }
 
-// FTLX — Fan Token Leaders Index
-// Target composition (weighted): GAL, ARG, OG, PSG, BAR, ASR, CITY, ATM, POR, JUV
+// ───────── Deployed, production indices on Chiliz Mainnet ─────────
+// These `id`s double as the URL slug (/indices/FTLX, /indices/FGMX, …)
+// and the lookup key in ETF_CONTRACTS. Keep the key and the ticker in sync.
+
+// FTLX — Fan Token Leaders Index (weighted)
 const FTLX_TOKENS = ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"] as const
 const FTLX_WEIGHTS = [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49] as const
 
+// FGMX — Fan Gaming Index (equal weight, esports)
+const FGMX_TOKENS = ["OG", "NAVI", "ALL", "MIBR"] as const
+
+// FFLX — Fan Fight Index (equal weight, combat sports)
+const FFLX_TOKENS = ["UFC", "PFL"] as const
+
 export const INDICES: IndexData[] = [
   {
-    id: "1",
+    id: "FTLX",
     name: "FTLX — Fan Token Leaders Index",
     symbol: "FTLX",
     description:
@@ -166,6 +175,32 @@ export const INDICES: IndexData[] = [
     weights: [...FTLX_WEIGHTS],
     price: calculateIndexPrice([...FTLX_TOKENS], undefined, [...FTLX_WEIGHTS]).toFixed(2),
     apy: "14.2%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FGMX",
+    name: "FGMX — Fan Gaming Index",
+    symbol: "FGMX",
+    description:
+      "A thematic index providing exposure to the esports segment of the fan token ecosystem, with equal weighting across all included teams.",
+    type: "equal",
+    tokens: [...FGMX_TOKENS],
+    price: calculateIndexPrice([...FGMX_TOKENS]).toFixed(2),
+    apy: "18.7%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FFLX",
+    name: "FFLX — Fan Fight Index",
+    symbol: "FFLX",
+    description:
+      "An index focused on combat sports, tracking the performance of leading organizations with fan tokens in this category.",
+    type: "equal",
+    tokens: [...FFLX_TOKENS],
+    price: calculateIndexPrice([...FFLX_TOKENS]).toFixed(2),
+    apy: "15.4%",
     totalValue: "—",
     holders: 0,
   },
