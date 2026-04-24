@@ -13,7 +13,7 @@ import {
   useSwitchChain,
   useReadContracts,
 } from "wagmi"
-import { parseEther, formatEther } from "viem"
+import { parseEther, formatEther, parseGwei } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
 import type { IndexData } from "./IndexCard"
@@ -172,6 +172,15 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         Math.min(10_000_000, 600_000 + buyTokenCount * 400_000),
       )
 
+      // Chiliz Chain requires a much higher priority fee (miner tip) than
+      // what wallets auto-suggest via RPC. Without it, the tx gets included
+      // but reverts early (~6% gas used) — matching the symptom we saw.
+      // Successful txs on Chiliz use ~500 Gwei priority. We set 600 Gwei to
+      // leave headroom and a maxFeePerGas comfortably above a 2500 Gwei
+      // base fee (2500 base + 600 tip = 3100; we set 4000 to absorb spikes).
+      const maxPriorityFeePerGas = parseGwei("600")
+      const maxFeePerGas = parseGwei("4000")
+
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
@@ -179,6 +188,8 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         args: [address, minOuts],
         value: parseEther(amount),
         gas: gasLimit,
+        maxPriorityFeePerGas,
+        maxFeePerGas,
       })
     } catch {
       // handled by wagmi error state

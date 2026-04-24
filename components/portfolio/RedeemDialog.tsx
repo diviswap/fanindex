@@ -10,6 +10,7 @@ import {
   useSwitchChain,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
+import { parseGwei } from "viem"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { XCircle, ArrowDownToLine, AlertTriangle, Info, ExternalLink, Coins, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -112,6 +113,13 @@ export function RedeemDialog({
         ),
       )
 
+      // Chiliz Chain requires a much higher priority fee (miner tip) than
+      // what wallets auto-suggest via RPC. Without it, the tx gets included
+      // but reverts early. Successful txs on Chiliz use ~500 Gwei priority;
+      // we set 600 Gwei of tip and 4000 Gwei maxFee to absorb base-fee spikes.
+      const maxPriorityFeePerGas = parseGwei("600")
+      const maxFeePerGas = parseGwei("4000")
+
       if (redemptionType === "chz") {
         writeContract({
           address: contracts.vault,
@@ -119,6 +127,8 @@ export function RedeemDialog({
           functionName: "redeemAllToCHZNative",
           args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
           gas: gasLimit,
+          maxPriorityFeePerGas,
+          maxFeePerGas,
         })
       } else {
         writeContract({
@@ -127,6 +137,8 @@ export function RedeemDialog({
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
           gas: gasLimit,
+          maxPriorityFeePerGas,
+          maxFeePerGas,
         })
       }
     } catch {
