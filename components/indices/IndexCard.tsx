@@ -119,7 +119,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   return (
     <>
-      <Link href={`/indices/${index.id}`} className="block h-full group">
+      <Link href={`/indices/${index.ticker ?? index.id}`} className="block h-full group">
           <div className="h-full min-h-[500px] border border-border bg-card/80 backdrop-blur-sm p-8 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">

@@ -222,6 +222,19 @@ export function getIndexById(id: string): IndexData | undefined {
   return INDICES.find((index) => index.id === id)
 }
 
+// Helper function to get index by ticker code (e.g. "FTLX", "FGMX").
+// Lookup is case-insensitive so URLs like /indices/ftlx also resolve.
+export function getIndexByTicker(ticker: string): IndexData | undefined {
+  const normalised = ticker.toUpperCase()
+  return INDICES.find((index) => index.ticker?.toUpperCase() === normalised)
+}
+
+// Flexible resolver used by the dynamic route: tries ticker first and
+// falls back to the numeric id for backwards compatibility.
+export function getIndexByTickerOrId(slug: string): IndexData | undefined {
+  return getIndexByTicker(slug) ?? getIndexById(slug)
+}
+
 // Helper function to get indices by type
 export function getIndicesByType(type: "weighted" | "equal" | "managed"): IndexData[] {
   return INDICES.filter((index) => index.type === type)

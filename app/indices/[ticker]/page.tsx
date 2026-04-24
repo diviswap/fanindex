@@ -2,12 +2,28 @@ import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { Footer } from "@/components/ui/footer-section"
 import { IndexDetailView } from "@/components/indices/IndexDetailView"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import { INDICES } from "@/lib/data/indices"
 
-export default async function IndexDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const index = INDICES.find((i) => i.id === id)
+export default async function IndexDetailPage({
+  params,
+}: {
+  params: Promise<{ ticker: string }>
+}) {
+  const { ticker } = await params
+  const normalised = ticker.toUpperCase()
+
+  // Primary lookup: by ticker code (e.g. "FTLX", "FGMX").
+  let index = INDICES.find((i) => i.ticker?.toUpperCase() === normalised)
+
+  // Backwards-compat: if someone still hits a legacy numeric URL
+  // (e.g. /indices/1), resolve it and redirect to the ticker URL.
+  if (!index) {
+    const byId = INDICES.find((i) => i.id === ticker)
+    if (byId?.ticker) {
+      redirect(`/indices/${byId.ticker}`)
+    }
+  }
 
   if (!index) {
     notFound()
