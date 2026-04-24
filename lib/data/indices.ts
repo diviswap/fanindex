@@ -157,8 +157,8 @@ export function getIndexAPY(
 const FTLX_TOKENS = ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"] as const
 const FTLX_WEIGHTS = [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49] as const
 
-// FGMX — Fan Gaming Index (equal weight, esports)
-const FGMX_TOKENS = ["OG", "NAVI", "ALL", "MIBR"] as const
+// FGMX — Fan Gaming Index (equal weight, 5 tokens)
+const FGMX_TOKENS = ["OG", "TH", "ALL", "MIBR", "DOJO"] as const
 
 // FFLX — Fan Fight Index (equal weight, combat sports)
 const FFLX_TOKENS = ["UFC", "PFL"] as const
