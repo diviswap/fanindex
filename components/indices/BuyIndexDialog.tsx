@@ -111,18 +111,17 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
       const minOuts = Array(tokenCount).fill(BigInt(0))
 
-      // Exact gas configuration observed on successful FTLX buy txns on
-      // Chiliz Mainnet:
-      //   Gas limit:      2,058,949   (actual used ~1,774,778 / 86.20%)
-      //   Max fee:        3,164.0625 gwei
-      //   Priority fee:   501 gwei
-      // These values provide enough headroom for the 10 DEX swaps + NFT mint
-      // and match the base fee on Chiliz (~2,500 gwei).
-      const GWEI = BigInt(1_000_000_000)
-      const gasLimit = BigInt(2_058_949)
-      // 3,164.0625 gwei = 3_164_062_500 wei/gas (fractional gwei → use wei math)
-      const maxFeePerGas = BigInt(3_164_062_500)
-      const maxPriorityFeePerGas = BigInt(501) * GWEI
+      // Gas LIMIT only (not fees). We observed successful FTLX buys on
+      // Chiliz Mainnet consuming ~1,774,778 gas (10 DEX swaps + NFT mint);
+      // we allocate 2,100,000 as a safety buffer.
+      //
+      // IMPORTANT: we intentionally do NOT pass maxFeePerGas /
+      // maxPriorityFeePerGas. Chiliz's base fee fluctuates heavily (often
+      // above 2,500 gwei); hardcoding a max fee causes the wallet to
+      // reject the transaction whenever the current base fee exceeds it.
+      // Letting wagmi/viem + the wallet estimate fees using live network
+      // conditions is both safer and cheaper for the user.
+      const gasLimit = BigInt(2_100_000)
 
       writeContract({
         address: contracts.vault,
@@ -131,8 +130,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         args: [address, minOuts],
         value: parseEther(amount),
         gas: gasLimit,
-        maxFeePerGas,
-        maxPriorityFeePerGas,
       })
     } catch (e) {
       // handled by wagmi error state
