@@ -135,10 +135,10 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     feePctLabel: string
   } | null>(null)
 
-  // Surfaced pre-flight error from simulateContract. Catching the revert
-  // before broadcasting saves the user from burning gas on a failed tx.
+  // Surfaced pre-flight error from a best-effort background simulation.
+  // The wallet popup is opened immediately regardless; this just tells the
+  // user *why* a tx would fail, without blocking the click.
   const [simError, setSimError] = useState<string | null>(null)
-  const [isSimulating, setIsSimulating] = useState(false)
 
   const router = useRouter()
 
@@ -173,45 +173,38 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     const minOuts = Array(buyTokenCount).fill(BigInt(0))
     const value = parseEther(amount)
 
-    // ── Pre-flight simulation ──────────────────────────────────────────
-    // simulateContract runs the tx against the current state and either
-    // returns the exact gas + request to send, or throws with the real
-    // revert reason (custom error name, revert string, etc). This gives
-    // us a precise error to show the user instead of silently broadcasting
-    // a tx that will revert on-chain and burn their gas.
-    setIsSimulating(true)
-    let simulated
-    try {
-      simulated = await publicClient!.simulateContract({
-        address: contracts.vault,
-        abi: EtfVaultABI.abi,
-        functionName: "buyNative",
-        args: [address, minOuts],
-        value,
-        account: address,
-      })
-    } catch (err: unknown) {
-      const raw =
-        typeof err === "object" && err !== null
-          ? // viem errors expose `shortMessage` and a formatted `details`/`metaMessages`
-            (err as { shortMessage?: string; message?: string; details?: string }).shortMessage ??
-            (err as { details?: string }).details ??
-            (err as Error).message ??
-            String(err)
-          : String(err)
-      console.log("[v0] FTLX buyNative simulation reverted:", raw)
-      setSimError(raw)
-      setIsSimulating(false)
-      return
+    // Best-effort background simulation to surface the real revert reason
+    // to the user AFTER submit. This does not gate the tx — the wallet
+    // popup is opened immediately so the user never gets stuck if the RPC
+    // is slow.
+    if (publicClient) {
+      publicClient
+        .simulateContract({
+          address: contracts.vault,
+          abi: EtfVaultABI.abi,
+          functionName: "buyNative",
+          args: [address, minOuts],
+          value,
+          account: address,
+        })
+        .catch((err: unknown) => {
+          const raw =
+            typeof err === "object" && err !== null
+              ? (err as { shortMessage?: string; message?: string; details?: string }).shortMessage ??
+                (err as { details?: string }).details ??
+                (err as Error).message ??
+                String(err)
+              : String(err)
+          console.log("[v0] FTLX buyNative simulation reverted:", raw)
+          setSimError(raw)
+        })
     }
-    setIsSimulating(false)
 
-    // +25% buffer over the simulation's gas usage. If `gas` isn't set,
-    // fall back to a formula calibrated to observed mainnet usage.
-    const simGas = (simulated.request as { gas?: bigint }).gas
-    const gasLimit: bigint = simGas
-      ? (simGas * 125n) / 100n
-      : BigInt(Math.min(10_000_000, 400_000 + buyTokenCount * 220_000))
+    // Gas limit calibrated to observed mainnet usage: ~400k overhead
+    // (fee transfer + NFT mint + routing) plus ~220k per swap.
+    const gasLimit = BigInt(
+      Math.min(10_000_000, 400_000 + buyTokenCount * 220_000),
+    )
 
     // Chiliz Chain requires a much higher priority fee (miner tip) than
     // what wallets auto-suggest via RPC. Successful txs on Chiliz use
@@ -562,7 +555,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                     !isConnected ||
                     isWrongChain ||
                     !hasContracts ||
-                    isSimulating ||
                     isPending ||
                     isConfirming ||
                     isSuccess ||
@@ -571,12 +563,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   }
                   className="flex-1 bg-success hover:bg-success/90 text-black font-bold text-sm sm:text-base h-9 sm:h-11"
                 >
-                  {isSimulating ? (
-                    <>
-                      <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
-                      Simulating...
-                    </>
-                  ) : isPending ? (
+                  {isPending ? (
                     <>
                       <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
                       Waiting for wallet...
