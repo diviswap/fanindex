@@ -111,11 +111,18 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
       const minOuts = Array(tokenCount).fill(BigInt(0))
 
-      // Gas budget: each constituent triggers a DEX swap (~250k gas) plus
-      // NFT mint + bookkeeping (~300k). Scale with the number of tokens
-      // and add a comfortable buffer so 10-token indices like FTLX don't
-      // revert with out-of-gas.
-      const gasLimit = BigInt(500_000 + tokenCount * 300_000)
+      // Exact gas configuration observed on successful FTLX buy txns on
+      // Chiliz Mainnet:
+      //   Gas limit:      2,058,949   (actual used ~1,774,778 / 86.20%)
+      //   Max fee:        3,164.0625 gwei
+      //   Priority fee:   501 gwei
+      // These values provide enough headroom for the 10 DEX swaps + NFT mint
+      // and match the base fee on Chiliz (~2,500 gwei).
+      const GWEI = BigInt(1_000_000_000)
+      const gasLimit = BigInt(2_058_949)
+      // 3,164.0625 gwei = 3_164_062_500 wei/gas (fractional gwei → use wei math)
+      const maxFeePerGas = BigInt(3_164_062_500)
+      const maxPriorityFeePerGas = BigInt(501) * GWEI
 
       writeContract({
         address: contracts.vault,
@@ -124,6 +131,8 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         args: [address, minOuts],
         value: parseEther(amount),
         gas: gasLimit,
+        maxFeePerGas,
+        maxPriorityFeePerGas,
       })
     } catch (e) {
       // handled by wagmi error state
