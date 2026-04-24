@@ -73,10 +73,27 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
             abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "minInvestment",
           },
+          {
+            address: contracts.vault,
+            abi: EtfVaultABI.abi as readonly unknown[],
+            functionName: "getEtfInfo",
+          },
         ]
       : [],
     query: { enabled: open && hasContracts },
   })
+
+  // Live token count from getEtfInfo() — this is the source of truth for the
+  // length of the `minOuts` array. Using a stale/hardcoded value causes the
+  // contract to revert with BuyerLengthMismatch.
+  const onChainTokenCount = useMemo(() => {
+    const r = vaultConfigData?.[2]
+    if (r?.status === "success" && Array.isArray(r.result)) {
+      const tokensArr = (r.result as unknown as readonly unknown[][])[0]
+      if (Array.isArray(tokensArr)) return tokensArr.length
+    }
+    return undefined
+  }, [vaultConfigData])
 
   const feeBps = useMemo(() => {
     const r = vaultConfigData?.[0]
@@ -143,7 +160,11 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
-      const buyTokenCount = contractConfig?.tokens ?? index.tokens.length
+      // ALWAYS prefer the live on-chain token count. The contract's
+      // BatchBuyer reverts with BuyerLengthMismatch if minOuts.length
+      // doesn't match the registered token list exactly.
+      const buyTokenCount =
+        onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
       const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
       // Boost gas price by +200% (3×) to prevent FTLX buys from getting
@@ -158,13 +179,20 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         // fall back to wallet default gas pricing
       }
 
+      // Scale gas limit to the number of swaps. Each Uniswap-style swap on
+      // Chiliz costs ~400k gas; add overhead for fee transfer + NFT mint.
+      // 10 swaps → ~4.2M gas. We cap at 10M to stay well under block gas.
+      const gasLimit = BigInt(
+        Math.min(10_000_000, 600_000 + buyTokenCount * 400_000),
+      )
+
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
         functionName: "buyNative",
         args: [address, minOuts],
         value: parseEther(amount),
-        gas: BigInt(800_000),
+        gas: gasLimit,
         ...(boostedGasPrice ? { gasPrice: boostedGasPrice } : {}),
       })
     } catch {

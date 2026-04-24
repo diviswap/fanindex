@@ -112,12 +112,28 @@ export function RedeemDialog({
       }
       const gasOverride = boostedGasPrice ? { gasPrice: boostedGasPrice } : {}
 
+      // Scale gas limit to the number of tokens in the index.
+      // - redeemAllToCHZNative: swaps each position back to CHZ → ~400k / token
+      // - withdrawTokens: pure ERC-20 transfers → ~80k / token
+      // We look up the registered token count (fallback to a safe FTLX-sized
+      // estimate of 10). Capped at 10M to stay well under block gas.
+      const tokenCount = tokenRows.length || 10
+      const gasLimit = BigInt(
+        Math.min(
+          10_000_000,
+          redemptionType === "chz"
+            ? 600_000 + tokenCount * 400_000
+            : 200_000 + tokenCount * 80_000,
+        ),
+      )
+
       if (redemptionType === "chz") {
         writeContract({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
           args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
+          gas: gasLimit,
           ...gasOverride,
         })
       } else {
@@ -126,6 +142,7 @@ export function RedeemDialog({
           abi: EtfVaultABI.abi,
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
+          gas: gasLimit,
           ...gasOverride,
         })
       }
