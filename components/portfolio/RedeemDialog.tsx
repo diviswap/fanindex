@@ -99,14 +99,14 @@ export function RedeemDialog({
     reset()
 
     try {
-      // Boost gas price by +150% (2.5×) to prevent FTLX redemptions from
+      // Boost gas price by +200% (3×) to prevent FTLX redemptions from
       // reverting under Chiliz mempool congestion. `redeemAllToCHZNative`
       // swaps all 10 tokens back to CHZ in a single tx and is especially
       // sensitive to gas underpricing.
       let boostedGasPrice: bigint | undefined
       try {
         const current = await publicClient?.getGasPrice()
-        if (current) boostedGasPrice = (current * 5n) / 2n
+        if (current) boostedGasPrice = current * 3n
       } catch {
         // fall back to wallet default gas pricing
       }

@@ -146,14 +146,14 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       const buyTokenCount = contractConfig?.tokens ?? index.tokens.length
       const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
-      // Boost gas price by +150% (2.5×) to prevent FTLX buys from getting
+      // Boost gas price by +200% (3×) to prevent FTLX buys from getting
       // stuck or reverting under Chiliz mempool congestion. FTLX executes
       // 10 swaps in a single tx, so an underpriced tx is much more likely
       // to fail than a single-token action.
       let boostedGasPrice: bigint | undefined
       try {
         const current = await publicClient?.getGasPrice()
-        if (current) boostedGasPrice = (current * 5n) / 2n
+        if (current) boostedGasPrice = current * 3n
       } catch {
         // fall back to wallet default gas pricing
       }
