@@ -135,11 +135,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     feePctLabel: string
   } | null>(null)
 
-  // Surfaced pre-flight error from a best-effort background simulation.
-  // The wallet popup is opened immediately regardless; this just tells the
-  // user *why* a tx would fail, without blocking the click.
-  const [simError, setSimError] = useState<string | null>(null)
-
   const router = useRouter()
 
   // Set purchase details and call onSuccess only after on-chain confirmation
@@ -162,72 +157,70 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     if (!amount || Number.parseFloat(amount) <= 0) return
 
     reset()
-    setSimError(null)
 
-    const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
-    // ALWAYS prefer the live on-chain token count. The contract's
-    // BatchBuyer reverts with BuyerLengthMismatch if minOuts.length
-    // doesn't match the registered token list exactly.
-    const buyTokenCount =
-      onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
-    const minOuts = Array(buyTokenCount).fill(BigInt(0))
-    const value = parseEther(amount)
+    try {
+      const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
+      // ALWAYS prefer the live on-chain token count. The contract's
+      // BatchBuyer reverts with BuyerLengthMismatch if minOuts.length
+      // doesn't match the registered token list exactly.
+      const buyTokenCount =
+        onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
+      const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
-    // Best-effort background simulation to surface the real revert reason
-    // to the user AFTER submit. This does not gate the tx — the wallet
-    // popup is opened immediately so the user never gets stuck if the RPC
-    // is slow.
-    if (publicClient) {
-      publicClient
-        .simulateContract({
+      // Gas limit strategy: try to estimate the real cost on-chain and add
+      // a 25% buffer. If estimation fails, fall back to a formula calibrated
+      // to real Chiliz mainnet usage (~177k gas / swap, observed in
+      // successful txs) instead of overshooting. A massively oversized gas
+      // limit — like our earlier 4.6M — can itself cause some wallets/RPCs
+      // to reject or mis-price the tx.
+      let gasLimit: bigint
+      try {
+        const estimated = await publicClient!.estimateContractGas({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "buyNative",
           args: [address, minOuts],
-          value,
+          value: parseEther(amount),
           account: address,
         })
-        .catch((err: unknown) => {
-          const raw =
-            typeof err === "object" && err !== null
-              ? (err as { shortMessage?: string; message?: string; details?: string }).shortMessage ??
-                (err as { details?: string }).details ??
-                (err as Error).message ??
-                String(err)
-              : String(err)
-          console.log("[v0] FTLX buyNative simulation reverted:", raw)
-          setSimError(raw)
-        })
+        // +25% buffer
+        gasLimit = (estimated * 125n) / 100n
+      } catch {
+        // Fallback: 400k overhead (fee transfer + NFT mint + routing)
+        // plus ~220k per swap (a bit above the ~177k observed to leave
+        // headroom for slippage paths and warm/cold storage variance).
+        gasLimit = BigInt(
+          Math.min(10_000_000, 400_000 + buyTokenCount * 220_000),
+        )
+      }
+
+      // Chiliz Chain requires a much higher priority fee (miner tip) than
+      // what wallets auto-suggest via RPC. Without it, the tx gets included
+      // but reverts early (~6% gas used) — matching the symptom we saw.
+      // Successful txs on Chiliz use ~500 Gwei priority. We set 600 Gwei to
+      // leave headroom and a maxFeePerGas comfortably above a 2500 Gwei
+      // base fee (2500 base + 600 tip = 3100; we set 4000 to absorb spikes).
+      const maxPriorityFeePerGas = parseGwei("600")
+      const maxFeePerGas = parseGwei("4000")
+
+      writeContract({
+        address: contracts.vault,
+        abi: EtfVaultABI.abi,
+        functionName: "buyNative",
+        args: [address, minOuts],
+        value: parseEther(amount),
+        gas: gasLimit,
+        maxPriorityFeePerGas,
+        maxFeePerGas,
+      })
+    } catch {
+      // handled by wagmi error state
     }
-
-    // Gas limit calibrated to observed mainnet usage: ~400k overhead
-    // (fee transfer + NFT mint + routing) plus ~220k per swap.
-    const gasLimit = BigInt(
-      Math.min(10_000_000, 400_000 + buyTokenCount * 220_000),
-    )
-
-    // Chiliz Chain requires a much higher priority fee (miner tip) than
-    // what wallets auto-suggest via RPC. Successful txs on Chiliz use
-    // ~500 Gwei priority; we set 600 Gwei with 4000 Gwei maxFee headroom.
-    const maxPriorityFeePerGas = parseGwei("600")
-    const maxFeePerGas = parseGwei("4000")
-
-    writeContract({
-      address: contracts.vault,
-      abi: EtfVaultABI.abi,
-      functionName: "buyNative",
-      args: [address, minOuts],
-      value,
-      gas: gasLimit,
-      maxPriorityFeePerGas,
-      maxFeePerGas,
-    })
   }
 
   const handleClose = () => {
     setAmount("")
     setPurchaseDetails(null)
-    setSimError(null)
     reset()
     onOpenChange(false)
   }
@@ -458,10 +451,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                     type="number"
                     placeholder="0.0"
                     value={amount}
-                    onChange={(e) => {
-                    setAmount(e.target.value)
-                    if (simError) setSimError(null)
-                  }}
+                    onChange={(e) => setAmount(e.target.value)}
                     className="text-base sm:text-lg h-10 sm:h-12 pr-14 sm:pr-16"
                     disabled={isPending || isConfirming || isSuccess}
                   />
@@ -522,28 +512,11 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                 </p>
               </div>
 
-              {/* Pre-flight simulation error — the real revert reason
-                  surfaces here before the user broadcasts a failing tx. */}
-              {simError && !error && (
-                <div className="flex items-start gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
-                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-semibold text-destructive">Transaction would fail</p>
-                    <p className="text-[11px] sm:text-xs text-destructive/90 break-words mt-0.5">{simError}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Broadcast / confirmation error */}
+              {/* Error state */}
               {error && (
-                <div className="flex items-start gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
-                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0 mt-0.5" />
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-semibold text-destructive">Transaction failed</p>
-                    <p className="text-[11px] sm:text-xs text-destructive/90 break-words mt-0.5">
-                      {(error as { shortMessage?: string }).shortMessage ?? error.message}
-                    </p>
-                  </div>
+                <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
+                  <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0" />
+                  <p className="text-xs sm:text-sm text-destructive">Transaction failed. Please try again.</p>
                 </div>
               )}
 
