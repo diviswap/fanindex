@@ -8,17 +8,16 @@ import { useEffect } from "react"
 import { TrendingUp, Shield, Zap } from "lucide-react"
 import { BarChart3 } from "lucide-react"
 import { INDICES } from "@/lib/data/indices"
-import { DEPLOYED_INDEX_IDS } from "@/lib/contracts/abis"
 
 export default function IndicesPage() {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  // Single source of truth: whatever lives in ETF_CONTRACTS is considered
-  // deployed. Adding a new vault automatically lists it here.
+  // Only FTLX, FGMX and FFLX have contracts deployed on Chiliz Mainnet.
+  // Keep this list in sync with ETF_CONTRACTS in lib/contracts/abis.ts.
   const deployedIndices = INDICES.filter((index) =>
-    (DEPLOYED_INDEX_IDS as string[]).includes(index.id),
+    ["FTLX", "FGMX", "FFLX"].includes(index.id),
   )
 
   return (

@@ -163,14 +163,6 @@ const FGMX_TOKENS = ["OG", "NAVI", "ALL", "MIBR"] as const
 // FFLX — Fan Fight Index (equal weight, combat sports)
 const FFLX_TOKENS = ["UFC", "PFL"] as const
 
-// FELX — Fan English League Index (weighted)
-const FELX_TOKENS = ["CITY", "AFC", "SPURS", "AVL", "EFC"] as const
-const FELX_WEIGHTS = [46, 36, 9, 6, 3] as const
-
-// FSLX — Fan Spanish League Index (weighted)
-const FSLX_TOKENS = ["BAR", "ATM", "SEVILLA", "VCF"] as const
-const FSLX_WEIGHTS = [53, 41, 3, 3] as const
-
 export const INDICES: IndexData[] = [
   {
     id: "FTLX",
@@ -209,34 +201,6 @@ export const INDICES: IndexData[] = [
     tokens: [...FFLX_TOKENS],
     price: calculateIndexPrice([...FFLX_TOKENS]).toFixed(2),
     apy: "15.4%",
-    totalValue: "—",
-    holders: 0,
-  },
-  {
-    id: "FELX",
-    name: "FELX — Fan English League Index",
-    symbol: "FELX",
-    description:
-      "Tracks the performance of leading English football clubs with fan tokens, weighted by their market relevance.",
-    type: "weighted",
-    tokens: [...FELX_TOKENS],
-    weights: [...FELX_WEIGHTS],
-    price: calculateIndexPrice([...FELX_TOKENS], undefined, [...FELX_WEIGHTS]).toFixed(2),
-    apy: "12.6%",
-    totalValue: "—",
-    holders: 0,
-  },
-  {
-    id: "FSLX",
-    name: "FSLX — Fan Spanish League Index",
-    symbol: "FSLX",
-    description:
-      "Measures the performance of leading Spanish football clubs with fan tokens, reflecting the structure of the local market.",
-    type: "weighted",
-    tokens: [...FSLX_TOKENS],
-    weights: [...FSLX_WEIGHTS],
-    price: calculateIndexPrice([...FSLX_TOKENS], undefined, [...FSLX_WEIGHTS]).toFixed(2),
-    apy: "13.1%",
     totalValue: "—",
     holders: 0,
   },

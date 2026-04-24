@@ -21,7 +21,6 @@ import type { IndexData } from "@/components/indices/IndexCard"
 import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { TransactionHistory } from "./TransactionHistory"
 import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
-import { DEPLOYED_INDEX_IDS } from "@/lib/contracts/abis"
 import { getTokenByAddress, getTokenBySymbol, FAN_TOKENS } from "@/lib/data/fan-tokens"
 import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
@@ -31,6 +30,9 @@ import Image from "next/image"
 import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
+
+// Only index "1" is deployed on Chiliz Mainnet
+const DEPLOYED_INDICES = ["1"]
 
 const CHART_COLORS = {
   weighted: "#3b82f6",
@@ -763,7 +765,7 @@ export function PortfolioView() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {INDICES.filter((i) => (DEPLOYED_INDEX_IDS as string[]).includes(i.id)).map((index) => (
+          {INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id)).map((index) => (
             <AvailableIndexCard
               key={index.id}
               index={index}
