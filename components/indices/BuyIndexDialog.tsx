@@ -75,18 +75,22 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
-      const tokenCount = contractConfig?.tokens || 2
+      if (!contractConfig) {
+        return
+      }
+
+      const tokenCount = contractConfig.tokens
       const minOuts = Array(tokenCount).fill(BigInt(0))
 
       writeContract({
         address: contracts.vault,
-        abi: EtfVaultABI.abi,
+        abi: EtfVaultABI,
         functionName: "buyNative",
         args: [address, minOuts],
         value: parseEther(amount),
         gas: BigInt(800_000),
       })
-    } catch {
+    } catch (e) {
       // handled by wagmi error state
     }
   }

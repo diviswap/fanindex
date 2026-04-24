@@ -1,7 +1,11 @@
 import EtfVaultABI from "./EtfVault.json"
 import SimplePositionsNFTABI from "./SimplePositionsNFT.json"
 
-export { EtfVaultABI, SimplePositionsNFTABI }
+// Extract the ABI array from the artifact JSON files
+const ETF_VAULT_ABI = EtfVaultABI.abi || EtfVaultABI
+const SIMPLE_POSITIONS_NFT_ABI = SimplePositionsNFTABI.abi || SimplePositionsNFTABI
+
+export { ETF_VAULT_ABI as EtfVaultABI, SIMPLE_POSITIONS_NFT_ABI as SimplePositionsNFTABI }
 
 // Mainnet Contract Addresses (Chiliz Chain)
 export const MAINNET_CONTRACTS = {
