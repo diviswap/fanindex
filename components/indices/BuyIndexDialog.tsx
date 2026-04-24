@@ -5,7 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState, useEffect, useMemo } from "react"
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain, useReadContracts } from "wagmi"
+import {
+  useAccount,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+  useReadContracts,
+  usePublicClient,
+} from "wagmi"
 import { parseEther, formatEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
@@ -37,6 +45,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const chainId = useChainId()
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
+  const publicClient = usePublicClient({ chainId: chiliz.id })
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
   const contracts = getContractAddresses(index.id)
@@ -137,6 +146,18 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       const buyTokenCount = contractConfig?.tokens ?? index.tokens.length
       const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
+      // Boost gas price by +150% (2.5×) to prevent FTLX buys from getting
+      // stuck or reverting under Chiliz mempool congestion. FTLX executes
+      // 10 swaps in a single tx, so an underpriced tx is much more likely
+      // to fail than a single-token action.
+      let boostedGasPrice: bigint | undefined
+      try {
+        const current = await publicClient?.getGasPrice()
+        if (current) boostedGasPrice = (current * 5n) / 2n
+      } catch {
+        // fall back to wallet default gas pricing
+      }
+
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
@@ -144,6 +165,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         args: [address, minOuts],
         value: parseEther(amount),
         gas: BigInt(800_000),
+        ...(boostedGasPrice ? { gasPrice: boostedGasPrice } : {}),
       })
     } catch {
       // handled by wagmi error state
