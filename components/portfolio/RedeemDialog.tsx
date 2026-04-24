@@ -8,7 +8,6 @@ import {
   useWaitForTransactionReceipt,
   useChainId,
   useSwitchChain,
-  usePublicClient,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
@@ -57,7 +56,6 @@ export function RedeemDialog({
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
-  const publicClient = usePublicClient({ chainId: chiliz.id })
 
   const isWrongChain = isConnected && chainId !== CHILIZ_MAINNET_ID
   const [redemptionType, setRedemptionType] = useState<"chz" | "tokens">("chz")
@@ -99,19 +97,6 @@ export function RedeemDialog({
     reset()
 
     try {
-      // Boost gas price by +200% (3×) to prevent FTLX redemptions from
-      // reverting under Chiliz mempool congestion. `redeemAllToCHZNative`
-      // swaps all 10 tokens back to CHZ in a single tx and is especially
-      // sensitive to gas underpricing.
-      let boostedGasPrice: bigint | undefined
-      try {
-        const current = await publicClient?.getGasPrice()
-        if (current) boostedGasPrice = current * 3n
-      } catch {
-        // fall back to wallet default gas pricing
-      }
-      const gasOverride = boostedGasPrice ? { gasPrice: boostedGasPrice } : {}
-
       // Scale gas limit to the number of tokens in the index.
       // - redeemAllToCHZNative: swaps each position back to CHZ → ~400k / token
       // - withdrawTokens: pure ERC-20 transfers → ~80k / token
@@ -134,7 +119,6 @@ export function RedeemDialog({
           functionName: "redeemAllToCHZNative",
           args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
           gas: gasLimit,
-          ...gasOverride,
         })
       } else {
         writeContract({
@@ -143,7 +127,6 @@ export function RedeemDialog({
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
           gas: gasLimit,
-          ...gasOverride,
         })
       }
     } catch {

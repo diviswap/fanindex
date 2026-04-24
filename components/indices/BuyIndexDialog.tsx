@@ -12,7 +12,6 @@ import {
   useChainId,
   useSwitchChain,
   useReadContracts,
-  usePublicClient,
 } from "wagmi"
 import { parseEther, formatEther } from "viem"
 import { chiliz } from "wagmi/chains"
@@ -45,7 +44,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   const chainId = useChainId()
   const { switchChain, isPending: isSwitching } = useSwitchChain()
   const { writeContract, data: hash, isPending, error, reset } = useWriteContract()
-  const publicClient = usePublicClient({ chainId: chiliz.id })
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
   const contracts = getContractAddresses(index.id)
@@ -167,18 +165,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         onChainTokenCount ?? contractConfig?.tokens ?? index.tokens.length
       const minOuts = Array(buyTokenCount).fill(BigInt(0))
 
-      // Boost gas price by +200% (3×) to prevent FTLX buys from getting
-      // stuck or reverting under Chiliz mempool congestion. FTLX executes
-      // 10 swaps in a single tx, so an underpriced tx is much more likely
-      // to fail than a single-token action.
-      let boostedGasPrice: bigint | undefined
-      try {
-        const current = await publicClient?.getGasPrice()
-        if (current) boostedGasPrice = current * 3n
-      } catch {
-        // fall back to wallet default gas pricing
-      }
-
       // Scale gas limit to the number of swaps. Each Uniswap-style swap on
       // Chiliz costs ~400k gas; add overhead for fee transfer + NFT mint.
       // 10 swaps → ~4.2M gas. We cap at 10M to stay well under block gas.
@@ -193,7 +179,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
         args: [address, minOuts],
         value: parseEther(amount),
         gas: gasLimit,
-        ...(boostedGasPrice ? { gasPrice: boostedGasPrice } : {}),
       })
     } catch {
       // handled by wagmi error state
