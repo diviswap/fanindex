@@ -11,14 +11,38 @@ import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
+const SITE_URL = "https://fanindex.io"
+
 export const metadata: Metadata = {
-  title: "FanIndex - Fan Token Investment Platform",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "FanIndex | Fan Token Index Investment Platform on Chiliz",
+    template: "%s | FanIndex",
+  },
   description:
-    "Transform Fan Tokens into structured financial instruments. Gain diversified exposure to sports teams through index-based products on the Chiliz Chain.",
+    "Invest in diversified fan token indices on Chiliz Chain. FTLX, FGMX, FFLX, FELX, FSLX — structured exposure to football, esports, and combat sports tokens with one transaction.",
   generator: "v0.app",
   applicationName: "FanIndex",
-  keywords: ["Fan Tokens", "Chiliz", "NFT", "DeFi", "Sports Investment", "Crypto Index"],
-  authors: [{ name: "FanIndex" }],
+  keywords: [
+    "Fan Tokens",
+    "Chiliz",
+    "CHZ",
+    "FTLX",
+    "FGMX",
+    "FFLX",
+    "FELX",
+    "FSLX",
+    "Fan Token Index",
+    "Sports Crypto",
+    "DeFi",
+    "Crypto Index Fund",
+    "Barcelona Fan Token",
+    "PSG Fan Token",
+    "Juventus Fan Token",
+    "OG Esports",
+    "UFC Fan Token",
+  ],
+  authors: [{ name: "FanIndex", url: SITE_URL }],
   creator: "FanIndex",
   publisher: "FanIndex",
   manifest: "/manifest.json",
@@ -41,15 +65,43 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
+    locale: "en_US",
+    url: SITE_URL,
     siteName: "FanIndex",
-    title: "FanIndex - Fan Token Investment Platform",
-    description: "Transform Fan Tokens into structured financial instruments. Join the waitlist for early access.",
+    title: "FanIndex | Fan Token Index Investment Platform",
+    description:
+      "Diversified fan token indices on Chiliz Chain. Invest in FTLX, FGMX, FFLX, FELX, FSLX — structured exposure to football, esports, and combat sports.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "FanIndex - Fan Token Investment Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "FanIndex - Fan Token Investment Platform",
-    description: "Transform Fan Tokens into structured financial instruments. Join the waitlist for early access.",
+    site: "@FanIndexes",
     creator: "@FanIndexes",
+    title: "FanIndex | Fan Token Index Investment Platform",
+    description:
+      "Diversified fan token indices on Chiliz Chain. FTLX, FGMX, FFLX, FELX, FSLX — one transaction, multiple tokens.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: SITE_URL,
   },
 }
 
