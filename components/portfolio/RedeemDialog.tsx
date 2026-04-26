@@ -10,6 +10,7 @@ import {
   useSwitchChain,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
+import { parseEther } from "viem"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { XCircle, ArrowDownToLine, AlertTriangle, Info, ExternalLink, Coins, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -97,15 +98,26 @@ export function RedeemDialog({
     reset()
 
     try {
-      // Let the wallet handle gas limit and fee estimation — this matches
-      // the working script pattern and produces correct Chiliz Chain fees
-      // automatically via MetaMask's estimator.
+      // Calculate minOut with 2% slippage protection for redemptions.
+      // For redeemAllToCHZNative: minOut = totalValueCHZ * (redemptionPercentage/100) * 0.98
+      // For withdrawTokens: no output amount parameter, so no slippage protection possible
+      let minOutCHZ = BigInt(0)
+      if (redemptionType === "chz" && totalValueCHZ > 0) {
+        const redemptionValue = (totalValueCHZ * redemptionPercentage) / 100
+        const minOutWithSlippage = redemptionValue * 0.98 // 2% slippage
+        try {
+          minOutCHZ = parseEther(minOutWithSlippage.toFixed(18))
+        } catch {
+          minOutCHZ = BigInt(0)
+        }
+      }
+
       if (redemptionType === "chz") {
         writeContract({
           address: contracts.vault,
           abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
-          args: [BigInt(nftId), redemptionPercentage, BigInt(0)],
+          args: [BigInt(nftId), redemptionPercentage, minOutCHZ],
         })
       } else {
         writeContract({

@@ -183,20 +183,60 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
 
-      // Match the working purchase script exactly:
-      //   - minOuts has ONE entry per actually-swapped token
-      //     (weight > 0 AND address != WCHZ), computed above as `buyableCount`
-      //   - each entry is a SYMBOLIC minimum (0.0001 CHZ-equivalent), NOT 0.
-      //     A zero min-out causes the DEX router to revert with
-      //     "INSUFFICIENT_OUTPUT_AMOUNT", which is what was making our buys
-      //     fail even though the tx was being included and gas-priced fine.
+      // Dynamic minOuts with 2% slippage protection against MEV.
+      // Each minOut entry is 98% of the pro-rata share of the net investment
+      // (after fees) allocated to that token position.
       const buyTokenCount =
         buyableCount ?? contractConfig?.tokens ?? index.tokens.length
-      const minOuts = Array(buyTokenCount).fill(parseEther("0.0001"))
+      const amountNum = Number.parseFloat(amount)
+      const netInvestmentAfterFee = amountNum * (1 - feePct)
 
-      // Let the wallet handle gas limit AND fee suggestion — that's how the
-      // script works (no explicit gas params) and what produces Chiliz's
-      // correct ~500 Gwei priority fee via MetaMask's fee estimator.
+      // Read token weights from on-chain data to calculate per-token allocation
+      const info = vaultConfigData?.[2]
+      const wchzRes = vaultConfigData?.[3]
+      let minOuts: bigint[] = []
+
+      if (
+        info?.status === "success" &&
+        Array.isArray(info.result) &&
+        wchzRes?.status === "success"
+      ) {
+        const [tokensArr, weightsArr] = info.result as unknown as [
+          readonly string[],
+          readonly bigint[],
+        ]
+        const wchz = String(wchzRes.result ?? "").toLowerCase()
+
+        // Calculate minOut for each token: (netInvestment * weight% * 98%)
+        const minOutsArray: bigint[] = []
+        let totalWeight = 0n
+        for (let i = 0; i < tokensArr.length; i++) {
+          const addr = String(tokensArr[i] ?? "").toLowerCase()
+          const w = weightsArr[i] ?? 0n
+          if (addr !== wchz) totalWeight += w
+        }
+
+        for (let i = 0; i < tokensArr.length; i++) {
+          const addr = String(tokensArr[i] ?? "").toLowerCase()
+          const w = weightsArr[i] ?? 0n
+          if (w > 0n && addr !== wchz && totalWeight > 0n) {
+            const weightFraction = Number(w) / Number(totalWeight)
+            const tokenAllocation = netInvestmentAfterFee * weightFraction
+            // Apply 2% slippage: minOut = allocation * 0.98
+            const minOut = tokenAllocation * 0.98
+            minOutsArray.push(parseEther(minOut.toFixed(18)))
+          }
+        }
+        minOuts = minOutsArray
+      }
+
+      // Fallback: equal-weight minOuts with 2% slippage if on-chain data unavailable
+      if (minOuts.length === 0) {
+        const perTokenAmount = netInvestmentAfterFee / buyTokenCount
+        const perTokenMinOut = perTokenAmount * 0.98 // 2% slippage
+        minOuts = Array(buyTokenCount).fill(parseEther(perTokenMinOut.toFixed(18)))
+      }
+
       writeContract({
         address: contracts.vault,
         abi: EtfVaultABI.abi,
