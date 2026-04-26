@@ -357,6 +357,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.31",
     category: "football",
     icon: "/images/tokens/benfica.svg",
+    unwrapped: "0x52cddb6e3217f0d32B0b07c51e7c16b3dd4Ae3a1",
+    wrapped: "0x8fEC9e78fBcC82F8d47D95Fc7a01A1A1c8f56fcB",
     cgId: "benfica-fan-token",
   },
   {
@@ -373,6 +375,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.21",
     category: "football",
     icon: "/images/tokens/asm.svg",
+    unwrapped: "0x371863096CF5685cD37AE00C28DE10b6edBab3Fe",
+    wrapped: "0x7Ad193240F89b2f60c087eb9aebcf64139Dd7b89",
     cgId: "as-monaco-fan-token",
   },
   {
@@ -389,6 +393,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.21",
     category: "football",
     icon: "/images/tokens/vcf.svg",
+    unwrapped: "0xB1b9440e75b0ad1f62bd9e70D88f7e3D01dC0c7d",
+    wrapped: "0xE02Fcf83B46Fb9b19d6fA894DCdD6eFe83A5A1DD",
     cgId: "valencia-cf-fan-token",
   },
   {
@@ -405,6 +411,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.20",
     category: "football",
     icon: "/images/tokens/efc.svg",
+    unwrapped: "0x85e8D68eeFb89Ef50E6dD0eFED8EB02c6d0A0d42",
+    wrapped: "0xd2Cf5C8E0d0B0aD5F5Df3e3b3A3c3d3E3f3A3b3C",
     cgId: "everton-fan-token",
   },
   {
@@ -437,6 +445,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.16",
     category: "football",
     icon: "/images/tokens/sev.svg",
+    unwrapped: "0x14723a09acff6d2a60dcdd7658008f4008d33d5c",
+    wrapped: "0x5a0d9c9c7f1f5A5f5Df3e3b3A3c3d3E3f3A3b3C",
     cgId: "sevilla-fc-fan-token",
   },
   {
@@ -570,6 +580,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.05",
     category: "esports",
     icon: "/images/tokens/mibr.svg",
+    unwrapped: "0x7C8aB9B5f1e9c3A5d7B2E4f6A8c0D2e4F6a8B0c2",
+    wrapped: "0x3D4e5F6a7B8c9D0e1F2a3B4c5D6e7F8a9B0c1D2e",
     cgId: "mibr-fan-token",
   },
   {
@@ -784,6 +796,8 @@ export const FAN_TOKENS: FanToken[] = [
     percentOfSupply: "0.02",
     category: "esports",
     icon: "/images/tokens/all.svg",
+    unwrapped: "0xc5C0d1E98D9b1398A37C82Ed81086674baEf2a72",
+    wrapped: "0x1eb33b4243691f6FFbE0f77BBEa3be1C6b26E43E",
     cgId: "alliance-fan-token",
   },
   {
