@@ -1,266 +1,235 @@
 import { NextRequest, NextResponse } from "next/server"
 import { FAN_TOKENS } from "@/lib/data/fan-tokens"
 
-// CoinGecko market chart endpoint for historical data
 const COINGECKO_API = "https://api.coingecko.com/api/v3"
 
 interface MarketChartResponse {
-  prices: [number, number][] // [timestamp, price]
+  prices: [number, number][]
   market_caps: [number, number][]
   total_volumes: [number, number][]
 }
 
-// Cache for historical data (5 minutes)
+// 5-minute in-process cache
 const historyCache = new Map<string, { data: MarketChartResponse; timestamp: number }>()
-const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000
 
-async function fetchTokenHistory(cgId: string, days: number): Promise<MarketChartResponse | null> {
-  const cacheKey = `${cgId}-${days}`
+async function fetchTokenHistory(cgId: string, fetchDays: number): Promise<MarketChartResponse | null> {
+  const cacheKey = `${cgId}-${fetchDays}`
   const cached = historyCache.get(cacheKey)
-  
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-    return cached.data
-  }
+  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) return cached.data
 
   try {
-    const response = await fetch(
-      `${COINGECKO_API}/coins/${cgId}/market_chart?vs_currency=usd&days=${days}&interval=${days <= 1 ? 'hourly' : 'daily'}`,
-      {
-        headers: {
-          'Accept': 'application/json',
-        },
-        next: { revalidate: 300 } // Cache for 5 minutes
-      }
+    const interval = fetchDays <= 2 ? "hourly" : "daily"
+    const res = await fetch(
+      `${COINGECKO_API}/coins/${cgId}/market_chart?vs_currency=usd&days=${fetchDays}&interval=${interval}`,
+      { headers: { Accept: "application/json" }, next: { revalidate: 300 } }
     )
-
-    if (!response.ok) {
-      console.log(`[v0] CoinGecko API error for ${cgId}: ${response.status}`)
-      return null
-    }
-
-    const data: MarketChartResponse = await response.json()
+    if (!res.ok) return null
+    const data: MarketChartResponse = await res.json()
     historyCache.set(cacheKey, { data, timestamp: Date.now() })
     return data
-  } catch (error) {
-    console.log(`[v0] Error fetching history for ${cgId}:`, error)
+  } catch {
     return null
   }
 }
 
-// Get CHZ price history in USD for conversion
-async function getChzHistory(days: number): Promise<Map<number, number>> {
-  const chzData = await fetchTokenHistory("chiliz", days)
-  const priceMap = new Map<number, number>()
-  
-  if (chzData?.prices) {
-    for (const [timestamp, price] of chzData.prices) {
-      // Round timestamp to nearest hour/day for matching
-      const roundedTs = days <= 1 
-        ? Math.round(timestamp / 3600000) * 3600000 // Round to hour
-        : Math.round(timestamp / 86400000) * 86400000 // Round to day
-      priceMap.set(roundedTs, price)
-    }
+async function getChzHistory(fetchDays: number): Promise<Map<number, number>> {
+  const chzData = await fetchTokenHistory("chiliz", fetchDays)
+  const map = new Map<number, number>()
+  if (!chzData?.prices) return map
+  const bucket = fetchDays <= 2 ? 3_600_000 : 86_400_000
+  for (const [ts, price] of chzData.prices) {
+    map.set(Math.round(ts / bucket) * bucket, price)
   }
-  
-  return priceMap
+  return map
 }
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
+  const { searchParams } = request.nextUrl
   const tokensParam = searchParams.get("tokens")
   const daysParam = searchParams.get("days")
+  // weights=16.42,12.73,… in the same order as tokens. Omit for equal-weight.
+  const weightsParam = searchParams.get("weights")
 
   if (!tokensParam) {
     return NextResponse.json({ error: "Missing tokens parameter" }, { status: 400 })
   }
 
-  const tokenSymbols = tokensParam.split(",").map(t => t.trim().toUpperCase())
-  let days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
-  
-  // For 24h chart, fetch 2 days of data to ensure we have points from both ayer and hoy
+  const tokenSymbols = tokensParam.split(",").map((t) => t.trim().toUpperCase())
+  const days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
   const fetchDays = days === 1 ? 2 : days
+  const bucket = days <= 1 ? 3_600_000 : 86_400_000
 
-  // Get CoinGecko IDs for the requested tokens
-  const tokensWithCgId = tokenSymbols
-    .map(symbol => FAN_TOKENS.find(t => t.symbol.toUpperCase() === symbol))
-    .filter(t => t?.cgId)
+  // Parse optional weights (percentages, e.g. 16.42 → decimal 0.1642)
+  let weights: number[] | null = null
+  if (weightsParam) {
+    const parsed = weightsParam.split(",").map(Number)
+    if (parsed.length === tokenSymbols.length && parsed.every((w) => !isNaN(w))) {
+      const weightSum = parsed.reduce((s, w) => s + w, 0)
+      // Normalise to decimal fractions summing to 1 (handles both raw % and already-normalised)
+      weights = parsed.map((w) => w / weightSum)
+    }
+  }
 
-  if (tokensWithCgId.length === 0) {
-    return NextResponse.json({ 
-      error: "No valid tokens found with CoinGecko IDs",
-      tokens: tokenSymbols,
-      data: []
-    }, { status: 200 })
+  // Map symbols → token definitions (only those with a CoinGecko ID)
+  const tokenDefs = tokenSymbols.map((sym) =>
+    FAN_TOKENS.find((t) => t.symbol.toUpperCase() === sym)
+  )
+  const validTokenDefs = tokenDefs.filter((t): t is (typeof FAN_TOKENS)[0] => !!t?.cgId)
+
+  if (validTokenDefs.length === 0) {
+    return NextResponse.json({ tokens: tokenSymbols, days, data: [], source: "empty" }, { status: 200 })
   }
 
   try {
-    // Fetch CHZ price history for conversion
-    const chzHistory = await getChzHistory(days)
-    
-  // Fetch history for all tokens in parallel
-  const tokenHistories = await Promise.all(
-    tokensWithCgId.map(async (token) => {
-      const data = await fetchTokenHistory(token!.cgId!, fetchDays)
-      return { symbol: token!.symbol, data, staticPrice: parseFloat(token!.price) }
-    })
-  )
+    const chzHistory = await getChzHistory(fetchDays)
 
-  // Check if we got any real data
-  const hasRealData = tokenHistories.some(t => t.data?.prices && t.data.prices.length > 0)
+    // Fetch each token's price history in parallel
+    const tokenHistories = await Promise.all(
+      validTokenDefs.map(async (token, idx) => {
+        const data = await fetchTokenHistory(token.cgId!, fetchDays)
+        // Figure out this token's weight.
+        // weights array is indexed against the ORIGINAL tokenSymbols list.
+        const originalIdx = tokenSymbols.indexOf(token.symbol.toUpperCase())
+        const w = weights ? weights[originalIdx] : 1 / tokenSymbols.length
+        return { symbol: token.symbol, data, weight: w ?? 1 / validTokenDefs.length, staticPrice: parseFloat(token.price) }
+      })
+    )
 
-    // If no real data, generate fallback based on static prices
+    const hasRealData = tokenHistories.some((t) => t.data?.prices?.length)
+
     if (!hasRealData) {
-      const fallbackData = generateFallbackData(tokenHistories, days)
       return NextResponse.json({
         tokens: tokenSymbols,
         days,
-        data: fallbackData,
-        source: "fallback"
+        data: buildFallback(tokenHistories, days, weights, tokenSymbols),
+        source: "fallback",
       })
     }
 
-    // Build combined price data
-    // We'll create data points for each timestamp where we have data
-    const priceDataMap = new Map<number, { prices: number[]; chzPrice: number }>()
-    
-    for (const { data } of tokenHistories) {
+    // Build a map: roundedTimestamp → { tokenSymbol → chzPrice }
+    const tsMap = new Map<number, Map<string, number>>()
+
+    for (const { symbol, data } of tokenHistories) {
       if (!data?.prices) continue
-      
-      for (const [timestamp, usdPrice] of data.prices) {
-        // Round timestamp for matching
-        const roundedTs = days <= 1 
-          ? Math.round(timestamp / 3600000) * 3600000
-          : Math.round(timestamp / 86400000) * 86400000
-        
-        const chzPrice = chzHistory.get(roundedTs) || 0.07 // Default CHZ price if not found
-        
-        if (!priceDataMap.has(roundedTs)) {
-          priceDataMap.set(roundedTs, { prices: [], chzPrice })
-        }
-        
-        const entry = priceDataMap.get(roundedTs)!
-        // Convert USD price to CHZ
-        const chzTokenPrice = chzPrice > 0 ? usdPrice / chzPrice : 0
-        entry.prices.push(chzTokenPrice)
+      for (const [ts, usdPrice] of data.prices) {
+        const roundedTs = Math.round(ts / bucket) * bucket
+        const chzPrice = chzHistory.get(roundedTs) || 0.07
+        const tokenPriceInCHZ = chzPrice > 0 ? usdPrice / chzPrice : 0
+
+        if (!tsMap.has(roundedTs)) tsMap.set(roundedTs, new Map())
+        tsMap.get(roundedTs)!.set(symbol, tokenPriceInCHZ)
       }
     }
 
-    // Calculate average index price for each timestamp
-    const chartData = Array.from(priceDataMap.entries())
-      .filter(([_, data]) => data.prices.length > 0)
-      .map(([timestamp, data]) => {
-        const avgPrice = data.prices.reduce((a, b) => a + b, 0) / data.prices.length
+    // Build chart points applying  Price = Σ (w_i × P_i)
+    const validSymbols = tokenHistories.map((t) => t.symbol)
+    const chartData = Array.from(tsMap.entries())
+      .filter(([, priceBySymbol]) =>
+        // Only include points where at least half the tokens have data
+        priceBySymbol.size >= Math.ceil(validSymbols.length / 2)
+      )
+      .map(([timestamp, priceBySymbol]) => {
+        let indexPrice = 0
+        let coveredWeight = 0
+
+        for (const { symbol, weight } of tokenHistories) {
+          const p = priceBySymbol.get(symbol)
+          if (p !== undefined && p > 0) {
+            indexPrice += weight * p
+            coveredWeight += weight
+          }
+        }
+
+        // If we only have partial data, rescale so the result isn't deflated
+        const adjustedPrice = coveredWeight > 0 && coveredWeight < 1
+          ? indexPrice / coveredWeight
+          : indexPrice
+
         return {
           timestamp,
           date: formatDate(timestamp, days),
-          price: Number(avgPrice.toFixed(6)),
-          volume: 0 // Volume data not aggregated
+          price: Number(adjustedPrice.toFixed(6)),
+          volume: 0,
         }
       })
       .sort((a, b) => a.timestamp - b.timestamp)
 
-    // For 24h data, filter to last 24 hours from the 2 days of data fetched
+    // For days=1, trim to strict last 24h
+    let finalData = chartData
     if (days === 1 && chartData.length > 0) {
-      const now = Date.now()
-      const oneDayAgo = now - 24 * 60 * 60 * 1000
-      const recentData = chartData.filter(d => d.timestamp >= oneDayAgo)
-      
-      // Return only last 24h of data
-      if (recentData.length > 0) {
-        return NextResponse.json({
-          tokens: tokenSymbols,
-          days,
-          data: recentData,
-          source: "coingecko"
-        })
-      }
+      const cutoff = Date.now() - 24 * 60 * 60 * 1000
+      const recent = chartData.filter((d) => d.timestamp >= cutoff)
+      if (recent.length > 0) finalData = recent
     }
 
-    return NextResponse.json({
-      tokens: tokenSymbols,
-      days,
-      data: chartData,
-      source: "coingecko"
-    })
-  } catch (error) {
-    console.log("[v0] Error processing history:", error)
-    // Return fallback data on error
-    const fallbackData = generateFallbackFromTokens(tokensWithCgId, days)
-    return NextResponse.json({ 
-      tokens: tokenSymbols,
-      days,
-      data: fallbackData,
-      source: "fallback"
-    }, { status: 200 })
+    return NextResponse.json({ tokens: tokenSymbols, days, data: finalData, source: "coingecko" })
+  } catch {
+    const tokenDefs2 = tokenSymbols.map((sym) => FAN_TOKENS.find((t) => t.symbol.toUpperCase() === sym))
+    const fallback = buildFallbackFromDefs(tokenDefs2, tokenSymbols, weights, days)
+    return NextResponse.json({ tokens: tokenSymbols, days, data: fallback, source: "fallback" }, { status: 200 })
   }
 }
 
-function formatDate(timestamp: number, days: number): string {
-  const date = new Date(timestamp)
-  if (days <= 1) {
-    return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
-  } else if (days <= 7) {
-    return date.toLocaleDateString("en-US", { weekday: "short", hour: "2-digit" })
-  } else {
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+// ── Fallback generators ──────────────────────────────────────────────────────
+
+function buildFallback(
+  tokenHistories: { symbol: string; weight: number; staticPrice: number }[],
+  days: number,
+  weights: number[] | null,
+  tokenSymbols: string[]
+): ReturnType<typeof generateHistoricalPoints> {
+  // Weighted-sum base price from static data
+  let basePrice = 0
+  for (const { weight, staticPrice } of tokenHistories) {
+    basePrice += weight * staticPrice
   }
+  return generateHistoricalPoints(basePrice || 1, days)
 }
 
-// Generate fallback data based on token histories with static prices
-function generateFallbackData(
-  tokenHistories: { symbol: string; data: MarketChartResponse | null; staticPrice: number }[],
+function buildFallbackFromDefs(
+  defs: ((typeof FAN_TOKENS)[0] | undefined)[],
+  tokenSymbols: string[],
+  weights: number[] | null,
   days: number
-) {
-  // Calculate average price from static token data
-  const avgPrice = tokenHistories.reduce((sum, t) => sum + (t.staticPrice || 0), 0) / tokenHistories.length
-  return generateHistoricalPoints(avgPrice, days)
+): ReturnType<typeof generateHistoricalPoints> {
+  let basePrice = 0
+  const n = defs.length
+  for (let i = 0; i < n; i++) {
+    const p = defs[i] ? parseFloat(defs[i]!.price) : 0
+    const w = weights ? weights[i] : 1 / n
+    basePrice += (w ?? 1 / n) * p
+  }
+  return generateHistoricalPoints(basePrice || 1, days)
 }
 
-// Generate fallback from tokens directly
-function generateFallbackFromTokens(
-  tokens: (typeof FAN_TOKENS[0] | undefined)[],
-  days: number
-) {
-  const validTokens = tokens.filter(t => t)
-  const avgPrice = validTokens.reduce((sum, t) => sum + parseFloat(t!.price), 0) / validTokens.length
-  return generateHistoricalPoints(avgPrice, days)
-}
-
-// Generate realistic historical price points with some variance
 function generateHistoricalPoints(basePrice: number, days: number) {
   const points: { timestamp: number; date: string; price: number; volume: number }[] = []
   const now = Date.now()
-  const interval = days <= 1 ? 3600000 : 86400000 // hourly or daily
+  const interval = days <= 1 ? 3_600_000 : 86_400_000
   const numPoints = days <= 1 ? 24 : days
-  
-  // Use a seed based on the base price for consistent but different looking charts
+
   let seed = basePrice * 1000
-  const seededRandom = () => {
+  const rand = () => {
     seed = (seed * 9301 + 49297) % 233280
     return seed / 233280
   }
-  
-  // Generate a trend direction
-  const trendDirection = (seededRandom() - 0.5) * 0.3 // -15% to +15% overall trend
-  
+
+  const trend = (rand() - 0.5) * 0.3
+
   for (let i = numPoints; i >= 0; i--) {
     const timestamp = now - i * interval
-    
-    // Calculate price with trend and some random variance
-    const progress = 1 - (i / numPoints)
-    const trend = trendDirection * progress
-    const noise = (seededRandom() - 0.5) * 0.08 // +/- 4% noise
-    const multiplier = 1 + trend + noise
-    
-    const price = basePrice * multiplier
-    
-    points.push({
-      timestamp,
-      date: formatDate(timestamp, days),
-      price: Number(price.toFixed(6)),
-      volume: 0
-    })
+    const progress = 1 - i / numPoints
+    const price = basePrice * (1 + trend * progress + (rand() - 0.5) * 0.08)
+    points.push({ timestamp, date: formatDate(timestamp, days), price: Number(price.toFixed(6)), volume: 0 })
   }
-  
+
   return points
+}
+
+function formatDate(timestamp: number, days: number): string {
+  const d = new Date(timestamp)
+  if (days <= 1) return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+  if (days <= 7) return d.toLocaleDateString("en-US", { weekday: "short", hour: "2-digit" })
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" })
 }

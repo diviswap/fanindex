@@ -50,8 +50,12 @@ export function IndexCard({ index }: IndexCardProps) {
   // Dedicated 24h fetch (hourly granularity) — CoinGecko returns daily points
   // for days=90, so we can't slice that to 24h and get a real return.
   // This matches the same pattern used in IndexDetailView.
+  const historyUrl = index.weights?.length
+    ? `/api/prices/history?tokens=${index.tokens.join(",")}&days=1&weights=${index.weights.join(",")}`
+    : `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`
+
   const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    historyUrl,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )

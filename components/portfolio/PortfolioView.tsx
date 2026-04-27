@@ -103,8 +103,9 @@ function AvailableIndexCard({
 }) {
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
+  const weightsSuffix = index.weights?.length ? `&weights=${index.weights.join(",")}` : ""
   const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsSuffix}`,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )

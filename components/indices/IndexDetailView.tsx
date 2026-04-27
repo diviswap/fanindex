@@ -79,8 +79,12 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   //  - 24h hourly data (API returns hourly points for days=1)
   // This is necessary because 90d data only has daily granularity — slicing it
   // to the last 24h would yield just 1 point and no chart line.
+  const weightsSuffix = index.weights?.length
+    ? `&weights=${index.weights.join(",")}`
+    : ""
+
   const { data: history90dData, isLoading: history90dLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsSuffix}`,
     fetcher,
     {
       refreshInterval: 600000,
@@ -90,10 +94,10 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   )
 
   const { data: history24hData, isLoading: history24hLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsSuffix}`,
     fetcher,
     {
-      refreshInterval: 300000, // 5 min — more frequent for 24h view
+      refreshInterval: 300000,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
     }
