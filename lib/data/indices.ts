@@ -18,36 +18,53 @@ export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: strin
   return parseFloat(token.price) / CHZ_PRICE_USD
 }
 
+/**
+ * Index price using the canonical weighted-sum formula:
+ *
+ *   Price = Σ (w_i × P_i)
+ *
+ * where w_i is the weight of token i (as a decimal fraction, e.g. 0.1642
+ * for 16.42%) and P_i is its price in CHZ. This is a direct sum, NOT a
+ * weighted average — the weights are applied as-is, not normalised.
+ *
+ * For equal-weight indices (no weights provided) each token weight is 1/n,
+ * so the formula reduces to the arithmetic mean, which is correct for that
+ * index type.
+ */
 export function calculateIndexPrice(
   tokenSymbols: string[],
   livePrices?: Array<{ symbol: string; priceInCHZ: number }>,
   /**
-   * Optional per-token weights (percentages). When provided, the price is the
-   * weighted average; otherwise it falls back to equal-weight average.
+   * Optional per-token target weights expressed as percentages (e.g. 16.42
+   * for 16.42%). They are converted to decimal fractions internally before
+   * being applied as multipliers. Must be the same length as tokenSymbols.
+   * When omitted, equal weights (1/n each) are used.
    */
   weights?: number[]
 ): number {
   if (tokenSymbols.length === 0) return 0
 
-  // Weighted average when weights are provided and valid
+  let price: number
+
   if (weights && weights.length === tokenSymbols.length) {
-    const weightSum = weights.reduce((s, w) => s + w, 0)
-    if (weightSum > 0) {
-      const weighted = tokenSymbols.reduce((sum, symbol, i) => {
-        return sum + getTokenPrice(symbol, livePrices) * (weights[i] / weightSum)
-      }, 0)
-      return weighted > 0 ? weighted : 1
-    }
+    // Weighted-sum: Price = Σ (w_i × P_i)
+    // Weights are percentages → divide by 100 to get the decimal fraction.
+    price = tokenSymbols.reduce((sum, symbol, i) => {
+      const w = weights[i] / 100
+      const p = getTokenPrice(symbol, livePrices)
+      return sum + w * p
+    }, 0)
+  } else {
+    // Equal-weight: each w_i = 1/n → reduces to arithmetic mean
+    const n = tokenSymbols.length
+    price = tokenSymbols.reduce((sum, symbol) => {
+      return sum + getTokenPrice(symbol, livePrices) / n
+    }, 0)
   }
 
-  const totalPrice = tokenSymbols.reduce((sum, symbol) => {
-    return sum + getTokenPrice(symbol, livePrices)
-  }, 0)
-
-  const avgPrice = totalPrice / tokenSymbols.length
   // Never return 0 — live prices will override this in the UI,
   // but a non-zero static fallback avoids "Minimum: 0 CHZ" flash.
-  return avgPrice > 0 ? avgPrice : 1
+  return price > 0 ? price : 1
 }
 
 /**
