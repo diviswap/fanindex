@@ -3,310 +3,614 @@
 import { Footer } from "@/components/ui/footer-section"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import {
-  Scale,
-  Equal,
-  TrendingUp,
-  BarChart3,
-  Award,
-  Droplets,
-  Shield,
-  DollarSign,
-  Zap,
   ArrowRight,
-  CheckCircle2,
+  BarChart3,
+  Shield,
+  Globe2,
+  Layers,
+  RefreshCw,
+  Wallet,
+  ChevronRight,
+  TrendingUp,
+  Activity,
+  Lock,
 } from "lucide-react"
 import { ConnectWallet } from "@/components/web3/ConnectWallet"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import Image from "next/image"
 
+// ─── Index family data ──────────────────────────────────────────────────────
+
+const INDEX_FAMILY = [
+  {
+    ticker: "FTLX",
+    name: "Fan Token Leaders Index",
+    description: "The benchmark. Tracks the largest and most liquid fan tokens across global football.",
+    tokens: "GAL · ARG · OG · PSG · BAR · ASR · CITY · ATM · POR · JUV",
+    type: "Weighted",
+    featured: true,
+    category: "Football",
+  },
+  {
+    ticker: "FGMX",
+    name: "Fan Gaming Index",
+    description: "Equal-weight exposure to the esports segment of the fan token ecosystem.",
+    tokens: "OG · TH · ALL · MIBR · DOJO",
+    type: "Equal Weight",
+    featured: false,
+    category: "Esports",
+  },
+  {
+    ticker: "FFLX",
+    name: "Fan Fight Index",
+    description: "Focused exposure to combat sports organisations with on-chain fan tokens.",
+    tokens: "UFC · PFL",
+    type: "Equal Weight",
+    featured: false,
+    category: "Combat Sports",
+  },
+  {
+    ticker: "FELX",
+    name: "Fan English League Index",
+    description: "Weighted exposure to Premier League and English football fan tokens.",
+    tokens: "CITY · AFC · SPURS · AVL · EFC",
+    type: "Weighted",
+    featured: false,
+    category: "Football",
+  },
+  {
+    ticker: "FSLX",
+    name: "Fan Spanish League Index",
+    description: "Weighted exposure to LaLiga fan tokens reflecting the structure of the Spanish market.",
+    tokens: "BAR · ATM · SEVILLA · VCF",
+    type: "Weighted",
+    featured: false,
+    category: "Football",
+  },
+]
+
+// ─── Why FanIndex cards ──────────────────────────────────────────────────────
+
+const WHY_CARDS = [
+  {
+    icon: Layers,
+    title: "Diversified Exposure",
+    body: "Reduce concentration risk across teams and leagues with a single on-chain transaction.",
+  },
+  {
+    icon: Shield,
+    title: "On-Chain Transparency",
+    body: "All index positions are verifiable on-chain. No black boxes, no custodial risk.",
+  },
+  {
+    icon: Globe2,
+    title: "Professional Infrastructure",
+    body: "Built for long-term SportFi participation. Institutional-grade design from day one.",
+  },
+]
+
+// ─── Methodology stats ───────────────────────────────────────────────────────
+
+const METHODOLOGY = [
+  { label: "Rebalancing", value: "Monthly" },
+  { label: "Weighting", value: "Market-Cap" },
+  { label: "Entry Fee", value: "1%" },
+  { label: "Exit Fee", value: "0%" },
+  { label: "Settlement", value: "Instant" },
+  { label: "Position Format", value: "NFT" },
+]
+
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export default function FanIndexLanding() {
+  const heroRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
+    <div className="relative flex w-full flex-col items-center justify-center overflow-x-hidden bg-background min-h-screen">
       <NavBar />
 
       <main className="relative z-10 w-full">
-        {/* Hero Section - Inspired by Alpaca/Moment */}
-        <section className="relative w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-12 pt-20 pb-12 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
-            {/* Left Column - Text Content */}
-            <div>
-              {/* Announcement Badge */}
-              <div className="flex justify-center lg:justify-start mb-4 sm:mb-6 md:mb-8">
-                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-success/10 border border-success/20">
-                  <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
-                  <span className="text-xs sm:text-sm font-medium text-foreground">Now Live on Chiliz Chain</span>
-                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
+
+        {/* ── SECTION 1: HERO ─────────────────────────────────────────────── */}
+        <section
+          ref={heroRef}
+          className="relative w-full min-h-[90vh] flex flex-col justify-center pt-24 pb-0"
+        >
+          {/* Subtle grid texture */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, oklch(0.98 0 0 / 0.03) 1px, transparent 1px), linear-gradient(to bottom, oklch(0.98 0 0 / 0.03) 1px, transparent 1px)",
+              backgroundSize: "64px 64px",
+            }}
+          />
+          {/* Radial glow — top center */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[500px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,oklch(0.7_0.19_145/0.08),transparent)]" />
+
+          <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+              {/* Left */}
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+                {/* Badge */}
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-success/20 bg-success/5 px-3.5 py-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="text-xs font-medium tracking-wide text-success">Now Live on Chiliz Chain</span>
+                </div>
+
+                {/* Headline */}
+                <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-bold tracking-tight text-foreground leading-[1.05] text-balance mb-6">
+                  The Index Layer<br />
+                  <span className="text-success">for Fan Tokens</span>
+                </h1>
+
+                {/* Subheadline */}
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl mb-8 text-pretty">
+                  Tokenized sports indices, analytics, and portfolio infrastructure
+                  for the modern SportFi investor.
+                </p>
+
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto mb-10">
+                  <Link href="/indices" className="w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      className="w-full sm:w-auto h-12 px-8 bg-success text-success-foreground hover:bg-success/90 font-semibold gap-2"
+                    >
+                      Explore Indices
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link href="/fan-tokens" className="w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full sm:w-auto h-12 px-8 bg-transparent font-medium"
+                    >
+                      View Market
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Trust indicators */}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2">
+                  {[
+                    "On-Chain Infrastructure",
+                    "NFT-Based Positions",
+                    "Real-Time Analytics",
+                    "Built on Chiliz Chain",
+                  ].map((item) => (
+                    <span key={item} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="h-1 w-1 rounded-full bg-success" />
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </div>
 
-              {/* Main Headline */}
-              <div className="text-center lg:text-left mb-6 sm:mb-8 md:mb-10">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-foreground mb-3 sm:mb-4 md:mb-6 text-balance leading-[1.1]">
-                  Tokenized Sports Indices for the <span className="text-success">Modern Investor</span>
-                </h1>
+              {/* Right — floating index cards */}
+              <div className="hidden lg:flex items-center justify-center relative h-[460px]">
+                {/* Central glow orb */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="h-64 w-64 rounded-full bg-success/6 blur-3xl" />
+                </div>
 
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground leading-relaxed text-pretty">
-                  Gain diversified exposure to Fan Tokens through professionally structured index products. Built on
-                  Chiliz Chain, powered by DeFi.
-                </p>
+                {/* FTLX — center large */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                  <IndexHeroCard ticker="FTLX" name="Fan Token Leaders" type="Weighted · 10 tokens" large />
+                </div>
+
+                {/* Surrounding cards */}
+                <div className="absolute top-4 left-10 z-10">
+                  <IndexHeroCard ticker="FELX" name="English League" type="Weighted · 5 tokens" />
+                </div>
+                <div className="absolute top-4 right-10 z-10">
+                  <IndexHeroCard ticker="FSLX" name="Spanish League" type="Weighted · 4 tokens" />
+                </div>
+                <div className="absolute bottom-8 left-6 z-10">
+                  <IndexHeroCard ticker="FGMX" name="Fan Gaming" type="Equal · 5 tokens" />
+                </div>
+                <div className="absolute bottom-8 right-6 z-10">
+                  <IndexHeroCard ticker="FFLX" name="Fan Fight" type="Equal · 2 tokens" />
+                </div>
+
+                {/* Connecting lines — decorative */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" aria-hidden>
+                  <line x1="50%" y1="50%" x2="22%" y2="16%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="78%" y2="16%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="15%" y2="84%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
+                  <line x1="50%" y1="50%" x2="85%" y2="84%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
+                </svg>
               </div>
+            </div>
+          </div>
+        </section>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center lg:justify-start gap-3 sm:gap-4">
-                <ConnectWallet />
-                <Link href="/indices" className="w-full sm:w-auto">
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className="w-full sm:w-auto text-sm sm:text-base px-6 sm:px-8 h-11 sm:h-12 group bg-transparent"
-                  >
-                    Explore Indices
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+        {/* ── SECTION 2: WHY FANINDEX ─────────────────────────────────────── */}
+        <section className="relative w-full py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+            <div className="max-w-2xl mx-auto text-center mb-16">
+              <p className="text-xs font-semibold tracking-widest text-success uppercase mb-4">Infrastructure</p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground text-balance">
+                Structured Exposure for SportFi
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {WHY_CARDS.map(({ icon: Icon, title, body }) => (
+                <div
+                  key={title}
+                  className="group relative p-8 rounded-2xl bg-card border border-border hover:border-success/25 transition-all duration-300"
+                >
+                  <div className="mb-6 h-11 w-11 rounded-xl bg-success/8 flex items-center justify-center group-hover:bg-success/12 transition-colors">
+                    <Icon className="h-5 w-5 text-success" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">{title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 3: INDEX FAMILY ──────────────────────────────────────── */}
+        <section className="relative w-full py-24 lg:py-32 bg-muted/20">
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, oklch(0.98 0 0 / 0.02) 1px, transparent 1px), linear-gradient(to bottom, oklch(0.98 0 0 / 0.02) 1px, transparent 1px)",
+              backgroundSize: "48px 48px",
+            }}
+          />
+          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+            <div className="max-w-2xl mx-auto text-center mb-16">
+              <p className="text-xs font-semibold tracking-widest text-success uppercase mb-4">Products</p>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground text-balance">
+                The FanIndex Ecosystem
+              </h2>
+            </div>
+
+            {/* Featured — FTLX */}
+            <div className="mb-6">
+              <Link href="/indices/FTLX">
+                <div className="group relative p-8 sm:p-10 rounded-2xl bg-card border border-success/20 hover:border-success/40 transition-all duration-300 overflow-hidden">
+                  <div className="pointer-events-none absolute top-0 right-0 h-64 w-64 bg-[radial-gradient(ellipse_at_top_right,oklch(0.7_0.19_145/0.07),transparent)]" />
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center gap-3 mb-4">
+                        <span className="font-mono text-2xl font-bold text-success">FTLX</span>
+                        <span className="rounded-full border border-success/20 bg-success/8 px-2.5 py-0.5 text-xs font-medium text-success">Benchmark</span>
+                        <span className="rounded-full border border-border bg-muted/50 px-2.5 py-0.5 text-xs text-muted-foreground">Weighted</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">Fan Token Leaders Index</h3>
+                      <p className="text-sm text-muted-foreground max-w-xl leading-relaxed mb-4">
+                        The benchmark index of the fan token market. Tracks the largest and most liquid fan tokens, representing the overall performance of the ecosystem.
+                      </p>
+                      <p className="text-xs text-muted-foreground font-mono tracking-wide">
+                        GAL · ARG · OG · PSG · BAR · ASR · CITY · ATM · POR · JUV
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground group-hover:text-success transition-colors shrink-0">
+                      <span>View Index</span>
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
+
+            {/* Grid — remaining 4 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {INDEX_FAMILY.filter((i) => !i.featured).map((idx) => (
+                <Link key={idx.ticker} href={`/indices/${idx.ticker}`}>
+                  <div className="group relative h-full p-6 rounded-2xl bg-card border border-border hover:border-success/25 transition-all duration-300 flex flex-col">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-mono text-lg font-bold text-foreground">{idx.ticker}</span>
+                      <span className="text-[10px] rounded-full border border-border px-2 py-0.5 text-muted-foreground">{idx.type}</span>
+                    </div>
+                    <h4 className="text-sm font-semibold text-foreground mb-2">{idx.name}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed flex-1 mb-4">{idx.description}</p>
+                    <p className="text-[10px] text-muted-foreground/70 font-mono truncate">{idx.tokens}</p>
+                    <div className="mt-4 flex items-center gap-1 text-xs text-muted-foreground group-hover:text-success transition-colors">
+                      <span>View</span>
+                      <ChevronRight className="h-3 w-3" />
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 4: ANALYTICS PLATFORM ───────────────────────────────── */}
+        <section className="relative w-full py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              <div>
+                <p className="text-xs font-semibold tracking-widest text-success uppercase mb-4">Analytics</p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance mb-6">
+                  Real-Time Fan Token Market Intelligence
+                </h2>
+                <p className="text-base text-muted-foreground leading-relaxed mb-8 max-w-lg">
+                  Track market caps, volumes, CHZ supply percentages, and token rankings across the entire fan token ecosystem. Bloomberg-grade data for SportFi.
+                </p>
+                <Link href="/fan-tokens">
+                  <Button variant="outline" className="gap-2 bg-transparent">
+                    Open Market Data
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
               </div>
-            </div>
 
-            {/* Right Column - Video */}
-            <div className="hidden sm:block relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0">
-              <video autoPlay loop muted playsInline className="w-full h-auto">
-                <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/MULTI_TOKEN_2025-WzOZc5j6pyWOdUiuIEpVyDhX5csMYs.webm" type="video/webm" />
-                Your browser does not support the video tag.
-              </video>
+              {/* Terminal-style preview */}
+              <div className="rounded-2xl border border-border bg-card overflow-hidden">
+                {/* Terminal header */}
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
+                  <div className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-yellow-500/60" />
+                  <div className="h-2.5 w-2.5 rounded-full bg-success/60" />
+                  <span className="ml-2 text-xs text-muted-foreground font-mono">FanIndex Market — Chiliz Chain</span>
+                </div>
+                {/* Header row */}
+                <div className="grid grid-cols-4 gap-2 px-4 pt-4 pb-2 border-b border-border/50">
+                  {["Token", "Price (CHZ)", "Market Cap", "24h"].map((h) => (
+                    <span key={h} className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{h}</span>
+                  ))}
+                </div>
+                {/* Mock rows */}
+                {[
+                  { symbol: "BAR", price: "1.842", cap: "$8.2M", change: "+3.14%", pos: true },
+                  { symbol: "GAL", price: "0.741", cap: "$6.1M", change: "+1.87%", pos: true },
+                  { symbol: "PSG", price: "0.614", cap: "$4.7M", change: "-0.52%", pos: false },
+                  { symbol: "CITY", price: "0.537", cap: "$3.9M", change: "+2.31%", pos: true },
+                  { symbol: "JUV", price: "0.312", cap: "$2.4M", change: "-1.08%", pos: false },
+                  { symbol: "ATM", price: "0.289", cap: "$2.1M", change: "+0.94%", pos: true },
+                ].map((row) => (
+                  <div key={row.symbol} className="grid grid-cols-4 gap-2 px-4 py-2.5 hover:bg-muted/20 transition-colors">
+                    <span className="text-xs font-mono font-semibold text-foreground">{row.symbol}</span>
+                    <span className="text-xs font-mono text-muted-foreground">{row.price}</span>
+                    <span className="text-xs font-mono text-muted-foreground">{row.cap}</span>
+                    <span className={`text-xs font-mono font-medium ${row.pos ? "text-success" : "text-destructive"}`}>{row.change}</span>
+                  </div>
+                ))}
+                <div className="px-4 py-3 border-t border-border/50 flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground/60 font-mono">Live · Updated every 60s</span>
+                  <Activity className="h-3.5 w-3.5 text-success animate-pulse" />
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Professional-Grade Investment Tools */}
-        <section className="relative w-full bg-muted/30 py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
+        {/* ── SECTION 5: PORTFOLIO INFRASTRUCTURE ─────────────────────────── */}
+        <section className="relative w-full py-24 lg:py-32 bg-muted/20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-3 md:mb-4">
-                Professional-Grade Investment Tools
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+              {/* Portfolio card preview */}
+              <div className="order-2 lg:order-1 space-y-3">
+                {/* Position card */}
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Portfolio Value</p>
+                      <p className="text-2xl font-bold text-foreground font-mono">1,240.00 CHZ</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm text-success font-medium">
+                      <TrendingUp className="h-4 w-4" />
+                      +12.4%
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
+                    {[
+                      { label: "Active Positions", value: "3" },
+                      { label: "Chain Status", value: "Chiliz" },
+                      { label: "Position Type", value: "NFT" },
+                    ].map(({ label, value }) => (
+                      <div key={label}>
+                        <p className="text-[10px] text-muted-foreground mb-1">{label}</p>
+                        <p className="text-sm font-semibold text-foreground">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Active positions */}
+                {[
+                  { ticker: "FTLX", amount: "500 CHZ", gain: "+8.2%" },
+                  { ticker: "FGMX", amount: "440 CHZ", gain: "+18.7%" },
+                  { ticker: "FELX", amount: "300 CHZ", gain: "+10.1%" },
+                ].map((pos) => (
+                  <div key={pos.ticker} className="flex items-center justify-between rounded-xl border border-border bg-card px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center">
+                        <span className="text-[10px] font-bold text-success font-mono">{pos.ticker.slice(0, 2)}</span>
+                      </div>
+                      <span className="text-sm font-semibold text-foreground font-mono">{pos.ticker}</span>
+                    </div>
+                    <span className="text-xs text-muted-foreground">{pos.amount}</span>
+                    <span className="text-xs font-medium text-success">{pos.gain}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="order-1 lg:order-2">
+                <p className="text-xs font-semibold tracking-widest text-success uppercase mb-4">Portfolio</p>
+                <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance mb-6">
+                  Track Your Indexed Positions
+                </h2>
+                <p className="text-base text-muted-foreground leading-relaxed mb-8 max-w-lg">
+                  Every investment is minted as an NFT representing your on-chain indexed position. Track performance, view composition, and redeem at any time.
+                </p>
+                <div className="flex items-center gap-3">
+                  <ConnectWallet />
+                  <Link href="/portfolio">
+                    <Button variant="outline" className="bg-transparent gap-2">
+                      View Portfolio
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 6: REBALANCE ENGINE ─────────────────────────────────── */}
+        <section className="relative w-full py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
+            <div className="max-w-2xl mx-auto text-center mb-16">
+              <p className="text-xs font-semibold tracking-widest text-success uppercase mb-4">Methodology</p>
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground text-balance">
+                Monthly Rebalanced Infrastructure
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground px-2 sm:px-4">
-                Everything you need to invest in the Fan Token economy with confidence
+              <p className="mt-4 text-base text-muted-foreground max-w-xl mx-auto">
+                Transparent, rules-based index methodology. Every weight, every token, every rebalancing event — verifiable on-chain.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <BarChart3 className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
+            {/* Stats grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-12">
+              {METHODOLOGY.map(({ label, value }) => (
+                <div key={label} className="rounded-xl border border-border bg-card p-4 text-center">
+                  <p className="text-lg font-bold text-foreground mb-1">{value}</p>
+                  <p className="text-[11px] text-muted-foreground">{label}</p>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">Diversified Exposure</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Reduce risk with basket investments. Access multiple teams and leagues through thematic indices in a
-                  single transaction.
-                </p>
-              </div>
+              ))}
+            </div>
 
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <Award className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
+            {/* Process steps */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              {[
+                { icon: BarChart3, step: "01", title: "Token Selection", body: "Tokens are selected based on on-chain liquidity, market cap, and trading activity on Chiliz Chain." },
+                { icon: RefreshCw, step: "02", title: "Monthly Rebalancing", body: "Weights are reviewed and adjusted monthly. Rebalancing events are executed transparently on-chain." },
+                { icon: Lock, step: "03", title: "Position Minting", body: "After each investment, an NFT is minted representing the exact composition and value of the position." },
+              ].map(({ icon: Icon, step, title, body }) => (
+                <div key={step} className="relative p-6 rounded-2xl border border-border bg-card">
+                  <div className="flex items-start gap-4">
+                    <div className="shrink-0">
+                      <div className="h-10 w-10 rounded-xl bg-success/8 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-success" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-mono text-muted-foreground/60 mb-1">{step}</p>
+                      <h4 className="text-sm font-semibold text-foreground mb-2">{title}</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{body}</p>
+                    </div>
+                  </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">NFT Certificates</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Each investment is tokenized as an NFT that certifies ownership and can be transferred or redeemed
-                  anytime.
-                </p>
-              </div>
-
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">Audited & Secure</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  All smart contracts are audited and deployed on Chiliz Chain with complete on-chain transparency.
-                </p>
-              </div>
-
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <Droplets className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">Liquidity Generation</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Every purchase distributes trades across official pools, generating organic volume and market depth.
-                </p>
-              </div>
-
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <DollarSign className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">Transparent Fees</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  1% entry fee, 0% exit fee. Managed indices include 1-2% annual management fee for active strategy.
-                </p>
-              </div>
-
-              <div className="group relative p-6 sm:p-8 md:p-10 rounded-2xl bg-card border border-border hover:border-success/30 transition-all hover:shadow-lg">
-                <div className="mb-4 sm:mb-6 h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-success/10 flex items-center justify-center group-hover:bg-success/20 transition-colors">
-                  <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-                </div>
-                <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3">Instant Settlement</h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Buy and redeem indices instantly with automated smart contract execution on Chiliz Chain.
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* Three Index Strategies */}
-        <section className="relative w-full py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-12">
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12 md:mb-16">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-3 md:mb-4">
-                Three Index Strategies
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground px-2 sm:px-4">
-                Choose the investment approach that matches your goals
-              </p>
-            </div>
+        {/* ── SECTION 7: FINAL CTA ────────────────────────────────────────── */}
+        <section className="relative w-full py-32 overflow-hidden">
+          {/* Background */}
+          <div className="pointer-events-none absolute inset-0 bg-foreground" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/30 to-transparent" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_50%,oklch(0.7_0.19_145/0.05),transparent)]" />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-              <div className="relative p-6 sm:p-8 md:p-10 rounded-3xl bg-card border-2 border-border hover:border-success/40 transition-all">
-                <div className="mb-4 sm:mb-6">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-success/10 flex items-center justify-center mb-3 sm:mb-4">
-                    <Scale className="h-6 w-6 sm:h-7 sm:w-7 text-success" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Weighted Index</h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    Tokens allocated proportionally based on liquidity or market capitalization
-                  </p>
-                </div>
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Market-cap weighted allocation</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Automatic rebalancing</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Passive strategy</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="relative p-6 sm:p-8 md:p-10 rounded-3xl bg-card border-2 border-border hover:border-success/40 transition-all">
-                <div className="mb-4 sm:mb-6">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-success/10 flex items-center justify-center mb-3 sm:mb-4">
-                    <Equal className="h-5 w-5 sm:h-6 sm:w-6 text-success" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-semibold text-foreground mb-2">Equal-Weight Index</h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    Equal allocation across all tokens for democratized exposure
-                  </p>
-                </div>
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Equal weight per token</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Balanced diversification</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Simple structure</span>
-                  </li>
-                </ul>
-              </div>
-
-              <div className="relative p-6 sm:p-8 md:p-10 rounded-3xl bg-card border-2 border-success/40 transition-all">
-                <div className="absolute -top-3 right-4 sm:right-6">
-                  <span className="inline-block px-2.5 sm:px-3 py-1 rounded-full bg-success text-success-foreground text-xs font-semibold">
-                    PREMIUM
-                  </span>
-                </div>
-                <div className="mb-4 sm:mb-6">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl bg-success/10 flex items-center justify-center mb-3 sm:mb-4">
-                    <TrendingUp className="h-6 w-6 sm:h-7 sm:w-7 text-success" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-2">Managed Index</h3>
-                  <p className="text-sm sm:text-base text-muted-foreground">
-                    Actively managed by experts with dynamic adjustments
-                  </p>
-                </div>
-                <ul className="space-y-2 sm:space-y-3">
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Professional management</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Active rebalancing</span>
-                  </li>
-                  <li className="flex items-start gap-2 sm:gap-3">
-                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-success mt-0.5 flex-shrink-0" />
-                    <span className="text-xs sm:text-sm text-muted-foreground">Performance optimized</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Final CTA Section */}
-        <section className="relative w-full bg-foreground py-12 sm:py-16 md:py-20 lg:py-24 xl:py-32">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-12 text-center">
-            <div className="mb-6 sm:mb-8 md:mb-12 flex justify-center">
-              <div className="relative w-full max-w-2xl sm:max-w-3xl">
+          <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-12 text-center">
+            {/* Logo strip */}
+            <div className="mb-12 flex justify-center">
+              <div className="relative w-full max-w-2xl">
                 <Image
                   src="/images/new-order-of-logos-1.png"
-                  alt="Fan Token Logos - Barcelona, PSG, Manchester City, Juventus, AC Milan, Atletico Madrid, Aston Villa, AS Roma, Tottenham"
+                  alt="Fan Token Logos — Barcelona, PSG, Manchester City, Juventus, Atletico, Aston Villa"
                   width={1200}
                   height={200}
-                  className="w-full h-auto"
+                  className="w-full h-auto opacity-80"
                   priority
                 />
               </div>
             </div>
 
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-background mb-3 sm:mb-4 md:mb-6 px-2 sm:px-4">
-              Start Investing in Fan Tokens Today
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-background text-balance mb-5 leading-tight">
+              Built for the Future<br />of SportFi
             </h2>
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-background/70 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto px-2 sm:px-4">
-              Join hundreds of investors building diversified portfolios in the sports token economy
+            <p className="text-base sm:text-lg text-background/60 max-w-xl mx-auto mb-10 leading-relaxed">
+              Fan Tokens created a new asset class. FanIndex is building the infrastructure around it.
             </p>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 px-2 sm:px-4">
-              <Link href="/indices" className="w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/indices">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-success hover:bg-success/90 text-success-foreground text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-14"
+                  className="h-13 px-10 bg-success text-success-foreground hover:bg-success/90 font-semibold gap-2 text-base"
                 >
-                  Browse Indices
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  Launch App
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/whitepaper" className="w-full sm:w-auto">
+              <Link href="/whitepaper">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto bg-transparent border-background/20 text-background hover:bg-background/10 text-sm sm:text-base px-6 sm:px-8 h-12 sm:h-14"
+                  className="h-13 px-10 bg-transparent border-background/20 text-background hover:bg-background/8 font-medium text-base"
                 >
                   Read Whitepaper
                 </Button>
               </Link>
             </div>
+
+            {/* Bottom built on Chiliz */}
+            <div className="mt-16 flex items-center justify-center gap-2 text-background/30">
+              <Wallet className="h-4 w-4" />
+              <span className="text-sm">Built on Chiliz Chain</span>
+            </div>
           </div>
         </section>
+
       </main>
 
       <Footer />
     </div>
+  )
+}
+
+// ─── Hero index card component ───────────────────────────────────────────────
+
+function IndexHeroCard({
+  ticker,
+  name,
+  type,
+  large = false,
+}: {
+  ticker: string
+  name: string
+  type: string
+  large?: boolean
+}) {
+  return (
+    <Link href={`/indices/${ticker}`}>
+      <div
+        className={`
+          group relative rounded-2xl border border-border bg-card/80 backdrop-blur-sm
+          hover:border-success/30 transition-all duration-300 cursor-pointer
+          shadow-[0_4px_24px_rgba(0,0,0,0.12)]
+          ${large ? "px-6 py-5 min-w-[180px]" : "px-4 py-3.5 min-w-[140px]"}
+        `}
+      >
+        <div className={`font-mono font-bold text-success ${large ? "text-2xl mb-1" : "text-base mb-1"}`}>
+          {ticker}
+        </div>
+        <div className={`font-medium text-foreground ${large ? "text-sm" : "text-xs"}`}>{name}</div>
+        <div className={`text-muted-foreground ${large ? "text-xs mt-1" : "text-[10px] mt-0.5"}`}>{type}</div>
+        {large && (
+          <div className="mt-3 flex items-center gap-1 text-xs text-success/70">
+            <span className="h-1 w-1 rounded-full bg-success animate-pulse" />
+            <span>Live</span>
+          </div>
+        )}
+      </div>
+    </Link>
   )
 }
