@@ -120,7 +120,7 @@ export default function FanIndexLanding() {
         {/* ── SECTION 1: HERO ─────────────────────────────────────────────── */}
         <section
           ref={heroRef}
-          className="relative w-full min-h-[90vh] flex flex-col justify-center pt-24 pb-0"
+          className="relative w-full min-h-[90vh] flex flex-col justify-center pt-24 pb-10"
         >
           {/* Subtle grid texture */}
           <div
@@ -135,7 +135,7 @@ export default function FanIndexLanding() {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[500px] bg-[radial-gradient(ellipse_60%_40%_at_50%_0%,oklch(0.7_0.19_145/0.08),transparent)]" />
 
           <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
 
               {/* Left */}
               <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -195,39 +195,71 @@ export default function FanIndexLanding() {
                 </div>
               </div>
 
-              {/* Right — floating index cards */}
-              <div className="hidden lg:flex items-center justify-center relative h-[460px]">
-                {/* Central glow orb */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="h-64 w-64 rounded-full bg-success/6 blur-3xl" />
+              {/* Right — floating cards + globe (desktop only) */}
+              <div className="hidden lg:flex items-center justify-center relative h-[540px]">
+
+                {/* Globe — behind cards */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[340px] h-[340px] lg:w-[400px] lg:h-[400px] pointer-events-none select-none z-0">
+                  {/* Dark overlay so globe blends into background */}
+                  <div className="absolute inset-0 rounded-full z-10"
+                    style={{ background: "radial-gradient(circle at 50% 50%, transparent 55%, var(--background) 80%)" }}
+                  />
+                  <Image
+                    src="/globe.jpg"
+                    alt="Global network"
+                    fill
+                    className="object-contain opacity-60 mix-blend-luminosity"
+                    priority
+                  />
                 </div>
 
+                {/* Soft ambient glow above globe */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
+                  <div className="h-52 w-52 rounded-full bg-success/8 blur-3xl" />
+                </div>
+
+                {/* Connecting lines */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none z-[2]" aria-hidden>
+                  <line x1="50%" y1="46%" x2="21%" y2="14%" stroke="oklch(0.7 0.19 145 / 0.15)" strokeWidth="1" strokeDasharray="5 5" />
+                  <line x1="50%" y1="46%" x2="79%" y2="14%" stroke="oklch(0.7 0.19 145 / 0.15)" strokeWidth="1" strokeDasharray="5 5" />
+                  <line x1="50%" y1="46%" x2="14%" y2="80%" stroke="oklch(0.7 0.19 145 / 0.15)" strokeWidth="1" strokeDasharray="5 5" />
+                  <line x1="50%" y1="46%" x2="86%" y2="80%" stroke="oklch(0.7 0.19 145 / 0.15)" strokeWidth="1" strokeDasharray="5 5" />
+                  {/* Dot at center */}
+                  <circle cx="50%" cy="46%" r="3" fill="oklch(0.7 0.19 145 / 0.4)" />
+                  <circle cx="50%" cy="46%" r="6" fill="none" stroke="oklch(0.7 0.19 145 / 0.15)" strokeWidth="1" />
+                </svg>
+
                 {/* FTLX — center large */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                <div className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 z-20">
                   <IndexHeroCard ticker="FTLX" name="Fan Token Leaders" type="Weighted · 10 tokens" large />
                 </div>
 
                 {/* Surrounding cards */}
-                <div className="absolute top-4 left-10 z-10">
+                <div className="absolute top-[5%] left-[8%] z-10">
                   <IndexHeroCard ticker="FELX" name="English League" type="Weighted · 5 tokens" />
                 </div>
-                <div className="absolute top-4 right-10 z-10">
+                <div className="absolute top-[5%] right-[8%] z-10">
                   <IndexHeroCard ticker="FSLX" name="Spanish League" type="Weighted · 4 tokens" />
                 </div>
-                <div className="absolute bottom-8 left-6 z-10">
+                <div className="absolute bottom-[10%] left-[4%] z-10">
                   <IndexHeroCard ticker="FGMX" name="Fan Gaming" type="Equal · 5 tokens" />
                 </div>
-                <div className="absolute bottom-8 right-6 z-10">
+                <div className="absolute bottom-[10%] right-[4%] z-10">
                   <IndexHeroCard ticker="FFLX" name="Fan Fight" type="Equal · 2 tokens" />
                 </div>
+              </div>
 
-                {/* Connecting lines — decorative */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" aria-hidden>
-                  <line x1="50%" y1="50%" x2="22%" y2="16%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="78%" y2="16%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="15%" y2="84%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
-                  <line x1="50%" y1="50%" x2="85%" y2="84%" stroke="currentColor" strokeWidth="1" className="text-success" strokeDasharray="4 4" />
-                </svg>
+              {/* Mobile — horizontal scroll strip of cards */}
+              <div className="lg:hidden w-full -mx-4 px-4 overflow-x-auto flex gap-3 pb-2 scrollbar-hide">
+                {[
+                  { ticker: "FTLX", name: "Fan Token Leaders", type: "Weighted · 10", featured: true },
+                  { ticker: "FELX", name: "English League",    type: "Weighted · 5",  featured: false },
+                  { ticker: "FSLX", name: "Spanish League",    type: "Weighted · 4",  featured: false },
+                  { ticker: "FGMX", name: "Fan Gaming",        type: "Equal · 5",     featured: false },
+                  { ticker: "FFLX", name: "Fan Fight",         type: "Equal · 2",     featured: false },
+                ].map((c) => (
+                  <IndexHeroCard key={c.ticker} ticker={c.ticker} name={c.name} type={c.type} featured={c.featured} />
+                ))}
               </div>
             </div>
           </div>
@@ -583,31 +615,52 @@ function IndexHeroCard({
   name,
   type,
   large = false,
+  featured = false,
 }: {
   ticker: string
   name: string
   type: string
   large?: boolean
+  featured?: boolean
 }) {
   return (
-    <Link href={`/indices/${ticker}`}>
+    <Link href={`/indices/${ticker}`} className="block flex-shrink-0">
       <div
-        className={`
-          group relative rounded-2xl border border-border bg-card/80 backdrop-blur-sm
-          hover:border-success/30 transition-all duration-300 cursor-pointer
-          shadow-[0_4px_24px_rgba(0,0,0,0.12)]
-          ${large ? "px-6 py-5 min-w-[180px]" : "px-4 py-3.5 min-w-[140px]"}
-        `}
+        className={[
+          "group relative rounded-2xl cursor-pointer transition-all duration-300",
+          // Glassmorphism base
+          "border backdrop-blur-md",
+          featured || large
+            ? "border-success/30 bg-white/[0.04] shadow-[0_0_0_1px_oklch(0.7_0.19_145/0.15),0_8px_32px_rgba(0,0,0,0.35),0_0_24px_oklch(0.7_0.19_145/0.08)] hover:shadow-[0_0_0_1px_oklch(0.7_0.19_145/0.30),0_12px_40px_rgba(0,0,0,0.4),0_0_36px_oklch(0.7_0.19_145/0.14)]"
+            : "border-white/8 bg-white/[0.03] shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:border-success/20 hover:bg-white/[0.055]",
+          large ? "px-6 py-5 min-w-[190px]" : "px-4 py-4 min-w-[148px]",
+        ].join(" ")}
       >
-        <div className={`font-mono font-bold text-success ${large ? "text-2xl mb-1" : "text-base mb-1"}`}>
+        {/* Top accent line for featured */}
+        {(featured || large) && (
+          <div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-success/50 to-transparent" />
+        )}
+
+        {/* Ticker */}
+        <div className={`font-mono font-bold tracking-tight text-success ${large ? "text-2xl mb-1.5" : "text-base mb-1"}`}>
           {ticker}
         </div>
-        <div className={`font-medium text-foreground ${large ? "text-sm" : "text-xs"}`}>{name}</div>
-        <div className={`text-muted-foreground ${large ? "text-xs mt-1" : "text-[10px] mt-0.5"}`}>{type}</div>
+
+        {/* Name */}
+        <div className={`font-medium text-foreground/90 ${large ? "text-sm leading-snug" : "text-xs leading-snug"}`}>
+          {name}
+        </div>
+
+        {/* Type */}
+        <div className={`text-muted-foreground/70 ${large ? "text-xs mt-1.5" : "text-[10px] mt-1"}`}>
+          {type}
+        </div>
+
+        {/* Live pill — only on center card */}
         {large && (
-          <div className="mt-3 flex items-center gap-1 text-xs text-success/70">
-            <span className="h-1 w-1 rounded-full bg-success animate-pulse" />
-            <span>Live</span>
+          <div className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-success/10 border border-success/20 px-2.5 py-1">
+            <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+            <span className="text-[10px] font-semibold tracking-wide text-success uppercase">Live</span>
           </div>
         )}
       </div>
