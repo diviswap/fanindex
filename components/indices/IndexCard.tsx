@@ -23,10 +23,18 @@ export interface IndexData {
   description: string
   type: "weighted" | "equal" | "managed"
   tokens: string[]
+  /**
+   * Optional target weights for each token (percentages, summing to 100).
+   * Must be the same length as `tokens`. If omitted, the UI falls back to
+   * equal-weight for display (live on-chain weights may still override).
+   */
+  weights?: number[]
   price: string
   apy: string
   totalValue: string
   holders: number
+  /** Optional short ticker (e.g. "FTLX") rendered alongside the name */
+  symbol?: string
 }
 
 interface IndexCardProps {
@@ -39,41 +47,35 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  // 90d fetch — same as detail view, then slice client-side for 24h
-  // This ensures 24h return matches the detail chart exactly
-  const { data: history90d } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+  // Dedicated 24h fetch (hourly granularity) — CoinGecko returns daily points
+  // for days=90, so we can't slice that to 24h and get a real return.
+  // This matches the same pattern used in IndexDetailView.
+  const { data: history24h } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
     fetcher,
-    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+    { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
 
   const displayPrice = useMemo(() => {
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+    // Prefer the latest hourly point (freshest source of truth)
+    const data24h = history24h?.data
+    if (data24h && data24h.length > 0) {
+      return data24h[data24h.length - 1].price.toFixed(4)
     }
-    const data = history90d?.data
-    if (data && data.length > 0) {
-      return data[data.length - 1].price.toFixed(4)
+    if (liveTokenPrices && liveTokenPrices.length > 0) {
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
     }
     return Number.parseFloat(index.price).toFixed(4)
-  }, [history90d, liveTokenPrices, index.tokens, index.price])
-
-  // Slice to last 24h (same logic as IndexDetailView)
-  const slice24h = useMemo(() => {
-    const data = history90d?.data
-    if (!data || data.length === 0) return []
-    const cutoff = Date.now() - 1 * 24 * 60 * 60 * 1000
-    const sliced = data.filter((d: { timestamp: number; date: string; price: number; volume: number }) => d.timestamp >= cutoff)
-    return sliced.length > 1 ? sliced : data
-  }, [history90d])
+  }, [history24h, liveTokenPrices, index.tokens, index.price])
 
   const return24h = useMemo(() => {
-    if (slice24h.length < 2) return null
-    const first = slice24h[0].price
-    const last = slice24h[slice24h.length - 1].price
+    const data = history24h?.data
+    if (!data || data.length < 2) return null
+    const first = data[0].price
+    const last = data[data.length - 1].price
     if (!first || first === 0) return null
     return ((last - first) / first) * 100
-  }, [slice24h])
+  }, [history24h])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -108,7 +110,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   return (
     <>
-      <Link href={`/indices/${index.id}`} className="block h-full group">
+      <Link href={`/indices/${index.symbol ?? index.id}`} className="block h-full group">
           <div className="h-full min-h-[500px] border border-border bg-card/80 backdrop-blur-sm p-8 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">

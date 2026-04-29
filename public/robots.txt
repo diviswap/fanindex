@@ -1,0 +1,11 @@
+# FanIndex - Fan Token Investment Platform
+# https://fanindex.io
+
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://fanindex.io/sitemap.xml
+
+# Crawl-delay for politeness
+Crawl-delay: 1

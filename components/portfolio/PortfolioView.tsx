@@ -31,8 +31,10 @@ import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-// Only index "1" is deployed on Chiliz Mainnet
-const DEPLOYED_INDICES = ["1"]
+// Indices that have contracts deployed on Chiliz Mainnet.
+// Keep this list in sync with ETF_CONTRACTS (lib/contracts/abis.ts) and
+// DEPLOYED_INDICES in lib/hooks/use-portfolio-onchain.ts.
+const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"]
 
 const CHART_COLORS = {
   weighted: "#3b82f6",
@@ -109,7 +111,7 @@ function AvailableIndexCard({
 
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices).toFixed(4)
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
     }
     const data = history24h?.data
     if (data && data.length > 0) {

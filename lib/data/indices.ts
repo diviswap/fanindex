@@ -4,7 +4,7 @@ import { FAN_TOKENS, getTokenBySymbol } from "@/lib/data/fan-tokens"
 export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: string; priceInCHZ: number }>): number {
   const token = getTokenBySymbol(symbol)
   if (!token) return 0
-  
+
   // Try to get live price from CoinGecko
   if (livePrices) {
     const livePrice = livePrices.find(p => p.symbol === symbol)
@@ -12,22 +12,38 @@ export function getTokenPrice(symbol: string, livePrices?: Array<{ symbol: strin
       return livePrice.priceInCHZ
     }
   }
-  
+
   // Fallback to static price
   const CHZ_PRICE_USD = 0.02984
   return parseFloat(token.price) / CHZ_PRICE_USD
 }
 
 export function calculateIndexPrice(
-  tokenSymbols: string[], 
-  livePrices?: Array<{ symbol: string; priceInCHZ: number }>
+  tokenSymbols: string[],
+  livePrices?: Array<{ symbol: string; priceInCHZ: number }>,
+  /**
+   * Optional per-token weights (percentages). When provided, the price is the
+   * weighted average; otherwise it falls back to equal-weight average.
+   */
+  weights?: number[]
 ): number {
   if (tokenSymbols.length === 0) return 0
-  
+
+  // Weighted average when weights are provided and valid
+  if (weights && weights.length === tokenSymbols.length) {
+    const weightSum = weights.reduce((s, w) => s + w, 0)
+    if (weightSum > 0) {
+      const weighted = tokenSymbols.reduce((sum, symbol, i) => {
+        return sum + getTokenPrice(symbol, livePrices) * (weights[i] / weightSum)
+      }, 0)
+      return weighted > 0 ? weighted : 1
+    }
+  }
+
   const totalPrice = tokenSymbols.reduce((sum, symbol) => {
     return sum + getTokenPrice(symbol, livePrices)
   }, 0)
-  
+
   const avgPrice = totalPrice / tokenSymbols.length
   // Never return 0 — live prices will override this in the UI,
   // but a non-zero static fallback avoids "Minimum: 0 CHZ" flash.
@@ -133,17 +149,96 @@ export function getIndexAPY(
   return `${sign}${apy.toFixed(1)}%`
 }
 
+// ───────── Deployed, production indices on Chiliz Mainnet ─────────
+// These `id`s double as the URL slug (/indices/FTLX, /indices/FGMX, …)
+// and the lookup key in ETF_CONTRACTS. Keep the key and the ticker in sync.
+
+// FTLX — Fan Token Leaders Index (weighted)
+const FTLX_TOKENS = ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"] as const
+const FTLX_WEIGHTS = [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49] as const
+
+// FGMX — Fan Gaming Index (equal weight, 5 tokens)
+const FGMX_TOKENS = ["OG", "TH", "ALL", "MIBR", "DOJO"] as const
+
+// FFLX — Fan Fight Index (equal weight, combat sports)
+const FFLX_TOKENS = ["UFC", "PFL"] as const
+
+// FELX — Fan English League Index (weighted)
+const FELX_TOKENS = ["CITY", "AFC", "SPURS", "AVL", "EFC"] as const
+const FELX_WEIGHTS = [46, 36, 9, 6, 3] as const
+
+// FSLX — Fan Spanish League Index (weighted)
+const FSLX_TOKENS = ["BAR", "ATM", "SEVILLA", "VCF"] as const
+const FSLX_WEIGHTS = [53, 41, 3, 3] as const
+
 export const INDICES: IndexData[] = [
   {
-    id: "1",
-    name: "FanIndex Global ETF",
-    description: "50% OG Esports + 50% Valencia CF — live on Chiliz Mainnet",
-    type: "equal",
-    tokens: ["OG", "VCF"],
-    price: calculateIndexPrice(["OG", "VCF"]).toFixed(2),
+    id: "FTLX",
+    name: "FTLX — Fan Token Leaders Index",
+    symbol: "FTLX",
+    description:
+      "The benchmark index of the fan token market. It tracks the largest and most liquid fan tokens, representing the overall performance of the ecosystem.",
+    type: "weighted",
+    tokens: [...FTLX_TOKENS],
+    weights: [...FTLX_WEIGHTS],
+    price: calculateIndexPrice([...FTLX_TOKENS], undefined, [...FTLX_WEIGHTS]).toFixed(2),
     apy: "14.2%",
-    totalValue: "2.8M",
-    holders: 456,
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FGMX",
+    name: "FGMX — Fan Gaming Index",
+    symbol: "FGMX",
+    description:
+      "A thematic index providing exposure to the esports segment of the fan token ecosystem, with equal weighting across all included teams.",
+    type: "equal",
+    tokens: [...FGMX_TOKENS],
+    price: calculateIndexPrice([...FGMX_TOKENS]).toFixed(2),
+    apy: "18.7%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FFLX",
+    name: "FFLX — Fan Fight Index",
+    symbol: "FFLX",
+    description:
+      "An index focused on combat sports, tracking the performance of leading organizations with fan tokens in this category.",
+    type: "equal",
+    tokens: [...FFLX_TOKENS],
+    price: calculateIndexPrice([...FFLX_TOKENS]).toFixed(2),
+    apy: "15.4%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FELX",
+    name: "FELX — Fan English League Index",
+    symbol: "FELX",
+    description:
+      "Tracks the performance of leading English football clubs with fan tokens, weighted by their market relevance.",
+    type: "weighted",
+    tokens: [...FELX_TOKENS],
+    weights: [...FELX_WEIGHTS],
+    price: calculateIndexPrice([...FELX_TOKENS], undefined, [...FELX_WEIGHTS]).toFixed(2),
+    apy: "12.8%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FSLX",
+    name: "FSLX — Fan Spanish League Index",
+    symbol: "FSLX",
+    description:
+      "Measures the performance of leading Spanish football clubs with fan tokens, reflecting the structure of the local market.",
+    type: "weighted",
+    tokens: [...FSLX_TOKENS],
+    weights: [...FSLX_WEIGHTS],
+    price: calculateIndexPrice([...FSLX_TOKENS], undefined, [...FSLX_WEIGHTS]).toFixed(2),
+    apy: "13.6%",
+    totalValue: "—",
+    holders: 0,
   },
   {
     id: "2",
