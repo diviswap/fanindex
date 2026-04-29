@@ -196,26 +196,26 @@ export default function FanIndexLanding() {
               </div>
 
               {/* Right — floating cards + globe (desktop only) */}
-              <div className="hidden lg:flex items-center justify-center relative h-[540px]">
+              <div className="hidden lg:flex items-center justify-center relative h-[680px]">
 
-                {/* Globe — behind cards */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] lg:w-[600px] lg:h-[600px] pointer-events-none select-none z-0">
+                {/* Globe — behind cards, now much larger as focal point */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[700px] h-[700px] pointer-events-none select-none z-0">
                   {/* Dark overlay so globe blends into background */}
                   <div className="absolute inset-0 rounded-full z-10"
-                    style={{ background: "radial-gradient(circle at 50% 50%, transparent 50%, var(--background) 75%)" }}
+                    style={{ background: "radial-gradient(circle at 50% 50%, transparent 45%, var(--background) 70%)" }}
                   />
                   <Image
                     src="/globe.jpg"
                     alt="Global network"
                     fill
-                    className="object-contain opacity-70 mix-blend-luminosity"
+                    className="object-contain opacity-75 mix-blend-luminosity"
                     priority
                   />
                 </div>
 
                 {/* Soft ambient glow above globe */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[1]">
-                  <div className="h-80 w-80 rounded-full bg-success/8 blur-3xl" />
+                  <div className="h-96 w-96 rounded-full bg-success/8 blur-3xl" />
                 </div>
 
                 {/* Connecting lines */}
