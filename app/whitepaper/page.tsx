@@ -562,12 +562,6 @@ export default function WhitepaperPage() {
               Back to home
             </Link>
 
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur mb-7">
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
-                Whitepaper v2
-              </span>
-            </div>
-
             <h1 className="text-balance text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.08] text-foreground mb-4">
               The Index Layer for{" "}
               <span className="text-success">Fan Tokens</span>
