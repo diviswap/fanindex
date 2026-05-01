@@ -103,36 +103,41 @@ function AvailableIndexCard({
 }) {
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
-  const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+  // Same weights query and 90d fetch as IndexCard
+  const weightsQuery =
+    index.weights && index.weights.length === index.tokens.length
+      ? `&weights=${index.weights.join(",")}`
+      : ""
+
+  const { data: history90d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsQuery}`,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
 
   const displayPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
+      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(2)
     }
-    const data = history24h?.data
+    const data = history90d?.data
     if (data && data.length > 0) {
-      return data[data.length - 1].price.toFixed(4)
+      return data[data.length - 1].price.toFixed(2)
     }
-    return Number.parseFloat(index.price).toFixed(4)
-  }, [history24h, liveTokenPrices, index.tokens, index.price])
+    return Number.parseFloat(index.price).toFixed(2)
+  }, [history90d, liveTokenPrices, index.tokens, index.price])
 
+  // Same 24h logic as IndexCard: slice 90d data to 2 days back
   const return24h = useMemo(() => {
-    const data = history24h?.data
-    if (!data || data.length < 2) return null
-    
-    // For 24h data, use first price (oldest) and last price (current)
-    const firstPrice = data[0].price
-    const lastPrice = data[data.length - 1].price
-    
-    if (!firstPrice || firstPrice === 0) return null
-    
-    const change = ((lastPrice - firstPrice) / firstPrice) * 100
-    return change
-  }, [history24h])
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return null
+    const cutoff = Date.now() - 2 * 24 * 60 * 60 * 1000
+    const slice = all.filter(d => d.timestamp >= cutoff)
+    if (slice.length < 2) return null
+    const first = slice[0].price
+    const last = slice[slice.length - 1].price
+    if (!first) return null
+    return ((last - first) / first) * 100
+  }, [history90d])
 
   return (
     <div className="relative min-h-[380px] border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all duration-300 overflow-hidden">
