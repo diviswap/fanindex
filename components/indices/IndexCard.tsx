@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 
-import { TrendingUp, TrendingDown, Users, Share2, ArrowUpRight } from "lucide-react"
+import { TrendingUp, TrendingDown, Share2, ArrowUpRight } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
@@ -75,6 +75,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const return24h = useMemo(() => returnFor(2), [history90d])
   const return7d  = useMemo(() => returnFor(7), [history90d])
+  const return90d = useMemo(() => returnFor(90), [history90d])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -186,12 +187,15 @@ export function IndexCard({ index }: IndexCardProps) {
                   </div>
                   <div>
                     <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
-                      Holders
+                      90d
                     </div>
-                    <div className="flex items-center gap-1 text-base font-bold text-foreground tabular-nums">
-                      <Users className="h-3.5 w-3.5" />
-                      {index.holders}
-                    </div>
+                    {return90d === null ? (
+                      <div className="text-base font-bold text-muted-foreground">--</div>
+                    ) : (
+                      <div className={`text-base font-bold tabular-nums ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
+                        {return90d >= 0 ? "+" : ""}{return90d.toFixed(2)}%
+                      </div>
+                    )}
                   </div>
                 </div>
 

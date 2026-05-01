@@ -139,6 +139,15 @@ function AvailableIndexCard({
     return ((last - first) / first) * 100
   }, [history90d])
 
+  const return90d = useMemo(() => {
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return null
+    const first = all[0].price
+    const last = all[all.length - 1].price
+    if (!first) return null
+    return ((last - first) / first) * 100
+  }, [history90d])
+
   return (
     <div className="relative min-h-[380px] border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all duration-300 overflow-hidden">
       <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-80 dark:opacity-25">
@@ -187,8 +196,17 @@ function AvailableIndexCard({
               )}
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Holders</span>
-              <span className="font-semibold text-foreground">{index.holders}</span>
+              <span className="text-muted-foreground">90d Return</span>
+              {return90d === null ? (
+                <span className="font-semibold text-muted-foreground">--</span>
+              ) : (
+                <span className={`flex items-center gap-1 font-semibold ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
+                  {return90d >= 0
+                    ? <TrendingUp className="h-3.5 w-3.5" />
+                    : <TrendingDown className="h-3.5 w-3.5" />}
+                  {return90d >= 0 ? "+" : ""}{return90d.toFixed(2)}%
+                </span>
+              )}
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
@@ -412,7 +430,7 @@ export function PortfolioView() {
     return data
   }, [holdings, priceMap, portfolioStats.chzValue])
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  // ── Handlers ──────────────────────────────────���───────────────────────────
   const handleSell = (holding: NFTHolding) => {
     const tokenRows = holding.tokenAddresses.map((addr, i) => {
       const token = getTokenByAddress(addr)
