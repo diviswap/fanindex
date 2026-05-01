@@ -180,7 +180,7 @@ export async function GET(request: NextRequest) {
     // When weights are supplied, use a weighted average across whichever
     // constituents have data at that timestamp (re-normalised). Otherwise,
     // fall back to a simple equal-weighted average.
-    let chartData = Array.from(priceDataMap.entries())
+    const chartData = Array.from(priceDataMap.entries())
       .filter(([_, m]) => m.size > 0)
       .map(([timestamp, m]) => {
         let aggregate = 0
@@ -210,14 +210,6 @@ export async function GET(request: NextRequest) {
         }
       })
       .sort((a, b) => a.timestamp - b.timestamp)
-
-    // For 24h data, filter to last 24 hours from the 2 days of data fetched
-    // Only keep points within the last 24h from now
-    if (days === 1 && chartData.length > 0) {
-      const now = Date.now()
-      const oneDayAgo = now - 24 * 60 * 60 * 1000
-      chartData = chartData.filter(d => d.timestamp >= oneDayAgo)
-    }
 
     return NextResponse.json({
       tokens: tokenSymbols,
