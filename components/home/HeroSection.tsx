@@ -86,13 +86,13 @@ export function HeroSection() {
 
       {/*
         Layout:
-        Mobile  → single column, stacked: copy on top, globe below with full width.
-                  This allows the title, subtitle, buttons and globe to breathe.
-        Desktop → two columns, fully proportional with more breathing room.
+        Mobile  → positioned globe as background on the right, text + buttons
+                  in a single column overlay, so everything fits on-screen.
+        Desktop → two-column grid, globe in its own column.
       */}
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 pt-24 pb-12 sm:grid-cols-[1fr_auto] sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+      <div className="relative mx-auto max-w-7xl px-4 pt-24 pb-12 sm:grid sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
 
-        {/* Left — copy */}
+        {/* Left — copy (overlay on mobile, natural on sm+) */}
         <div className="relative z-10 min-w-0">
           <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1.5 backdrop-blur sm:gap-2.5 sm:px-3.5">
             <span className="relative flex h-1.5 w-1.5">
@@ -142,14 +142,13 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Right — globe + floating cards */}
-        {/*
-          Mobile: full-width column, centered, so the globe is large and prominent.
-          sm+: natural sizing within the grid column.
+        {/* Right — globe + floating cards
+            Mobile: absolute positioned background on the right edge
+            sm+: regular grid column
         */}
-        <div className="relative mx-auto w-full max-w-[420px] flex-shrink-0 sm:max-w-[640px] sm:justify-self-end lg:mx-0">
-          {/* Preserve aspect ratio */}
-          <div className="relative aspect-square w-full overflow-visible">
+        <div className="absolute right-0 top-0 h-full w-1/2 sm:relative sm:w-auto sm:h-auto sm:max-w-[640px] sm:mx-0">
+          {/* Preserve aspect ratio on sm+ */}
+          <div className="relative w-full h-full sm:aspect-square sm:w-full sm:overflow-visible">
             {/* Soft glow behind globe */}
             <div
               aria-hidden
@@ -165,8 +164,8 @@ export function HeroSection() {
               alt="Global SportFi network visualization"
               fill
               priority
-              sizes="(max-width: 640px) 420px, (max-width: 1024px) 90vw, 640px"
-              className="object-contain"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 90vw, 640px"
+              className="object-contain sm:object-contain"
               style={{
                 mixBlendMode: "screen",
                 maskImage:
