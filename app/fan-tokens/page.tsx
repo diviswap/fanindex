@@ -149,20 +149,41 @@ export default function FanTokensPage() {
       <WebGLShader />
       <NavBar />
 
-      <main className="relative z-10 w-full mx-auto max-w-7xl px-3 sm:px-4 lg:px-12 py-20 sm:py-24 md:py-32 mt-12 sm:mt-16 md:mt-0 pb-20 sm:pb-24">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 text-success text-xs sm:text-sm font-medium mb-4 sm:mb-6">
-            <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span>Live Fan Token Statistics</span>
+      {/* Hero header — matches home section style */}
+      <section className="relative w-full border-b border-border/40 overflow-hidden">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-50"
+          style={{
+            background:
+              "radial-gradient(ellipse 70% 60% at 50% 0%, color-mix(in oklch, var(--success) 8%, transparent), transparent 70%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/40 to-transparent"
+        />
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 pt-36 pb-20 sm:pt-44 sm:pb-28 text-center">
+          <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur mb-7">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+            </span>
+            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
+              Live Fan Token Statistics
+            </span>
           </div>
-          <h1 className="mb-3 sm:mb-4 text-foreground text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-none text-balance">
-            Fan Token Market
+          <h1 className="text-balance text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-6">
+            Fan Token{" "}
+            <span className="text-success">Market</span>
           </h1>
-          <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-3xl mx-auto text-pretty leading-relaxed px-4">
-            Real-time prices, market caps, and trading data for {FAN_TOKENS.length}+ fan tokens on Chiliz Chain
+          <p className="text-pretty text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Real-time prices, market caps, and trading data for {FAN_TOKENS.length}+ fan tokens on Chiliz Chain.
           </p>
         </div>
+      </section>
+
+      <main className="relative z-10 w-full mx-auto max-w-7xl px-3 sm:px-4 lg:px-12 py-10 sm:py-16 pb-20 sm:pb-24">
 
         {/* Search and Filters */}
         <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
@@ -431,3 +452,4 @@ export default function FanTokensPage() {
     </div>
   )
 }
+
