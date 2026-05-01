@@ -157,7 +157,7 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
         }}
       />
 
-      <div className="relative h-[420px] flex flex-col gap-4">
+      <div className="relative h-[420px] flex flex-col gap-2">
         {/* Header: icon + category badge — fixed height */}
         <div className="h-10 flex items-center justify-between">
           <div
@@ -229,7 +229,7 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
         </div>
 
         {/* Footer: NAV + view — fixed height at bottom */}
-        <div className="h-20 flex items-end justify-between border-t border-border/60 pt-4">
+        <div className="h-20 flex items-end justify-between border-t border-border/60 pt-2">
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               NAV
