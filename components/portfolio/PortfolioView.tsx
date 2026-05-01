@@ -123,11 +123,12 @@ function AvailableIndexCard({
   const return24h = useMemo(() => {
     const all: { price: number; timestamp: number }[] = history90d?.data ?? []
     if (all.length < 2) return null
-    const cutoff = Date.now() - 2 * 24 * 60 * 60 * 1000
-    const slice = all.filter(d => d.timestamp >= cutoff)
-    if (slice.length < 2) return null
-    const first = slice[0].price
-    const last = slice[slice.length - 1].price
+    // Filter to last 2 days by index position (last 2 points), not by Date.now()
+    // to avoid SSR/client hydration mismatch
+    const last2 = all.slice(-2)
+    if (last2.length < 2) return null
+    const first = last2[0].price
+    const last = last2[1].price
     if (!first) return null
     return ((last - first) / first) * 100
   }, [history90d])
@@ -141,12 +142,13 @@ function AvailableIndexCard({
     return ((last - first) / first) * 100
   }, [history90d])
 
-  // 30-day sparkline data — same as IndexCard
+  // 30-day sparkline data — use array slice instead of Date.now() to avoid SSR mismatch
   const sparkData = useMemo(() => {
     const all: { price: number; timestamp: number }[] = history90d?.data ?? []
     if (all.length < 2) return []
-    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
-    return all.filter(d => d.timestamp >= cutoff)
+    // For 30d data, approximately 30 points at daily granularity
+    // Safe to take last 30 points regardless of actual dates
+    return all.slice(-30)
   }, [history90d])
 
   return (

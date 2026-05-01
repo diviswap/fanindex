@@ -79,12 +79,11 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
     return ((last - first) / first) * 100
   }, [history90d])
 
-  // 30-day sparkline data
+  // 30-day sparkline data — use array slice instead of Date.now() to avoid SSR mismatch
   const sparkData = useMemo(() => {
     const all: { price: number; timestamp: number }[] = history90d?.data ?? []
     if (all.length < 2) return []
-    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
-    return all.filter(d => d.timestamp >= cutoff)
+    return all.slice(-30)
   }, [history90d])
 
   const chiliscanUrl = `https://chiliscan.com/token/0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9?a=${tokenId.toString()}`

@@ -65,8 +65,12 @@ export function IndexCard({ index }: IndexCardProps) {
   const returnFor = (daysBack: number): number | null => {
     const all: { price: number; timestamp: number }[] = history90d?.data ?? []
     if (all.length < 2) return null
-    const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
-    const slice = all.filter(d => d.timestamp >= cutoff)
+    // Use array indexing instead of Date.now() filtering to avoid SSR/client hydration mismatch
+    // daysBack is approximate: 2 for ~24h, 7 for ~7d, 90 for full 90d
+    // Since data is daily granularity, use index-based slicing
+    const pointsToSkip = Math.min(daysBack, all.length - 2)
+    const startIdx = Math.max(0, all.length - pointsToSkip - 1)
+    const slice = all.slice(startIdx)
     if (slice.length < 2) return null
     const first = slice[0].price
     const last = slice[slice.length - 1].price
@@ -78,13 +82,12 @@ export function IndexCard({ index }: IndexCardProps) {
   const return7d  = useMemo(() => returnFor(7), [history90d])
   const return90d = useMemo(() => returnFor(90), [history90d])
 
-  // 30-day sparkline data — densest middle ground that shows recent trend
-  // without being noisy. Falls back gracefully when data is loading.
+  // 30-day sparkline data — use last ~30 points (daily granularity) instead of Date.now()
+  // to avoid SSR/client hydration mismatch
   const sparkData = useMemo(() => {
     const all: { price: number; timestamp: number }[] = history90d?.data ?? []
     if (all.length < 2) return []
-    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
-    return all.filter(d => d.timestamp >= cutoff)
+    return all.slice(-30)
   }, [history90d])
 
   const contracts = getContractAddresses(index.id)

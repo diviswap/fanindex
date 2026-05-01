@@ -34,11 +34,13 @@ interface HistoryResponse {
 const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 // Slice the daily 90d dataset down to the requested period.
-// Returns the exact slice — no fallback to the full dataset.
+// Uses array slicing by index instead of Date.now() to avoid SSR/client hydration mismatch.
 function sliceByDays(data: HistoricalDataPoint[], daysBack: number): HistoricalDataPoint[] {
   if (!data || data.length === 0) return []
-  const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
-  return data.filter(d => d.timestamp >= cutoff)
+  // daysBack is approximate: 2 for ~24h, 7 for ~7d, 30 for ~30d, 90 for full
+  // Since data is daily granularity, use index-based slicing instead of Date.now()
+  const pointsToTake = Math.min(daysBack + 1, data.length)
+  return data.slice(-pointsToTake)
 }
 
 function returnFromSlice(slice: HistoricalDataPoint[]): number | null {
