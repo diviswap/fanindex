@@ -188,8 +188,8 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
           </p>
         </div>
 
-        {/* Token logo stack — flex-grow to take remaining space */}
-        <div className="flex-1 min-h-16 flex flex-col">
+        {/* Token logo stack — natural height, no flex-grow */}
+        <div className="min-h-12 flex flex-col">
           <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground mb-2.5">
             Constituents
           </div>
