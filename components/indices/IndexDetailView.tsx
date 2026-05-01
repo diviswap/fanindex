@@ -110,53 +110,56 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   const historyLoading =
     timePeriod === "24h" ? history24hLoading : history90dLoading
 
-  // Price is derived from the chart dataset so it always matches the last point.
-  // Prefer 24h (most recent hourly data) when available, fallback to 90d last daily,
-  // then fallback to live token prices, then static index.price.
-  const displayPrice = useMemo(() => {
-    const data24h = history24hData?.data
-    if (data24h && data24h.length > 0) {
-      return data24h[data24h.length - 1].price.toFixed(4)
-    }
-    const data90d = history90dData?.data
-    if (data90d && data90d.length > 0) {
-      return data90d[data90d.length - 1].price.toFixed(4)
-    }
+  // Canonical NAV (same formula as the index card and home page): a weighted
+  // average of the live CoinGecko CHZ prices. We prefer this over the history
+  // endpoint's last point because:
+  //   1. Live prices include every constituent (history may silently drop
+  //      tokens without a CoinGecko id, biasing the aggregate).
+  //   2. The card and home use this exact value — keeping a single source of
+  //      truth avoids visual drift between views.
+  const navPrice = useMemo(() => {
     if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
+      const nav = calculateIndexPrice(index.tokens, liveTokenPrices, index.weights)
+      if (nav > 0) return nav
     }
-    return Number.parseFloat(index.price).toFixed(4)
-  }, [history24hData, history90dData, liveTokenPrices, index.tokens, index.price])
+    const data24h = history24hData?.data
+    if (data24h && data24h.length > 0) return data24h[data24h.length - 1].price
+    const data90d = history90dData?.data
+    if (data90d && data90d.length > 0) return data90d[data90d.length - 1].price
+    return Number.parseFloat(index.price) || 0
+  }, [liveTokenPrices, history24hData, history90dData, index.tokens, index.weights, index.price])
+
+  // 2 decimals — matches IndexCard / home rendering
+  const displayPrice = navPrice.toFixed(2)
 
   // Pre-compute all four slices:
   //  - 24h uses its own hourly dataset
   //  - 7d/30d/90d are sliced from the 90d daily dataset
   //
   // IMPORTANT: 24h and 90d come from different CoinGecko endpoints with
-  // different granularity, so their last points don't match. To keep a single
-  // "current price" across all tabs, we replace the last daily point with the
-  // most recent hourly point (which is the freshest price available).
+  // different granularity, and neither necessarily matches the live NAV.
+  // To present a single coherent "current price" across all tabs, we replace
+  // the last point of every series with the canonical NAV (live CG prices),
+  // so every chart terminates exactly at the headline number.
   const slices = useMemo(() => {
     const daily = history90dData?.data ?? []
     const hourly = history24hData?.data ?? []
 
-    // Most recent point from the 24h (hourly) dataset — this is the "now" price
-    const latestHourly = hourly.length > 0 ? hourly[hourly.length - 1] : null
+    const replaceLastWithNav = (arr: HistoricalDataPoint[]) =>
+      arr.length > 0 && navPrice > 0
+        ? [...arr.slice(0, -1), { ...arr[arr.length - 1], price: navPrice }]
+        : arr
 
-    // Replace the last point of the daily dataset with the latest hourly point
-    // so 7d / 30d / 90d slices all end at the same price as 24h.
-    const dailySynced =
-      latestHourly && daily.length > 0
-        ? [...daily.slice(0, -1), { ...daily[daily.length - 1], price: latestHourly.price }]
-        : daily
+    const hourlySynced = replaceLastWithNav(hourly)
+    const dailySynced = replaceLastWithNav(daily)
 
     return {
-      "24h": hourly,
+      "24h": hourlySynced,
       "7d":  sliceByDays(dailySynced, 7),
       "30d": sliceByDays(dailySynced, 30),
       "90d": sliceByDays(dailySynced, 90),
     }
-  }, [history90dData, history24hData])
+  }, [history90dData, history24hData, navPrice])
 
   // Chart uses the slice for the selected period
   const filteredData = slices[timePeriod]
@@ -209,6 +212,11 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   const chartColor = isPositive ? "#22c55e" : "#ef4444" 
   const TrendIcon = isPositive ? TrendingUp : TrendingDown
   const trendColorClass = isPositive ? "text-success" : "text-destructive"
+
+  // Adapt axis/tooltip precision to the price magnitude so small CHZ values
+  // (e.g. 0.42) don't collapse to a single tick.
+  const axisDecimals = lastPrice >= 100 ? 0 : lastPrice >= 10 ? 1 : lastPrice >= 1 ? 2 : 3
+  const tooltipDecimals = Math.max(axisDecimals + 1, 2)
 
   const typeColors = {
     weighted: "text-blue-400 bg-blue-400/10 border-blue-400/30",
@@ -421,8 +429,8 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
                   tickLine={false}
                   axisLine={false}
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                  tickFormatter={(value) => value.toFixed(1)}
-                  width={40}
+                  tickFormatter={(value) => value.toFixed(axisDecimals)}
+                  width={48}
                   domain={['dataMin', 'dataMax']}
                 />
                 <Tooltip
@@ -435,7 +443,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
                   }}
                   labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600, marginBottom: '4px' }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number) => [`${value.toFixed(4)} CHZ`, 'Price']}
+                  formatter={(value: number) => [`${value.toFixed(tooltipDecimals)} CHZ`, 'Price']}
                 />
                 <Area
                   type="monotone"
