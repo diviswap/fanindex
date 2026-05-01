@@ -104,20 +104,20 @@ export function HeroSection() {
             </span>
           </div>
 
-          <h1 className="mt-4 text-balance text-[34px] font-semibold leading-[1.05] tracking-tight text-foreground sm:mt-7 sm:text-5xl sm:leading-[1.05] lg:text-[4.5rem]">
+          <h1 className="mt-4 text-balance text-[40px] font-semibold leading-[1.05] tracking-tight text-foreground sm:mt-7 sm:text-5xl sm:leading-[1.05] lg:text-[4.5rem]">
             The Index Layer for{" "}
             <span className="whitespace-nowrap text-success">Fan Tokens</span>
           </h1>
 
-          <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-base sm:leading-relaxed lg:text-lg">
+          <p className="mt-4 max-w-xl text-pretty text-[16px] leading-relaxed text-muted-foreground sm:mt-6 sm:text-base sm:leading-relaxed lg:text-lg">
             Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
           </p>
 
-          <div className="mt-6 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
+          <div className="mt-8 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
             <Link href="/indices">
               <Button
                 size="lg"
-                className="h-12 w-full rounded-full bg-success px-6 text-sm font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
+                className="h-13 w-full rounded-full bg-success px-6 text-base font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 Explore Indices
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -127,7 +127,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 w-full rounded-full border-border bg-card/40 px-6 text-sm font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
+                className="h-13 w-full rounded-full border-border bg-card/40 px-6 text-base font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 View Market
               </Button>
@@ -143,10 +143,10 @@ export function HeroSection() {
         </div>
 
         {/* Right — globe + floating cards
-            Mobile: absolute positioned background on the right edge
+            Mobile: hidden
             sm+: regular grid column
         */}
-        <div className="absolute right-0 top-0 h-full w-1/2 sm:relative sm:w-auto sm:h-auto sm:max-w-[640px] sm:mx-0">
+        <div className="hidden sm:block sm:relative sm:w-auto sm:h-auto sm:max-w-[640px] sm:mx-0">
           {/* Preserve aspect ratio on sm+ */}
           <div className="relative w-full h-full sm:aspect-square sm:w-full sm:overflow-visible">
             {/* Soft glow behind globe */}
