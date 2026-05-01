@@ -152,7 +152,7 @@ function AvailableIndexCard({
   }, [history90d])
 
   return (
-    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden min-h-[520px] flex flex-col">
+    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden min-h-[560px] flex flex-col">
       {/* Subtle video bg */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-60 dark:opacity-15 pointer-events-none">
         <video
