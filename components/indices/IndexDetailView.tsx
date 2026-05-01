@@ -9,8 +9,7 @@ import Link from "next/link"
 import type { IndexData } from "./IndexCard"
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
-import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice } from "@/lib/data/indices"
+import { useIndexNav } from "@/lib/hooks/use-index-nav"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useReadContract } from "wagmi"
 import useSWR from "swr"
@@ -54,7 +53,9 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   const [showBuyDialog, setShowBuyDialog] = useState(false)
   const [timePeriod, setTimePeriod] = useState<"24h" | "7d" | "30d" | "90d">("30d")
 
-  const { prices: liveTokenPrices } = useCoinGeckoPrices()
+  // Canonical NAV (shared with the cards on /indices and the home portfolio
+  // panel) — this is the single source of truth for the displayed price.
+  const { navPrice, displayPrice, livePrices: liveTokenPrices } = useIndexNav(index)
 
   // ── Dynamic fee from the on-chain vault ────────────────────────────────
   const contracts = getContractAddresses(index.id)
@@ -110,56 +111,31 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   const historyLoading =
     timePeriod === "24h" ? history24hLoading : history90dLoading
 
-  // Canonical NAV (same formula as the index card and home page): a weighted
-  // average of the live CoinGecko CHZ prices. We prefer this over the history
-  // endpoint's last point because:
-  //   1. Live prices include every constituent (history may silently drop
-  //      tokens without a CoinGecko id, biasing the aggregate).
-  //   2. The card and home use this exact value — keeping a single source of
-  //      truth avoids visual drift between views.
-  const navPrice = useMemo(() => {
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      const nav = calculateIndexPrice(index.tokens, liveTokenPrices, index.weights)
-      if (nav > 0) return nav
-    }
-    const data24h = history24hData?.data
-    if (data24h && data24h.length > 0) return data24h[data24h.length - 1].price
-    const data90d = history90dData?.data
-    if (data90d && data90d.length > 0) return data90d[data90d.length - 1].price
-    return Number.parseFloat(index.price) || 0
-  }, [liveTokenPrices, history24hData, history90dData, index.tokens, index.weights, index.price])
-
-  // 2 decimals — matches IndexCard / home rendering
-  const displayPrice = navPrice.toFixed(2)
-
-  // Pre-compute all four slices:
-  //  - 24h uses its own hourly dataset
-  //  - 7d/30d/90d are sliced from the 90d daily dataset
+  // Pre-compute all four chart slices.
   //
-  // IMPORTANT: 24h and 90d come from different CoinGecko endpoints with
-  // different granularity, and neither necessarily matches the live NAV
-  // exactly (the history endpoint silently drops tokens missing a CG id,
-  // while the canonical NAV uses static fallbacks for those). To present a
-  // single coherent price across the whole UI we **anchor** each historical
-  // series to the live NAV: multiply every point by `nav / lastHistorical`,
-  // which preserves the shape and all percentage returns while pinning the
-  // last point exactly to the headline NAV.
+  // The history endpoint aggregates per-token CHZ prices using the *same*
+  // weights as `calculateIndexPrice` (forwarded via `&weights=...`), so each
+  // point is a historical NAV computed with the canonical formula. We then
+  // anchor the entire series so its last point exactly matches the live NAV
+  // shown in the headline — multiplying every point by `navPrice / lastHist`.
+  // This preserves all percentage returns (the shape of the line) while
+  // putting the chart and headline on the same absolute scale, eliminating
+  // any visual mismatch between "current price" and "where the chart ends".
   const slices = useMemo(() => {
     const daily = history90dData?.data ?? []
     const hourly = history24hData?.data ?? []
 
-    const anchor = (arr: HistoricalDataPoint[]): HistoricalDataPoint[] => {
+    const anchorToNav = (arr: HistoricalDataPoint[]): HistoricalDataPoint[] => {
       if (arr.length === 0 || navPrice <= 0) return arr
       const last = arr[arr.length - 1].price
       if (!last || last <= 0) return arr
       const scale = navPrice / last
-      // No-op when already aligned to avoid pointless re-allocation
       if (Math.abs(scale - 1) < 1e-6) return arr
       return arr.map(p => ({ ...p, price: p.price * scale }))
     }
 
-    const hourlyAnchored = anchor(hourly)
-    const dailyAnchored = anchor(daily)
+    const hourlyAnchored = anchorToNav(hourly)
+    const dailyAnchored = anchorToNav(daily)
 
     return {
       "24h": hourlyAnchored,

@@ -9,8 +9,7 @@ import { ShareCardModal } from "@/components/share/ShareCardModal"
 import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
-import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { calculateIndexPrice } from "@/lib/data/indices"
+import { useIndexNav } from "@/lib/hooks/use-index-nav"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import Image from "next/image"
 import useSWR from "swr"
@@ -45,7 +44,9 @@ export function IndexCard({ index }: IndexCardProps) {
   const [showBuyDialog, setShowBuyDialog] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
 
-  const { prices: liveTokenPrices } = useCoinGeckoPrices()
+  // Canonical NAV — shared across the home portfolio panel, the cards on
+  // /indices, and the /indices/{symbol} detail view. See `useIndexNav`.
+  const { displayPrice } = useIndexNav(index)
 
   // Build query string with weights so the history endpoint returns
   // a properly-weighted aggregate matching the canonical NAV formula.
@@ -68,24 +69,6 @@ export function IndexCard({ index }: IndexCardProps) {
     fetcher,
     { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
   )
-
-  // NAV: same calculation used on the home page — weighted average of the
-  // current live token prices. This is the canonical "spot" NAV. We only
-  // fall back to historical or static price when live prices haven't loaded.
-  const navPrice = useMemo(() => {
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      const nav = calculateIndexPrice(index.tokens, liveTokenPrices, index.weights)
-      if (nav > 0) return nav
-    }
-    const data24h = history24h?.data
-    if (data24h && data24h.length > 0) {
-      return data24h[data24h.length - 1].price
-    }
-    return Number.parseFloat(index.price)
-  }, [liveTokenPrices, history24h, index.tokens, index.weights, index.price])
-
-  // 2 decimals to match the NAV format used on the home page
-  const displayPrice = navPrice.toFixed(2)
 
   const return24h = useMemo(() => {
     const data = history24h?.data
