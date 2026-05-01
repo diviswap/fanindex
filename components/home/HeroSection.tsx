@@ -94,52 +94,57 @@ export function HeroSection() {
                   globe clipped by container edge on the right.
         Desktop → same two columns but fully proportional with more breathing room.
       */}
-      <div className="relative mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-0 px-4 pt-24 pb-0 sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-[1.1fr_minmax(0,180px)] items-center gap-3 px-4 pt-20 pb-10 sm:grid-cols-[1fr_auto] sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
 
         {/* Left — copy */}
-        <div className="relative z-10 pb-8 sm:pb-0">
-          <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1 backdrop-blur sm:gap-2.5 sm:px-3.5 sm:py-1.5">
+        <div className="relative z-10 min-w-0">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/[0.06] px-2.5 py-1 backdrop-blur sm:gap-2.5 sm:px-3.5 sm:py-1.5">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
             </span>
-            <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-foreground/90 sm:text-[11px]">
-              Now Live on Chiliz Chain
+            <span className="text-[9px] font-medium uppercase tracking-[0.12em] text-foreground/90 sm:text-[11px] sm:tracking-[0.14em] whitespace-nowrap">
+              Live on Chiliz
             </span>
           </div>
 
-          <h1 className="mt-5 text-balance text-3xl font-semibold leading-[1.05] tracking-tight text-foreground sm:mt-7 sm:text-5xl lg:text-[4.5rem]">
+          <h1 className="mt-3 text-balance text-[22px] font-semibold leading-[1.1] tracking-tight text-foreground sm:mt-7 sm:text-5xl sm:leading-[1.05] lg:text-[4.5rem]">
             The Index Layer for{" "}
             <span className="whitespace-nowrap text-success">Fan Tokens</span>
           </h1>
 
-          <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base lg:text-lg">
-            Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
+          <p className="mt-2.5 max-w-xl text-pretty text-[12px] leading-snug text-muted-foreground sm:mt-6 sm:text-base sm:leading-relaxed lg:text-lg">
+            <span className="hidden sm:inline">
+              Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
+            </span>
+            <span className="sm:hidden">
+              Tokenized sports indices &amp; portfolio infrastructure for SportFi.
+            </span>
           </p>
 
-          <div className="mt-6 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center">
+          <div className="mt-4 flex flex-col items-stretch gap-2 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
             <Link href="/indices">
               <Button
                 size="lg"
-                className="h-11 w-full rounded-full bg-success px-6 text-sm font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7"
+                className="h-9 w-full rounded-full bg-success px-4 text-[12px] font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 Explore Indices
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5 sm:ml-2 sm:h-4 sm:w-4" />
               </Button>
             </Link>
             <Link href="/fan-tokens">
               <Button
                 size="lg"
                 variant="outline"
-                className="h-11 w-full rounded-full border-border bg-card/40 px-6 text-sm font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7"
+                className="h-9 w-full rounded-full border-border bg-card/40 px-4 text-[12px] font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 View Market
               </Button>
             </Link>
           </div>
 
-          {/* Trust indicators */}
-          <div className="mt-8 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:mt-12">
+          {/* Trust indicators — hidden on mobile to keep hero compact */}
+          <div className="mt-12 hidden grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:grid">
             <TrustItem icon={Hexagon} label="On-Chain Infrastructure" />
             <TrustItem icon={Activity} label="NFT-Based Positions" />
             <TrustItem icon={BarChart3} label="Real-Time Analytics" />
@@ -148,11 +153,12 @@ export function HeroSection() {
 
         {/* Right — globe + floating cards */}
         {/*
-          Mobile: fixed width so globe is partially cropped on the right edge.
-          The negative right margin lets the globe bleed off-screen intentionally.
+          Mobile: 180px column so globe fits beside copy without forcing
+          a stack. Negative right margin lets it bleed off the right edge
+          for a cinematic crop.
           sm+: natural sizing within the grid column.
         */}
-        <div className="relative w-[260px] flex-shrink-0 -mr-4 sm:w-full sm:mr-0 sm:max-w-[640px] sm:mx-auto lg:mx-0">
+        <div className="relative w-full max-w-[180px] flex-shrink-0 justify-self-end -mr-6 sm:w-full sm:max-w-[640px] sm:mr-0 sm:mx-auto lg:mx-0">
           {/* Preserve aspect ratio */}
           <div className="relative aspect-square w-full overflow-visible">
             {/* Soft glow behind globe */}
