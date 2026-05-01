@@ -124,7 +124,7 @@ export function IndexCard({ index }: IndexCardProps) {
   return (
     <>
       <Link href={`/indices/${index.symbol ?? index.id}`} className="block h-full group">
-          <div className="h-full border border-border bg-card/80 backdrop-blur-sm p-5 sm:p-7 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
+          <div className="h-full min-h-[580px] border border-border bg-card/80 backdrop-blur-sm p-5 sm:p-7 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
                 {/* Header row — symbol + type chip + name */}
@@ -227,8 +227,8 @@ export function IndexCard({ index }: IndexCardProps) {
                             <Image
                               src={tokenData.icon}
                               alt={symbol}
-                              width={14}
-                              height={14}
+                              width={18}
+                              height={18}
                               className="rounded-full"
                             />
                           )}

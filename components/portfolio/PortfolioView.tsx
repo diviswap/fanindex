@@ -152,7 +152,7 @@ function AvailableIndexCard({
   }, [history90d])
 
   return (
-    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden">
+    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden min-h-[520px]">
       {/* Subtle video bg */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-60 dark:opacity-15 pointer-events-none">
         <video
@@ -258,8 +258,8 @@ function AvailableIndexCard({
                   <Image
                     src={tokenData.icon}
                     alt={symbol}
-                    width={11}
-                    height={11}
+                    width={14}
+                    height={14}
                     className="rounded-full"
                   />
                 )}
