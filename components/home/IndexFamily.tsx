@@ -126,7 +126,7 @@ interface FamilyCardItem {
   title: string
   tagline: string
   description: string
-  icon: React.ComponentType<{ className?: string; strokeWidth?: number }>
+  icon: React.ComponentType<any>
   accent: string
   accentBg: string
   nav: string
