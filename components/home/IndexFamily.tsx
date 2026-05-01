@@ -157,9 +157,9 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
         }}
       />
 
-      <div className="relative flex h-full flex-col">
-        {/* Header: icon + category badge */}
-        <div className="flex items-center justify-between">
+      <div className="relative h-[420px] flex flex-col gap-4">
+        {/* Header: icon + category badge — fixed height */}
+        <div className="h-10 flex items-center justify-between">
           <div
             className={`flex h-9 w-9 items-center justify-center rounded-lg border ${item.accentBg}`}
           >
@@ -170,8 +170,8 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
           </span>
         </div>
 
-        {/* Ticker + title */}
-        <div className="mt-6">
+        {/* Ticker + title + description — fixed height */}
+        <div className="h-28">
           <div className="flex items-baseline gap-2">
             <span className="font-mono text-base font-semibold tracking-tight text-foreground">
               {item.ticker}
@@ -183,17 +183,17 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
           <h3 className="mt-1.5 text-lg font-semibold tracking-tight text-foreground sm:text-xl">
             {item.title}
           </h3>
-          <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground line-clamp-2">
             {item.description}
           </p>
         </div>
 
-        {/* Token logo stack */}
-        <div className="mt-6">
+        {/* Token logo stack — flex-grow to take remaining space */}
+        <div className="flex-1 min-h-16 flex flex-col">
           <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground mb-2.5">
             Constituents
           </div>
-          <div className="flex items-center">
+          <div className="flex items-start">
             <div className="flex -space-x-2">
               {visibleTokens.map((sym) => {
                 const t = getTokenBySymbol(sym)
@@ -228,8 +228,8 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
           </div>
         </div>
 
-        {/* Footer: NAV + view */}
-        <div className="mt-7 flex items-end justify-between border-t border-border/60 pt-5">
+        {/* Footer: NAV + view — fixed height at bottom */}
+        <div className="h-20 flex items-end justify-between border-t border-border/60 pt-4">
           <div>
             <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
               NAV
