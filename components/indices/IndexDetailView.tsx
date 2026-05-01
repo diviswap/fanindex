@@ -137,27 +137,35 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   //  - 7d/30d/90d are sliced from the 90d daily dataset
   //
   // IMPORTANT: 24h and 90d come from different CoinGecko endpoints with
-  // different granularity, and neither necessarily matches the live NAV.
-  // To present a single coherent "current price" across all tabs, we replace
-  // the last point of every series with the canonical NAV (live CG prices),
-  // so every chart terminates exactly at the headline number.
+  // different granularity, and neither necessarily matches the live NAV
+  // exactly (the history endpoint silently drops tokens missing a CG id,
+  // while the canonical NAV uses static fallbacks for those). To present a
+  // single coherent price across the whole UI we **anchor** each historical
+  // series to the live NAV: multiply every point by `nav / lastHistorical`,
+  // which preserves the shape and all percentage returns while pinning the
+  // last point exactly to the headline NAV.
   const slices = useMemo(() => {
     const daily = history90dData?.data ?? []
     const hourly = history24hData?.data ?? []
 
-    const replaceLastWithNav = (arr: HistoricalDataPoint[]) =>
-      arr.length > 0 && navPrice > 0
-        ? [...arr.slice(0, -1), { ...arr[arr.length - 1], price: navPrice }]
-        : arr
+    const anchor = (arr: HistoricalDataPoint[]): HistoricalDataPoint[] => {
+      if (arr.length === 0 || navPrice <= 0) return arr
+      const last = arr[arr.length - 1].price
+      if (!last || last <= 0) return arr
+      const scale = navPrice / last
+      // No-op when already aligned to avoid pointless re-allocation
+      if (Math.abs(scale - 1) < 1e-6) return arr
+      return arr.map(p => ({ ...p, price: p.price * scale }))
+    }
 
-    const hourlySynced = replaceLastWithNav(hourly)
-    const dailySynced = replaceLastWithNav(daily)
+    const hourlyAnchored = anchor(hourly)
+    const dailyAnchored = anchor(daily)
 
     return {
-      "24h": hourlySynced,
-      "7d":  sliceByDays(dailySynced, 7),
-      "30d": sliceByDays(dailySynced, 30),
-      "90d": sliceByDays(dailySynced, 90),
+      "24h": hourlyAnchored,
+      "7d":  sliceByDays(dailyAnchored, 7),
+      "30d": sliceByDays(dailyAnchored, 30),
+      "90d": sliceByDays(dailyAnchored, 90),
     }
   }, [history90dData, history24hData, navPrice])
 
