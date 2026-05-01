@@ -10,6 +10,20 @@ import { useMemo } from "react"
 
 const INDEX_TICKERS = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"] as const
 
+/**
+ * Positions are intentionally spread so no two cards share the same
+ * vertical band on the globe. Layout (% from each edge):
+ *
+ *  FTLX  — top-left corner  (top ~5%, left -6%)
+ *  FGMX  — top-right corner (top ~14%, right -6%)
+ *  FSLX  — mid-left         (top ~42%, left -12%)
+ *  FFLX  — lower-left       (bottom ~22%, left -8%)
+ *  FELX  — bottom-right     (bottom ~6%, right -2%)
+ *
+ * FFLX and FSLX are on the same side (left) but clearly separated
+ * vertically: FSLX at top-42% (~58% from top) vs FFLX at bottom-22%
+ * (~78% from top) — 20 percentage points apart.
+ */
 const TICKER_META: Record<
   (typeof INDEX_TICKERS)[number],
   { label: string; category: string; position: string; delay: string }
@@ -17,32 +31,32 @@ const TICKER_META: Record<
   FTLX: {
     label: "Fan Token Leaders",
     category: "Benchmark",
-    position: "top-[6%] left-[2%] sm:left-[-4%]",
+    position: "top-[5%] left-[0%] sm:left-[-4%]",
     delay: "0s",
   },
   FGMX: {
     label: "Fan Gaming",
     category: "Esports",
-    position: "top-[18%] right-[2%] sm:right-[-6%]",
+    position: "top-[14%] right-[0%] sm:right-[-6%]",
     delay: "0.6s",
+  },
+  FSLX: {
+    label: "Spanish League",
+    category: "Football",
+    position: "top-[42%] left-[0%] sm:left-[-12%]",
+    delay: "2.4s",
   },
   FFLX: {
     label: "Fan Fight",
     category: "Combat",
-    position: "bottom-[42%] left-[-2%] sm:left-[-8%]",
+    position: "bottom-[22%] left-[2%] sm:left-[-8%]",
     delay: "1.2s",
   },
   FELX: {
     label: "English League",
     category: "Football",
-    position: "bottom-[10%] right-[6%] sm:right-[-2%]",
+    position: "bottom-[5%] right-[0%] sm:right-[-2%]",
     delay: "1.8s",
-  },
-  FSLX: {
-    label: "Spanish League",
-    category: "Football",
-    position: "top-[44%] left-[-4%] sm:left-[-12%]",
-    delay: "2.4s",
   },
 }
 
@@ -60,7 +74,7 @@ export function HeroSection() {
 
   return (
     <section className="relative w-full overflow-x-hidden border-b border-border/40">
-      {/* Subtle radial gradient backdrop */}
+      {/* Radial backdrop glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-60"
@@ -74,35 +88,40 @@ export function HeroSection() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/40 to-transparent"
       />
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-0 px-6 pt-28 pb-0 sm:gap-10 sm:pb-20 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+      {/*
+        Layout:
+        Mobile  → two columns: copy (left) | globe (right), both visible side-by-side,
+                  globe clipped by container edge on the right.
+        Desktop → same two columns but fully proportional with more breathing room.
+      */}
+      <div className="relative mx-auto grid max-w-7xl grid-cols-[1fr_auto] items-center gap-0 px-4 pt-24 pb-0 sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+
         {/* Left — copy */}
-        <div className="relative z-10 pb-6 sm:pb-0">
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur">
+        <div className="relative z-10 pb-8 sm:pb-0">
+          <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1 backdrop-blur sm:gap-2.5 sm:px-3.5 sm:py-1.5">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
             </span>
-            <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
+            <span className="text-[10px] font-medium uppercase tracking-[0.14em] text-foreground/90 sm:text-[11px]">
               Now Live on Chiliz Chain
             </span>
           </div>
 
-          <h1 className="mt-7 text-balance text-5xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-[4.5rem]">
+          <h1 className="mt-5 text-balance text-3xl font-semibold leading-[1.05] tracking-tight text-foreground sm:mt-7 sm:text-5xl lg:text-[4.5rem]">
             The Index Layer for{" "}
-            <span className="relative whitespace-nowrap text-success">
-              Fan Tokens
-            </span>
+            <span className="whitespace-nowrap text-success">Fan Tokens</span>
           </h1>
 
-          <p className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-muted-foreground sm:mt-6 sm:text-base lg:text-lg">
             Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
           </p>
 
-          <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+          <div className="mt-6 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center">
             <Link href="/indices">
               <Button
                 size="lg"
-                className="h-12 w-full rounded-full bg-success px-7 text-sm font-semibold text-success-foreground hover:bg-success/90 sm:w-auto"
+                className="h-11 w-full rounded-full bg-success px-6 text-sm font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7"
               >
                 Explore Indices
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -112,7 +131,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 w-full rounded-full border-border bg-card/40 px-7 text-sm font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:w-auto"
+                className="h-11 w-full rounded-full border-border bg-card/40 px-6 text-sm font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7"
               >
                 View Market
               </Button>
@@ -120,7 +139,7 @@ export function HeroSection() {
           </div>
 
           {/* Trust indicators */}
-          <div className="mt-12 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40">
+          <div className="mt-8 grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 sm:mt-12">
             <TrustItem icon={Hexagon} label="On-Chain Infrastructure" />
             <TrustItem icon={Activity} label="NFT-Based Positions" />
             <TrustItem icon={BarChart3} label="Real-Time Analytics" />
@@ -128,24 +147,30 @@ export function HeroSection() {
         </div>
 
         {/* Right — globe + floating cards */}
-        <div className="relative w-full mx-auto lg:mx-0 aspect-square max-w-[480px] sm:max-w-[640px] overflow-visible -mb-16 sm:mb-0">
-          {/* Soft green glow behind globe */}
-          <div
-            aria-hidden
-            className="absolute inset-[12%] rounded-full opacity-50 blur-3xl"
-            style={{
-              background:
-                "radial-gradient(circle, color-mix(in oklch, var(--success) 35%, transparent), transparent 70%)",
-            }}
-          />
+        {/*
+          Mobile: fixed width so globe is partially cropped on the right edge.
+          The negative right margin lets the globe bleed off-screen intentionally.
+          sm+: natural sizing within the grid column.
+        */}
+        <div className="relative w-[260px] flex-shrink-0 -mr-4 sm:w-full sm:mr-0 sm:max-w-[640px] sm:mx-auto lg:mx-0">
+          {/* Preserve aspect ratio */}
+          <div className="relative aspect-square w-full overflow-visible">
+            {/* Soft glow behind globe */}
+            <div
+              aria-hidden
+              className="absolute inset-[12%] rounded-full opacity-50 blur-3xl"
+              style={{
+                background:
+                  "radial-gradient(circle, color-mix(in oklch, var(--success) 35%, transparent), transparent 70%)",
+              }}
+            />
 
-          <div className="relative h-full w-full">
             <Image
               src="/images/globe.png"
               alt="Global SportFi network visualization"
               fill
               priority
-              sizes="(max-width: 1024px) 90vw, 640px"
+              sizes="(max-width: 640px) 260px, (max-width: 1024px) 90vw, 640px"
               className="object-contain"
               style={{
                 mixBlendMode: "screen",
@@ -155,30 +180,30 @@ export function HeroSection() {
                   "radial-gradient(ellipse 90% 80% at 50% 44%, black 30%, rgba(0,0,0,0.55) 55%, transparent 70%)",
               }}
             />
-          </div>
 
-          {/* Floating ETF-style cards */}
-          {INDEX_TICKERS.map((ticker) => {
-            const meta = TICKER_META[ticker]
-            const price = indexPrices.get(ticker)
-            return (
-              <div
-                key={ticker}
-                className={`absolute ${meta.position} hidden sm:block`}
-                style={{
-                  animation: `float-y 7s ease-in-out infinite`,
-                  animationDelay: meta.delay,
-                }}
-              >
-                <FloatingTickerCard
-                  ticker={ticker}
-                  label={meta.label}
-                  category={meta.category}
-                  price={price}
-                />
-              </div>
-            )
-          })}
+            {/* Floating ETF-style cards — hidden on mobile, visible sm+ */}
+            {INDEX_TICKERS.map((ticker) => {
+              const meta = TICKER_META[ticker]
+              const price = indexPrices.get(ticker)
+              return (
+                <div
+                  key={ticker}
+                  className={`absolute ${meta.position} hidden sm:block`}
+                  style={{
+                    animation: `float-y 7s ease-in-out infinite`,
+                    animationDelay: meta.delay,
+                  }}
+                >
+                  <FloatingTickerCard
+                    ticker={ticker}
+                    label={meta.label}
+                    category={meta.category}
+                    price={price}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
 
@@ -200,9 +225,9 @@ function TrustItem({
   label: string
 }) {
   return (
-    <div className="flex items-center gap-2.5 bg-background px-4 py-3.5">
-      <Icon className="h-3.5 w-3.5 text-success" />
-      <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+    <div className="flex items-center gap-1.5 bg-background px-2 py-3 sm:gap-2.5 sm:px-4 sm:py-3.5">
+      <Icon className="h-3 w-3 flex-shrink-0 text-success sm:h-3.5 sm:w-3.5" />
+      <span className="text-[9px] font-medium uppercase leading-tight tracking-[0.06em] text-muted-foreground sm:text-[11px] sm:tracking-[0.08em]">
         {label}
       </span>
     </div>
@@ -221,7 +246,10 @@ function FloatingTickerCard({
   price?: string
 }) {
   return (
-    <div className="group relative w-[180px] rounded-xl border border-border/80 bg-card/70 p-3.5 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.6)] transition-all hover:border-success/40 hover:shadow-[0_8px_40px_-8px_color-mix(in_oklch,var(--success)_30%,transparent)]">
+    <Link
+      href={`/indices/${ticker.toLowerCase()}`}
+      className="group relative block w-[160px] rounded-xl border border-border/80 bg-card/70 p-3 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.6)] transition-all hover:border-success/40 hover:shadow-[0_8px_40px_-8px_color-mix(in_oklch,var(--success)_30%,transparent)] hover:-translate-y-0.5 sm:w-[180px] sm:p-3.5"
+    >
       {/* Edge highlight */}
       <div
         aria-hidden
@@ -238,22 +266,22 @@ function FloatingTickerCard({
           </span>
           <span className="h-1.5 w-1.5 rounded-full bg-success/80" />
         </div>
-        <div className="mt-2.5 flex items-baseline gap-1.5">
-          <span className="font-mono text-base font-semibold tracking-tight text-foreground">
+        <div className="mt-2 flex items-baseline gap-1.5 sm:mt-2.5">
+          <span className="font-mono text-sm font-semibold tracking-tight text-foreground sm:text-base">
             {ticker}
           </span>
         </div>
         <div className="mt-0.5 truncate text-[11px] text-muted-foreground">
           {label}
         </div>
-        <div className="mt-3 flex items-baseline justify-between border-t border-border/60 pt-2.5">
+        <div className="mt-2.5 flex items-baseline justify-between border-t border-border/60 pt-2 sm:mt-3 sm:pt-2.5">
           <span className="text-[10px] uppercase tracking-wider text-muted-foreground">NAV</span>
-          <span className="font-mono text-sm font-semibold text-foreground">
-            {price ? `${price}` : "—"}
-            <span className="ml-1 text-[10px] text-muted-foreground">CHZ</span>
+          <span className="font-mono text-xs font-semibold text-foreground sm:text-sm">
+            {price ?? "—"}
+            <span className="ml-0.5 text-[10px] text-muted-foreground">CHZ</span>
           </span>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
