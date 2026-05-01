@@ -29,7 +29,7 @@ const TICKER_META: Record<
   FFLX: {
     label: "Fan Fight",
     category: "Combat",
-    position: "bottom-[26%] left-[-2%] sm:left-[-8%]",
+    position: "bottom-[42%] left-[-2%] sm:left-[-8%]",
     delay: "1.2s",
   },
   FELX: {
@@ -59,7 +59,7 @@ export function HeroSection() {
   }, [liveTokenPrices])
 
   return (
-    <section className="relative w-full overflow-hidden border-b border-border/40">
+    <section className="relative w-full overflow-x-hidden border-b border-border/40">
       {/* Subtle radial gradient backdrop */}
       <div
         aria-hidden
@@ -74,9 +74,9 @@ export function HeroSection() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/40 to-transparent"
       />
 
-      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 pt-28 pb-20 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-0 px-6 pt-28 pb-0 sm:gap-10 sm:pb-20 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
         {/* Left — copy */}
-        <div className="relative z-10">
+        <div className="relative z-10 pb-6 sm:pb-0">
           <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
@@ -128,7 +128,7 @@ export function HeroSection() {
         </div>
 
         {/* Right — globe + floating cards */}
-        <div className="relative aspect-square w-full max-w-[640px] mx-auto lg:mx-0">
+        <div className="relative w-full mx-auto lg:mx-0 aspect-square max-w-[480px] sm:max-w-[640px] overflow-visible -mb-16 sm:mb-0">
           {/* Soft green glow behind globe */}
           <div
             aria-hidden
@@ -150,9 +150,9 @@ export function HeroSection() {
               style={{
                 mixBlendMode: "screen",
                 maskImage:
-                  "radial-gradient(circle at 50% 48%, black 38%, rgba(0,0,0,0.6) 50%, transparent 62%)",
+                  "radial-gradient(ellipse 90% 80% at 50% 44%, black 30%, rgba(0,0,0,0.55) 55%, transparent 70%)",
                 WebkitMaskImage:
-                  "radial-gradient(circle at 50% 48%, black 38%, rgba(0,0,0,0.6) 50%, transparent 62%)",
+                  "radial-gradient(ellipse 90% 80% at 50% 44%, black 30%, rgba(0,0,0,0.55) 55%, transparent 70%)",
               }}
             />
           </div>
