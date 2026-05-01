@@ -18,7 +18,6 @@ import { useState, useMemo } from "react"
 import { RedeemDialog } from "./RedeemDialog"
 import { BuyIndexDialog } from "@/components/indices/BuyIndexDialog"
 import type { IndexData } from "@/components/indices/IndexCard"
-import { PieChart as RechartsPie, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts"
 import { TransactionHistory } from "./TransactionHistory"
 import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
 import { getTokenByAddress, getTokenBySymbol, FAN_TOKENS } from "@/lib/data/fan-tokens"
@@ -27,6 +26,7 @@ import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import { NFTPositionCard } from "./NFTPositionCard"
 import { Sparkline } from "@/components/ui/sparkline"
+import { PortfolioAllocation, type AllocationItem } from "./PortfolioAllocation"
 import Image from "next/image"
 import useSWR from "swr"
 
@@ -36,14 +36,6 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json())
 // Keep this list in sync with ETF_CONTRACTS (lib/contracts/abis.ts) and
 // DEPLOYED_INDICES in lib/hooks/use-portfolio-onchain.ts.
 const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"]
-
-const CHART_COLORS = {
-  weighted: "#3b82f6",
-  equal: "#a855f7",
-  managed: "#10b981",
-  chz: "#f59e0b",
-  fanTokens: "#ec4899",
-}
 
 const typeColors: Record<string, string> = {
   weighted: "text-blue-400",
@@ -451,16 +443,24 @@ export function PortfolioView() {
     }
   }, [holdings, priceMap, chzBalance, userFanTokens])
 
-  // ── Chart data ────────────────────────────────────────────────────────────
-  const chartData = useMemo(() => {
-    const data: { name: string; value: number; type: string }[] = []
+  // ── Allocation items ──────────────────────────────────────────────────────
+  // Includes every value-bearing bucket: NFT positions, raw CHZ balance,
+  // and individual fan tokens — sorted in the chart by value descending.
+  const allocationItems = useMemo<AllocationItem[]>(() => {
+    const items: AllocationItem[] = []
 
-    // Add CHZ balance
+    // CHZ balance
     if (portfolioStats.chzValue > 0) {
-      data.push({ name: "CHZ Balance", value: portfolioStats.chzValue, type: "chz" })
+      items.push({
+        id: "chz",
+        name: "CHZ",
+        sublabel: "Native balance",
+        value: portfolioStats.chzValue,
+        category: "chz",
+      })
     }
 
-    // Add NFT positions
+    // NFT positions, one slice per index position
     holdings.forEach((h) => {
       const val = h.tokenAddresses.reduce((s, addr, i) => {
         if (!addr || typeof addr !== "string") return s
@@ -469,13 +469,32 @@ export function PortfolioView() {
         return s + amt * price
       }, 0)
       if (val > 0) {
-        const idx = INDICES.find((idx) => idx.id === h.indexId)
-        data.push({ name: h.indexName, value: val, type: idx?.type ?? "equal" })
+        items.push({
+          id: `nft-${h.tokenId.toString()}`,
+          name: h.indexName,
+          sublabel: `Position #${h.tokenId.toString()}`,
+          value: val,
+          category: "nft",
+        })
       }
     })
 
-    return data
-  }, [holdings, priceMap, portfolioStats.chzValue])
+    // Fan tokens held directly in the wallet
+    userFanTokens.forEach((t) => {
+      if (t.valueInCHZ > 0) {
+        items.push({
+          id: `token-${t.address}`,
+          name: t.symbol,
+          sublabel: t.name,
+          value: t.valueInCHZ,
+          category: "token",
+          icon: t.icon,
+        })
+      }
+    })
+
+    return items
+  }, [holdings, priceMap, portfolioStats.chzValue, userFanTokens])
 
   // ── Handlers ──────────────────────────────────���───────────────────────────
   const handleSell = (holding: NFTHolding) => {
@@ -791,48 +810,11 @@ export function PortfolioView() {
       </div>
 
       {/* Allocation chart (only when positions exist) */}
-      {chartData.length > 0 && (
-        <div className="border border-border bg-card backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-sm">
-          <h3 className="text-xl font-bold text-foreground mb-6">Portfolio Allocation</h3>
-          <div className="h-[280px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsPie>
-                <Pie
-                  data={chartData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) =>
-                    `${name}: ${(percent * 100).toFixed(1)}%`
-                  }
-                  outerRadius={90}
-                  dataKey="value"
-                >
-                  {chartData.map((entry, i) => (
-                    <Cell
-                      key={`cell-${i}`}
-                      fill={CHART_COLORS[entry.type as keyof typeof CHART_COLORS] ?? "#6b7280"}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--popover))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "8px",
-                  }}
-                  formatter={(value: number) => [`${value.toFixed(2)} CHZ`, "Value"]}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: "12px" }}
-                  formatter={(value) => (
-                    <span className="text-foreground text-xs">{value}</span>
-                  )}
-                />
-              </RechartsPie>
-            </ResponsiveContainer>
-          </div>
-        </div>
+      {allocationItems.length > 0 && (
+        <PortfolioAllocation
+          items={allocationItems}
+          totalValue={portfolioStats.totalValue}
+        />
       )}
 
       {/* Transaction History */}
