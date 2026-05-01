@@ -82,48 +82,23 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       ? `&weights=${index.weights.join(",")}`
       : ""
 
-  // Two separate fetches:
-  //  - 90d daily data (used for 7d/30d/90d slices)
-  //  - 24h hourly data (API returns hourly points for days=1)
-  // This is necessary because 90d data only has daily granularity — slicing it
-  // to the last 24h would yield just 1 point and no chart line.
-  const { data: history90dData, isLoading: history90dLoading } = useSWR<HistoryResponse>(
+  // Single fetch for the full 90d daily dataset. All four time periods
+  // (including "24h" which shows the last 2 days) are derived from this same
+  // dataset using sliceByDays — identical logic, identical aggregation.
+  const { data: history90dData, isLoading: historyLoading } = useSWR<HistoryResponse>(
     `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsQuery}`,
     fetcher,
     {
-      refreshInterval: 600000,
-      revalidateOnFocus: false,
-      dedupingInterval: 120000,
-    }
-  )
-
-  const { data: history24hData, isLoading: history24hLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
-    fetcher,
-    {
-      refreshInterval: 300000, // 5 min — more frequent for 24h view
+      refreshInterval: 300000,
       revalidateOnFocus: false,
       dedupingInterval: 60000,
     }
   )
 
-  // Show loader only when the currently-selected period is still loading
-  const historyLoading =
-    timePeriod === "24h" ? history24hLoading : history90dLoading
-
-  // Pre-compute all four chart slices.
-  //
-  // The history endpoint aggregates per-token CHZ prices using the *same*
-  // weights as `calculateIndexPrice` (forwarded via `&weights=...`), so each
-  // point is a historical NAV computed with the canonical formula. We then
-  // anchor the entire series so its last point exactly matches the live NAV
-  // shown in the headline — multiplying every point by `navPrice / lastHist`.
-  // This preserves all percentage returns (the shape of the line) while
-  // putting the chart and headline on the same absolute scale, eliminating
-  // any visual mismatch between "current price" and "where the chart ends".
+  // All four slices from the same dataset — same logic, same aggregation.
+  // "24h" shows 2 days of daily points so there is always more than 1 point.
   const slices = useMemo(() => {
     const daily = history90dData?.data ?? []
-    const hourly = history24hData?.data ?? []
 
     const anchorToNav = (arr: HistoricalDataPoint[]): HistoricalDataPoint[] => {
       if (arr.length === 0 || navPrice <= 0) return arr
@@ -134,16 +109,15 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       return arr.map(p => ({ ...p, price: p.price * scale }))
     }
 
-    const hourlyAnchored = anchorToNav(hourly)
-    const dailyAnchored = anchorToNav(daily)
+    const anchored = anchorToNav(daily)
 
     return {
-      "24h": hourlyAnchored,
-      "7d":  sliceByDays(dailyAnchored, 7),
-      "30d": sliceByDays(dailyAnchored, 30),
-      "90d": sliceByDays(dailyAnchored, 90),
+      "24h": sliceByDays(anchored, 2),
+      "7d":  sliceByDays(anchored, 7),
+      "30d": sliceByDays(anchored, 30),
+      "90d": sliceByDays(anchored, 90),
     }
-  }, [history90dData, history24hData, navPrice])
+  }, [history90dData, navPrice])
 
   // Chart uses the slice for the selected period
   const filteredData = slices[timePeriod]

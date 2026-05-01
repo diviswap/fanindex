@@ -48,45 +48,33 @@ export function IndexCard({ index }: IndexCardProps) {
   // /indices, and the /indices/{symbol} detail view. See `useIndexNav`.
   const { displayPrice } = useIndexNav(index)
 
-  // Build query string with weights so the history endpoint returns
-  // a properly-weighted aggregate matching the canonical NAV formula.
+  // Single 90d daily fetch — same dataset used by the detail view.
+  // 24h and 7d returns are derived with sliceByDays, identical logic.
   const weightsQuery =
     index.weights && index.weights.length === index.tokens.length
       ? `&weights=${index.weights.join(",")}`
       : ""
 
-  // Dedicated 24h fetch (hourly granularity) — CoinGecko returns daily points
-  // for days=90, so we can't slice that to 24h and get a real return.
-  const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
+  const { data: history90d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsQuery}`,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
 
-  // 7d weighted history (daily granularity)
-  const { data: history7d } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=7${weightsQuery}`,
-    fetcher,
-    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
-  )
-
-  const return24h = useMemo(() => {
-    const data = history24h?.data
-    if (!data || data.length < 2) return null
-    const first = data[0].price
-    const last = data[data.length - 1].price
-    if (!first || first === 0) return null
+  const returnFor = (daysBack: number): number | null => {
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return null
+    const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000
+    const slice = all.filter(d => d.timestamp >= cutoff)
+    if (slice.length < 2) return null
+    const first = slice[0].price
+    const last = slice[slice.length - 1].price
+    if (!first) return null
     return ((last - first) / first) * 100
-  }, [history24h])
+  }
 
-  const return7d = useMemo(() => {
-    const data = history7d?.data
-    if (!data || data.length < 2) return null
-    const first = data[0].price
-    const last = data[data.length - 1].price
-    if (!first || first === 0) return null
-    return ((last - first) / first) * 100
-  }, [history7d])
+  const return24h = useMemo(() => returnFor(2), [history90d])
+  const return7d  = useMemo(() => returnFor(7), [history90d])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
