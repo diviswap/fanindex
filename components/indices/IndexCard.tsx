@@ -6,6 +6,7 @@ import { TrendingUp, TrendingDown, Share2, ArrowUpRight } from "lucide-react"
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
+import { Sparkline } from "@/components/ui/sparkline"
 import Link from "next/link"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
@@ -77,6 +78,15 @@ export function IndexCard({ index }: IndexCardProps) {
   const return7d  = useMemo(() => returnFor(7), [history90d])
   const return90d = useMemo(() => returnFor(90), [history90d])
 
+  // 30-day sparkline data — densest middle ground that shows recent trend
+  // without being noisy. Falls back gracefully when data is loading.
+  const sparkData = useMemo(() => {
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return []
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
+    return all.filter(d => d.timestamp >= cutoff)
+  }, [history90d])
+
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
 
@@ -111,112 +121,111 @@ export function IndexCard({ index }: IndexCardProps) {
   return (
     <>
       <Link href={`/indices/${index.symbol ?? index.id}`} className="block h-full group">
-          <div className="h-full min-h-[500px] border border-border bg-card/80 backdrop-blur-sm p-8 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
+          <div className="h-full border border-border bg-card/80 backdrop-blur-sm p-5 sm:p-7 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
             <div className="relative z-10 h-full flex flex-col">
               <div className="flex-1 flex flex-col">
-                <div className="mb-8">
-                  <div
-                    className={`mb-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-semibold ${typeBgColors[index.type]}`}
-                  >
-                    <span className={typeColors[index.type]}>{typeLabels[index.type]}</span>
+                {/* Header row — symbol + type chip + name */}
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {index.symbol && (
+                        <span className="font-mono text-[11px] font-bold tracking-wider text-muted-foreground bg-muted/60 border border-border px-2 py-0.5 rounded">
+                          {index.symbol}
+                        </span>
+                      )}
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[10px] font-semibold uppercase tracking-wider ${typeBgColors[index.type]}`}
+                      >
+                        <span className={typeColors[index.type]}>{typeLabels[index.type]}</span>
+                      </span>
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground text-balance group-hover:text-success transition-colors leading-tight">
+                      {index.name}
+                    </h3>
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 text-balance group-hover:text-success transition-colors">
-                    {index.name}
-                  </h3>
-                  <p className="text-base text-muted-foreground leading-relaxed">{index.description}</p>
                 </div>
 
-                {/* NAV — large, primary metric (matches home) */}
-                <div className="mb-6 pb-6 border-b border-border/60">
-                  <div className="flex items-end justify-between gap-4">
-                    <div>
-                      <div className="text-xs text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
-                        NAV
-                      </div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
-                          {displayPrice}
-                        </span>
-                        <span className="text-sm font-medium text-muted-foreground">CHZ</span>
-                      </div>
-                    </div>
+                {/* NAV — primary metric, with 24h delta inline */}
+                <div className="mb-3">
+                  <div className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-[0.14em]">
+                    NAV
+                  </div>
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
+                      {displayPrice}
+                    </span>
+                    <span className="text-sm font-medium text-muted-foreground">CHZ</span>
                     {return24h !== null && (
-                      <div
-                        className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                          return24h >= 0
-                            ? "border-success/30 bg-success/10 text-success"
-                            : "border-destructive/30 bg-destructive/10 text-destructive"
+                      <span
+                        className={`ml-1 inline-flex items-center gap-0.5 text-sm font-semibold tabular-nums ${
+                          return24h >= 0 ? "text-success" : "text-destructive"
                         }`}
                       >
                         {return24h >= 0 ? (
-                          <TrendingUp className="h-3 w-3" />
+                          <TrendingUp className="h-3.5 w-3.5" />
                         ) : (
-                          <TrendingDown className="h-3 w-3" />
+                          <TrendingDown className="h-3.5 w-3.5" />
                         )}
                         {return24h >= 0 ? "+" : ""}
                         {return24h.toFixed(2)}%
-                      </div>
+                      </span>
                     )}
                   </div>
                 </div>
 
-                <div className="mb-8 grid grid-cols-3 gap-4">
-                  <div>
-                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
-                      24h
-                    </div>
-                    {return24h === null ? (
-                      <div className="text-base font-bold text-muted-foreground">--</div>
-                    ) : (
-                      <div className={`text-base font-bold tabular-nums ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
-                        {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
+                {/* Live 30-day sparkline */}
+                <Sparkline
+                  data={sparkData}
+                  color={
+                    return90d !== null && return90d < 0
+                      ? "var(--destructive)"
+                      : "var(--success)"
+                  }
+                  height={56}
+                  className="mb-4"
+                />
+
+                {/* Returns row — compact, equal-width */}
+                <div className="mb-5 grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/30 p-2">
+                  {[
+                    { label: "24h", value: return24h },
+                    { label: "7d", value: return7d },
+                    { label: "90d", value: return90d },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="text-center px-1 py-1.5">
+                      <div className="text-[9px] text-muted-foreground mb-0.5 font-medium uppercase tracking-[0.14em]">
+                        {label}
                       </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
-                      7d
+                      {value === null ? (
+                        <div className="text-sm font-bold text-muted-foreground">--</div>
+                      ) : (
+                        <div className={`text-sm font-bold tabular-nums ${value >= 0 ? "text-success" : "text-destructive"}`}>
+                          {value >= 0 ? "+" : ""}{value.toFixed(2)}%
+                        </div>
+                      )}
                     </div>
-                    {return7d === null ? (
-                      <div className="text-base font-bold text-muted-foreground">--</div>
-                    ) : (
-                      <div className={`text-base font-bold tabular-nums ${return7d >= 0 ? "text-success" : "text-destructive"}`}>
-                        {return7d >= 0 ? "+" : ""}{return7d.toFixed(2)}%
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
-                      90d
-                    </div>
-                    {return90d === null ? (
-                      <div className="text-base font-bold text-muted-foreground">--</div>
-                    ) : (
-                      <div className={`text-base font-bold tabular-nums ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
-                        {return90d >= 0 ? "+" : ""}{return90d.toFixed(2)}%
-                      </div>
-                    )}
-                  </div>
+                  ))}
                 </div>
 
+                {/* Allocation chips — compact */}
                 <div className="flex-1">
-                  <div className="text-[10px] text-muted-foreground mb-3 font-medium uppercase tracking-[0.14em]">
-                    Asset Allocation ({index.tokens.length})
+                  <div className="text-[10px] text-muted-foreground mb-2 font-medium uppercase tracking-[0.14em]">
+                    {index.tokens.length} Constituents
                   </div>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-1.5">
                     {index.tokens.slice(0, 5).map((symbol) => {
                       const tokenData = getTokenBySymbol(symbol)
                       return (
                         <span
                           key={symbol}
-                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-foreground border border-border"
+                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-foreground border border-border"
                         >
                           {tokenData?.icon && (
                             <Image
                               src={tokenData.icon}
                               alt={symbol}
-                              width={20}
-                              height={20}
+                              width={14}
+                              height={14}
                               className="rounded-full"
                             />
                           )}
@@ -225,7 +234,7 @@ export function IndexCard({ index }: IndexCardProps) {
                       )
                     })}
                     {index.tokens.length > 5 && (
-                      <span className="px-3 py-2 rounded-lg bg-muted/50 text-sm font-semibold text-muted-foreground border border-border">
+                      <span className="px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-muted-foreground border border-border">
                         +{index.tokens.length - 5}
                       </span>
                     )}
@@ -233,21 +242,21 @@ export function IndexCard({ index }: IndexCardProps) {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-8 pt-8 border-t border-border">
+              <div className="flex gap-2 mt-5 pt-5 border-t border-border">
                 <Button
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setShowBuyDialog(true)
                   }}
-                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-12 text-base rounded-xl group/btn"
+                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-11 text-sm rounded-xl group/btn"
                 >
-                  <span>Invest Now</span>
-                  <ArrowUpRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  <span>Invest</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 ml-1.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-border bg-card/50 text-foreground hover:bg-muted h-12 w-12 p-0 rounded-xl"
+                  className="border-border bg-card/50 text-foreground hover:bg-muted h-11 w-11 p-0 rounded-xl"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
@@ -255,7 +264,7 @@ export function IndexCard({ index }: IndexCardProps) {
                   }}
                   title="Share this index"
                 >
-                  <Share2 className="h-5 w-5" />
+                  <Share2 className="h-4 w-4" />
                 </Button>
               </div>
             </div>

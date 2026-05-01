@@ -79,23 +79,23 @@ export default function PortfolioPage() {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/40 to-transparent"
           />
 
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 pt-36 pb-20 sm:pt-44 sm:pb-28">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur mb-7">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12 pt-28 sm:pt-36 pb-10 sm:pb-16">
+            <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1.5 backdrop-blur mb-5 sm:mb-7">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
+              <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
                 Live Portfolio Tracking
               </span>
             </div>
 
-            <h1 className="text-balance text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-6">
+            <h1 className="text-balance text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-3 sm:mb-6">
               My{" "}
               <span className="text-success">Portfolio</span>
             </h1>
-            <p className="text-pretty text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-14">
-              Track and manage your Fan Token index positions with real-time on-chain performance analytics.
+            <p className="text-pretty text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8 sm:mb-12">
+              Track and manage your Fan Token index positions with real-time on-chain analytics.
             </p>
 
             {/* Trust bar */}
@@ -105,9 +105,9 @@ export default function PortfolioPage() {
                 { icon: PieChart, label: "NFT Positions" },
                 { icon: RefreshCw, label: "Auto-Updated" },
               ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2.5 bg-background px-4 py-3.5">
-                  <Icon className="h-3.5 w-3.5 text-success" />
-                  <span className="text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                <div key={label} className="flex items-center gap-2 bg-background px-3 py-3 sm:px-4 sm:py-3.5">
+                  <Icon className="h-3.5 w-3.5 text-success shrink-0" />
+                  <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground truncate">
                     {label}
                   </span>
                 </div>
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
         </section>
 
         {/* Portfolio content */}
-        <section className="relative w-full py-16 sm:py-24">
+        <section className="relative w-full py-10 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <PortfolioErrorBoundary>
               <PortfolioView />
@@ -126,13 +126,13 @@ export default function PortfolioPage() {
         </section>
 
         {/* How it works — matching section style */}
-        <section className="relative w-full border-t border-border/40 py-28 sm:py-36">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <div className="max-w-2xl mb-16">
+        <section className="relative w-full border-t border-border/40 py-16 sm:py-28">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+            <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
                 How It Works
               </span>
-              <h2 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
                 NFT-Based Position Infrastructure
               </h2>
             </div>

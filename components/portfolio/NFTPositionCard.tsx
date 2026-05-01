@@ -6,6 +6,7 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { TrendingDown, TrendingUp, Coins, ExternalLink, Share2 } from "lucide-react"
 import { OnChainBadge } from "./OnChainBadge"
+import { Sparkline } from "@/components/ui/sparkline"
 import { getTokenByAddress, getTokenBySymbol } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import type { TokenPrice } from "@/lib/hooks/use-token-prices"
@@ -78,6 +79,14 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
     return ((last - first) / first) * 100
   }, [history90d])
 
+  // 30-day sparkline data
+  const sparkData = useMemo(() => {
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return []
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
+    return all.filter(d => d.timestamp >= cutoff)
+  }, [history90d])
+
   const chiliscanUrl = `https://chiliscan.com/token/0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9?a=${tokenId.toString()}`
 
   return (
@@ -128,6 +137,31 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             )}
           </div>
         </div>
+
+        {/* Live 30-day price sparkline */}
+        {sparkData.length >= 2 && (
+          <div className="rounded-xl border border-border/60 bg-muted/30 p-2">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                30d Price
+              </span>
+              {return90d !== null && (
+                <span className={`text-[10px] font-bold tabular-nums ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
+                  {return90d >= 0 ? "+" : ""}{return90d.toFixed(2)}%
+                </span>
+              )}
+            </div>
+            <Sparkline
+              data={sparkData}
+              color={
+                return90d !== null && return90d < 0
+                  ? "var(--destructive)"
+                  : "var(--success)"
+              }
+              height={36}
+            />
+          </div>
+        )}
 
         {/* Token breakdown - Composition */}
         <div className="rounded-xl bg-muted/40 border border-border/60 overflow-hidden">

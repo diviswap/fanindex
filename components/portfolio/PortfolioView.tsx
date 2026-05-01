@@ -26,6 +26,7 @@ import { useTokenPrices } from "@/lib/hooks/use-token-prices"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { usePortfolioOnchain, type NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import { NFTPositionCard } from "./NFTPositionCard"
+import { Sparkline } from "@/components/ui/sparkline"
 import Image from "next/image"
 import useSWR from "swr"
 
@@ -148,96 +149,142 @@ function AvailableIndexCard({
     return ((last - first) / first) * 100
   }, [history90d])
 
+  // 30-day sparkline data — same as IndexCard
+  const sparkData = useMemo(() => {
+    const all: { price: number; timestamp: number }[] = history90d?.data ?? []
+    if (all.length < 2) return []
+    const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000
+    return all.filter(d => d.timestamp >= cutoff)
+  }, [history90d])
+
   return (
-    <div className="relative min-h-[380px] border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all duration-300 overflow-hidden">
-      <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-80 dark:opacity-25">
+    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden">
+      {/* Subtle video bg */}
+      <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-60 dark:opacity-15 pointer-events-none">
         <video
           autoPlay loop muted playsInline
           className="w-full h-full object-cover"
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
         />
-        <div className="absolute inset-0 bg-background/50 dark:bg-background/30" />
+        <div className="absolute inset-0 bg-background/60 dark:bg-background/40" />
       </div>
 
       <div className="relative z-10 h-full flex flex-col">
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-3">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+              {index.symbol && (
+                <span className="font-mono text-[10px] font-bold tracking-wider text-muted-foreground bg-muted/80 border border-border px-1.5 py-0.5 rounded">
+                  {index.symbol}
+                </span>
+              )}
+              <span
+                className={`inline-flex items-center px-1.5 py-0.5 rounded border border-border text-[10px] font-semibold uppercase tracking-wider ${typeColors[index.type]}`}
+              >
+                {typeLabels[index.type]}
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-bold text-foreground text-balance leading-tight">
+              {index.name}
+            </h3>
+          </div>
+          <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-success/20 text-success border border-success/30">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+            </span>
+            Live
+          </span>
+        </div>
+
+        {/* Price + 24h delta */}
+        <div className="mb-2 flex items-baseline gap-2 flex-wrap">
+          <span className="font-mono text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
+            {displayPrice}
+          </span>
+          <span className="text-xs font-medium text-muted-foreground">CHZ</span>
+          {return24h !== null && (
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-semibold ${typeColors[index.type]}`}
+              className={`ml-auto inline-flex items-center gap-0.5 text-xs font-semibold tabular-nums ${
+                return24h >= 0 ? "text-success" : "text-destructive"
+              }`}
             >
-              {typeLabels[index.type]}
+              {return24h >= 0
+                ? <TrendingUp className="h-3 w-3" />
+                : <TrendingDown className="h-3 w-3" />}
+              {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
             </span>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-success/20 text-success border border-success/30">
-              Live
-            </span>
-          </div>
-          <h3 className="text-lg font-bold text-foreground mb-2 text-balance">
-            {index.name}
-          </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-            {index.description}
-          </p>
-          <div className="space-y-2 mb-4 text-sm">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Price</span>
-              <span className="font-semibold text-foreground">{displayPrice} CHZ</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-muted-foreground">24h Return</span>
-              {return24h === null ? (
-                <span className="font-semibold text-muted-foreground">--</span>
+          )}
+        </div>
+
+        {/* Sparkline */}
+        <Sparkline
+          data={sparkData}
+          color={
+            return90d !== null && return90d < 0
+              ? "var(--destructive)"
+              : "var(--success)"
+          }
+          height={44}
+          className="mb-3"
+        />
+
+        {/* Returns row */}
+        <div className="mb-3 grid grid-cols-2 gap-2 rounded-lg border border-border/60 bg-muted/30 p-2">
+          {[
+            { label: "24h", value: return24h },
+            { label: "90d", value: return90d },
+          ].map(({ label, value }) => (
+            <div key={label} className="text-center px-1">
+              <div className="text-[9px] text-muted-foreground mb-0.5 font-medium uppercase tracking-[0.14em]">
+                {label}
+              </div>
+              {value === null ? (
+                <div className="text-xs font-bold text-muted-foreground">--</div>
               ) : (
-                <span className={`flex items-center gap-1 font-semibold ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
-                  {return24h >= 0
-                    ? <TrendingUp className="h-3.5 w-3.5" />
-                    : <TrendingDown className="h-3.5 w-3.5" />}
-                  {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
-                </span>
+                <div className={`text-xs sm:text-sm font-bold tabular-nums ${value >= 0 ? "text-success" : "text-destructive"}`}>
+                  {value >= 0 ? "+" : ""}{value.toFixed(2)}%
+                </div>
               )}
             </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">90d Return</span>
-              {return90d === null ? (
-                <span className="font-semibold text-muted-foreground">--</span>
-              ) : (
-                <span className={`flex items-center gap-1 font-semibold ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
-                  {return90d >= 0
-                    ? <TrendingUp className="h-3.5 w-3.5" />
-                    : <TrendingDown className="h-3.5 w-3.5" />}
-                  {return90d >= 0 ? "+" : ""}{return90d.toFixed(2)}%
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-1.5 mb-4">
-            {index.tokens.map((symbol) => {
-              const tokenData = getTokenBySymbol(symbol)
-              return (
-                <span
-                  key={symbol}
-                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted text-xs font-mono font-medium text-muted-foreground border border-border"
-                >
-                  {tokenData?.icon && (
-                    <Image
-                      src={tokenData.icon}
-                      alt={symbol}
-                      width={14}
-                      height={14}
-                      className="rounded-full"
-                    />
-                  )}
-                  {symbol}
-                </span>
-              )
-            })}
-          </div>
+          ))}
+        </div>
+
+        {/* Tokens */}
+        <div className="flex flex-wrap gap-1 mb-3">
+          {index.tokens.slice(0, 6).map((symbol) => {
+            const tokenData = getTokenBySymbol(symbol)
+            return (
+              <span
+                key={symbol}
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border"
+              >
+                {tokenData?.icon && (
+                  <Image
+                    src={tokenData.icon}
+                    alt={symbol}
+                    width={11}
+                    height={11}
+                    className="rounded-full"
+                  />
+                )}
+                {symbol}
+              </span>
+            )
+          })}
+          {index.tokens.length > 6 && (
+            <span className="px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border">
+              +{index.tokens.length - 6}
+            </span>
+          )}
         </div>
 
         <Button
           onClick={onBuy}
-          className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-10"
+          className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-9 text-sm mt-auto"
         >
-          <ShoppingCart className="h-4 w-4 mr-2" />
+          <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
           Buy Index
         </Button>
       </div>
@@ -500,116 +547,127 @@ export function PortfolioView() {
   const hasPositions = holdings.length > 0
 
   return (
-    <div className="space-y-8 md:space-y-12">
-      {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {/* Total Value */}
-        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm text-muted-foreground mb-2 font-medium">Total Value</div>
+    <div className="space-y-6 md:space-y-10">
+      {/* Hero stats — total value as primary, others secondary */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 md:gap-4">
+        {/* Total Value — spans 2 cols on desktop for emphasis */}
+        <div className="lg:col-span-2 border border-border bg-card backdrop-blur-sm p-5 sm:p-7 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all relative overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-30"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 80% at 100% 0%, color-mix(in oklch, var(--success) 15%, transparent), transparent 70%)",
+            }}
+          />
+          <div className="relative flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] sm:text-xs text-muted-foreground mb-2 font-medium uppercase tracking-[0.12em]">
+                Total Portfolio Value
+              </div>
               {isLoadingOnChain || isLoadingBalance || isLoadingFanTokens ? (
-                <div className="h-9 w-28 bg-muted rounded animate-pulse mb-2" />
+                <div className="h-10 sm:h-12 w-40 bg-muted rounded animate-pulse mb-2" />
               ) : (
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
-                  {totalValue > 0 ? totalValue.toFixed(2) : "0"} CHZ
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="font-mono text-3xl sm:text-5xl font-bold text-foreground tabular-nums leading-none">
+                    {totalValue > 0 ? totalValue.toFixed(2) : "0.00"}
+                  </span>
+                  <span className="text-base sm:text-lg font-semibold text-muted-foreground">CHZ</span>
                 </div>
               )}
-              <div className="text-xs text-muted-foreground font-medium">NFTs + CHZ + Tokens</div>
-            </div>
-            <div className="flex flex-col items-end gap-2">
-              <div className="p-3 rounded-xl bg-success/10 border border-success/20">
-                <TrendingUp className="h-6 w-6 text-success" />
-              </div>
-              <button
-                onClick={() => setShowSharePortfolio(true)}
-                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-success transition-colors font-medium"
-                title="Share portfolio"
-              >
-                <Share2 className="h-3 w-3" />
-                Share
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* CHZ Balance */}
-        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-amber-500/20 transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm text-muted-foreground mb-2 font-medium">CHZ Balance</div>
-              {isLoadingBalance ? (
-                <div className="h-9 w-20 bg-muted rounded animate-pulse mb-2" />
-              ) : (
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
-                  {chzValue > 0 ? chzValue.toFixed(2) : "0"}
-                </div>
-              )}
-              <div className="text-xs text-muted-foreground font-medium">Native Chiliz</div>
-            </div>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <Coins className="h-6 w-6 text-amber-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* Active NFTs */}
-        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-blue-500/20 transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm text-muted-foreground mb-2 font-medium">Active NFTs</div>
-              {isLoadingOnChain ? (
-                <div className="h-9 w-16 bg-muted rounded animate-pulse mb-2" />
-              ) : (
-                <div className="text-3xl md:text-4xl font-bold text-foreground mb-1 tabular-nums">
-                  {activeNFTs}
-                </div>
-              )}
-              <div className="text-xs text-muted-foreground font-medium">Position NFTs owned</div>
-            </div>
-            <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <Layers className="h-6 w-6 text-blue-400" />
-            </div>
-          </div>
-        </div>
-
-        {/* On-Chain Status */}
-        <div className="border border-border bg-card backdrop-blur-sm p-6 rounded-2xl shadow-sm hover:shadow-md hover:border-success/20 transition-all">
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="text-sm text-muted-foreground mb-2 font-medium">Chain Status</div>
-              <div className="text-2xl font-bold text-success mb-1">Chiliz</div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
-                </span>
-                Chain ID 88888
+              <div className="mt-2 sm:mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[11px] sm:text-xs text-muted-foreground font-medium">
+                <span><span className="text-foreground font-semibold tabular-nums">{portfolioStats.nftValue.toFixed(2)}</span> NFTs</span>
+                <span className="text-border">·</span>
+                <span><span className="text-foreground font-semibold tabular-nums">{chzValue.toFixed(2)}</span> CHZ</span>
+                <span className="text-border">·</span>
+                <span><span className="text-foreground font-semibold tabular-nums">{portfolioStats.fanTokenValue.toFixed(2)}</span> Tokens</span>
               </div>
             </div>
-            <div className="p-3 rounded-xl bg-success/10 border border-success/20">
-              <Hash className="h-6 w-6 text-success" />
+            <button
+              onClick={() => setShowSharePortfolio(true)}
+              className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/60 hover:bg-muted px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
+              title="Share portfolio"
+            >
+              <Share2 className="h-3 w-3" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile: 2-col secondary stats / desktop: 2 separate cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 lg:gap-4 lg:col-span-1">
+          {/* CHZ Balance */}
+          <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-amber-500/20 transition-all">
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
+                CHZ Balance
+              </div>
+              <Coins className="h-3.5 w-3.5 text-amber-400 shrink-0" />
             </div>
+            {isLoadingBalance ? (
+              <div className="h-7 w-16 bg-muted rounded animate-pulse" />
+            ) : (
+              <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-tight">
+                {chzValue > 0 ? chzValue.toFixed(2) : "0"}
+              </div>
+            )}
+            <div className="text-[10px] text-muted-foreground mt-0.5">Native</div>
+          </div>
+
+          {/* Active NFTs */}
+          <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-blue-500/20 transition-all">
+            <div className="flex items-start justify-between mb-2">
+              <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
+                Active NFTs
+              </div>
+              <Layers className="h-3.5 w-3.5 text-blue-400 shrink-0" />
+            </div>
+            {isLoadingOnChain ? (
+              <div className="h-7 w-10 bg-muted rounded animate-pulse" />
+            ) : (
+              <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-tight">
+                {activeNFTs}
+              </div>
+            )}
+            <div className="text-[10px] text-muted-foreground mt-0.5">Positions</div>
+          </div>
+        </div>
+
+        {/* Chain Status — full width on mobile spanning both cols */}
+        <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-success/20 transition-all">
+          <div className="flex items-start justify-between mb-2">
+            <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
+              Chain Status
+            </div>
+            <Hash className="h-3.5 w-3.5 text-success shrink-0" />
+          </div>
+          <div className="text-xl sm:text-2xl font-bold text-success leading-tight">Chiliz</div>
+          <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
+            </span>
+            Chain ID 88888
           </div>
         </div>
       </div>
 
       {/* NFT Positions Grid */}
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">My NFT Positions</h2>
-            <p className="text-muted-foreground text-sm mt-1">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">My NFT Positions</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               {isLoadingOnChain
                 ? "Reading from Chiliz Mainnet..."
-                : `${holdings.length} position${holdings.length !== 1 ? "s" : ""} found on-chain`}
+                : `${holdings.length} position${holdings.length !== 1 ? "s" : ""} on-chain`}
             </p>
           </div>
           <Button
             variant="outline"
             size="sm"
             onClick={refetch}
-            className="border-border bg-card text-muted-foreground hover:text-foreground"
+            className="border-border bg-card text-muted-foreground hover:text-foreground shrink-0"
           >
             Refresh
           </Button>
@@ -655,13 +713,13 @@ export function PortfolioView() {
 
       {/* Fan Tokens Section */}
       <div>
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">Fan Tokens</h2>
-            <p className="text-muted-foreground text-sm mt-1">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Fan Tokens</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               {isLoadingFanTokens
                 ? "Reading balances from Chiliz..."
-                : `${userFanTokens.length} token${userFanTokens.length !== 1 ? "s" : ""} in your wallet`}
+                : `${userFanTokens.length} token${userFanTokens.length !== 1 ? "s" : ""} in wallet`}
             </p>
           </div>
         </div>
@@ -782,14 +840,14 @@ export function PortfolioView() {
 
       {/* Available Indices */}
       <div>
-        <div className="mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">Available Indices</h2>
-          <p className="text-lg text-muted-foreground">
+        <div className="mb-5 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">Available Indices</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Invest in live on-chain indices on the Chiliz network
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {INDICES.filter((i) => DEPLOYED_INDICES.includes(i.id)).map((index) => (
             <AvailableIndexCard
               key={index.id}

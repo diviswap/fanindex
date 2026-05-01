@@ -4,8 +4,9 @@ import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { Footer } from "@/components/ui/footer-section"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { IndexCard } from "@/components/indices/IndexCard"
+import { MarketOverview } from "@/components/indices/MarketOverview"
 import { useEffect } from "react"
-import { TrendingUp, Shield, Zap, BarChart3 } from "lucide-react"
+import { Shield, Zap, BarChart3 } from "lucide-react"
 import { INDICES } from "@/lib/data/indices"
 
 export default function IndicesPage() {
@@ -38,31 +39,32 @@ export default function IndicesPage() {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-success/40 to-transparent"
           />
 
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 pt-36 pb-20 sm:pt-44 sm:pb-28 text-center">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-success/25 bg-success/[0.06] px-3.5 py-1.5 backdrop-blur mb-7">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12 pt-28 sm:pt-36 pb-12 sm:pb-20 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1.5 backdrop-blur mb-5 sm:mb-7">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
-              <span className="text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
-                Diversified Sports Investment Products
+              <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
+                Live Sports Token Indices
               </span>
             </div>
 
-            <h1 className="text-balance text-5xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-6">
+            <h1 className="text-balance text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-4 sm:mb-6">
               Fan Token{" "}
               <span className="text-success">Indices</span>
             </h1>
-            <p className="text-pretty text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Gain diversified exposure to the sports token economy through professionally structured index products built on Chiliz Chain.
+            <p className="text-pretty text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+              Diversified exposure to the sports token economy. Live, on-chain, and rebalanced.
             </p>
           </div>
         </section>
 
-        {/* Index cards */}
-        <section className="relative w-full border-b border-border/40 py-24 sm:py-32">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+        {/* Index cards + market overview */}
+        <section className="relative w-full border-b border-border/40 py-12 sm:py-20">
+          <div className="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12">
+            <MarketOverview indices={deployedIndices} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 items-stretch">
               {deployedIndices.map((index) => (
                 <IndexCard key={index.id} index={index} />
               ))}
@@ -71,13 +73,13 @@ export default function IndicesPage() {
         </section>
 
         {/* Strategy types — same panel grid style as WhyFanIndex */}
-        <section className="relative w-full border-b border-border/40 py-28 sm:py-36">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <div className="max-w-2xl mb-16">
+        <section className="relative w-full border-b border-border/40 py-16 sm:py-28">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+            <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
                 Index Strategies
               </span>
-              <h2 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
                 Three Approaches to SportFi Exposure
               </h2>
             </div>
@@ -129,16 +131,16 @@ export default function IndicesPage() {
         </section>
 
         {/* Index methodology stats */}
-        <section className="relative w-full border-b border-border/40 py-28 sm:py-36">
-          <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
-            <div className="max-w-2xl mb-16">
+        <section className="relative w-full border-b border-border/40 py-16 sm:py-28">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+            <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
                 Methodology
               </span>
-              <h2 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+              <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
                 How Index Prices Are Calculated
               </h2>
-              <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+              <p className="mt-4 text-sm sm:text-base leading-relaxed text-muted-foreground">
                 Every FanIndex product uses a transparent, on-chain weighted pricing formula. Market prices are sourced in real time from CoinGecko and updated continuously.
               </p>
             </div>
@@ -181,7 +183,7 @@ export default function IndicesPage() {
         </section>
 
         {/* Future expansion */}
-        <section className="relative w-full py-28 sm:py-36">
+        <section className="relative w-full py-16 sm:py-28">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 opacity-40"
@@ -190,14 +192,14 @@ export default function IndicesPage() {
                 "radial-gradient(ellipse 60% 50% at 50% 100%, color-mix(in oklch, var(--success) 6%, transparent), transparent 70%)",
             }}
           />
-          <div className="relative mx-auto max-w-7xl px-6 sm:px-8 lg:px-12 text-center">
+          <div className="relative mx-auto max-w-7xl px-5 sm:px-8 lg:px-12 text-center">
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
               Roadmap
             </span>
-            <h2 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl mb-6">
+            <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4 sm:mb-6">
               Future Index Expansion
             </h2>
-            <p className="text-base text-muted-foreground max-w-xl mx-auto leading-relaxed mb-16">
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10 sm:mb-16">
               The FanIndex suite will grow to cover every major segment of the global sports token economy.
             </p>
 
