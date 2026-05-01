@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const tokensParam = searchParams.get("tokens")
   const daysParam = searchParams.get("days")
+  const weightsParam = searchParams.get("weights")
 
   if (!tokensParam) {
     return NextResponse.json({ error: "Missing tokens parameter" }, { status: 400 })
@@ -76,7 +77,25 @@ export async function GET(request: NextRequest) {
 
   const tokenSymbols = tokensParam.split(",").map(t => t.trim().toUpperCase())
   let days = Math.min(Math.max(parseInt(daysParam || "30"), 1), 365)
-  
+
+  // Optional per-token weights aligned with `tokens`. When provided, the
+  // historical aggregate price is a weighted average across constituents,
+  // matching the canonical NAV formula used throughout the app.
+  const parsedWeights = weightsParam
+    ? weightsParam.split(",").map(w => parseFloat(w.trim()))
+    : null
+  const validWeights =
+    parsedWeights &&
+    parsedWeights.length === tokenSymbols.length &&
+    parsedWeights.every(w => Number.isFinite(w) && w >= 0)
+      ? parsedWeights
+      : null
+  const weightSum = validWeights ? validWeights.reduce((s, w) => s + w, 0) : 0
+  const weightMap: Map<string, number> | null =
+    validWeights && weightSum > 0
+      ? new Map(tokenSymbols.map((s, i) => [s, validWeights[i]]))
+      : null
+
   // For 24h chart, fetch 2 days of data to ensure we have points from both ayer and hoy
   const fetchDays = days === 1 ? 2 : days
 
@@ -120,40 +139,62 @@ export async function GET(request: NextRequest) {
     }
 
     // Build combined price data
-    // We'll create data points for each timestamp where we have data
-    const priceDataMap = new Map<number, { prices: number[]; chzPrice: number }>()
-    
-    for (const { data } of tokenHistories) {
+    // For each timestamp, store a per-token CHZ price so the aggregate can be
+    // computed either equal-weighted or properly weighted.
+    const priceDataMap = new Map<number, Map<string, number>>()
+
+    for (const { symbol, data } of tokenHistories) {
       if (!data?.prices) continue
-      
+
       for (const [timestamp, usdPrice] of data.prices) {
         // Round timestamp for matching
-        const roundedTs = days <= 1 
+        const roundedTs = days <= 1
           ? Math.round(timestamp / 3600000) * 3600000
           : Math.round(timestamp / 86400000) * 86400000
-        
+
         const chzPrice = chzHistory.get(roundedTs) || 0.07 // Default CHZ price if not found
-        
+
         if (!priceDataMap.has(roundedTs)) {
-          priceDataMap.set(roundedTs, { prices: [], chzPrice })
+          priceDataMap.set(roundedTs, new Map())
         }
-        
+
         const entry = priceDataMap.get(roundedTs)!
         // Convert USD price to CHZ
         const chzTokenPrice = chzPrice > 0 ? usdPrice / chzPrice : 0
-        entry.prices.push(chzTokenPrice)
+        entry.set(symbol, chzTokenPrice)
       }
     }
 
-    // Calculate average index price for each timestamp
+    // Calculate aggregated index price for each timestamp.
+    // When weights are supplied, use a weighted average across whichever
+    // constituents have data at that timestamp (re-normalised). Otherwise,
+    // fall back to a simple equal-weighted average.
     const chartData = Array.from(priceDataMap.entries())
-      .filter(([_, data]) => data.prices.length > 0)
-      .map(([timestamp, data]) => {
-        const avgPrice = data.prices.reduce((a, b) => a + b, 0) / data.prices.length
+      .filter(([_, m]) => m.size > 0)
+      .map(([timestamp, m]) => {
+        let aggregate = 0
+        if (weightMap) {
+          let weighted = 0
+          let totalWeight = 0
+          for (const [sym, p] of m) {
+            const w = weightMap.get(sym) ?? 0
+            if (w <= 0) continue
+            weighted += p * w
+            totalWeight += w
+          }
+          aggregate = totalWeight > 0
+            ? weighted / totalWeight
+            // Fallback to equal-weighted if none of the tokens with weights
+            // had data at this timestamp.
+            : Array.from(m.values()).reduce((a, b) => a + b, 0) / m.size
+        } else {
+          const arr = Array.from(m.values())
+          aggregate = arr.reduce((a, b) => a + b, 0) / arr.length
+        }
         return {
           timestamp,
           date: formatDate(timestamp, days),
-          price: Number(avgPrice.toFixed(6)),
+          price: Number(aggregate.toFixed(6)),
           volume: 0 // Volume data not aggregated
         }
       })

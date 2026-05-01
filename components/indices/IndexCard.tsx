@@ -47,26 +47,45 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
+  // Build query string with weights so the history endpoint returns
+  // a properly-weighted aggregate matching the canonical NAV formula.
+  const weightsQuery =
+    index.weights && index.weights.length === index.tokens.length
+      ? `&weights=${index.weights.join(",")}`
+      : ""
+
   // Dedicated 24h fetch (hourly granularity) — CoinGecko returns daily points
   // for days=90, so we can't slice that to 24h and get a real return.
-  // This matches the same pattern used in IndexDetailView.
   const { data: history24h } = useSWR(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
     fetcher,
     { refreshInterval: 300000, revalidateOnFocus: false, dedupingInterval: 60000 }
   )
 
-  const displayPrice = useMemo(() => {
-    // Prefer the latest hourly point (freshest source of truth)
+  // 7d weighted history (daily granularity)
+  const { data: history7d } = useSWR(
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=7${weightsQuery}`,
+    fetcher,
+    { refreshInterval: 600000, revalidateOnFocus: false, dedupingInterval: 120000 }
+  )
+
+  // NAV: same calculation used on the home page — weighted average of the
+  // current live token prices. This is the canonical "spot" NAV. We only
+  // fall back to historical or static price when live prices haven't loaded.
+  const navPrice = useMemo(() => {
+    if (liveTokenPrices && liveTokenPrices.length > 0) {
+      const nav = calculateIndexPrice(index.tokens, liveTokenPrices, index.weights)
+      if (nav > 0) return nav
+    }
     const data24h = history24h?.data
     if (data24h && data24h.length > 0) {
-      return data24h[data24h.length - 1].price.toFixed(4)
+      return data24h[data24h.length - 1].price
     }
-    if (liveTokenPrices && liveTokenPrices.length > 0) {
-      return calculateIndexPrice(index.tokens, liveTokenPrices, index.weights).toFixed(4)
-    }
-    return Number.parseFloat(index.price).toFixed(4)
-  }, [history24h, liveTokenPrices, index.tokens, index.price])
+    return Number.parseFloat(index.price)
+  }, [liveTokenPrices, history24h, index.tokens, index.weights, index.price])
+
+  // 2 decimals to match the NAV format used on the home page
+  const displayPrice = navPrice.toFixed(2)
 
   const return24h = useMemo(() => {
     const data = history24h?.data
@@ -76,6 +95,15 @@ export function IndexCard({ index }: IndexCardProps) {
     if (!first || first === 0) return null
     return ((last - first) / first) * 100
   }, [history24h])
+
+  const return7d = useMemo(() => {
+    const data = history7d?.data
+    if (!data || data.length < 2) return null
+    const first = data[0].price
+    const last = data[data.length - 1].price
+    if (!first || first === 0) return null
+    return ((last - first) / first) * 100
+  }, [history7d])
 
   const contracts = getContractAddresses(index.id)
   const hasContracts = hasDeployedContracts(index.id)
@@ -126,37 +154,78 @@ export function IndexCard({ index }: IndexCardProps) {
                   <p className="text-base text-muted-foreground leading-relaxed">{index.description}</p>
                 </div>
 
-                <div className="mb-8 grid grid-cols-3 gap-6">
-                  <div>
-                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Price</div>
-                    <div className="text-xl font-bold text-foreground">{displayPrice} CHZ</div>
+                {/* NAV — large, primary metric (matches home) */}
+                <div className="mb-6 pb-6 border-b border-border/60">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <div className="text-xs text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
+                        NAV
+                      </div>
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
+                          {displayPrice}
+                        </span>
+                        <span className="text-sm font-medium text-muted-foreground">CHZ</span>
+                      </div>
+                    </div>
+                    {return24h !== null && (
+                      <div
+                        className={`flex shrink-0 items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                          return24h >= 0
+                            ? "border-success/30 bg-success/10 text-success"
+                            : "border-destructive/30 bg-destructive/10 text-destructive"
+                        }`}
+                      >
+                        {return24h >= 0 ? (
+                          <TrendingUp className="h-3 w-3" />
+                        ) : (
+                          <TrendingDown className="h-3 w-3" />
+                        )}
+                        {return24h >= 0 ? "+" : ""}
+                        {return24h.toFixed(2)}%
+                      </div>
+                    )}
                   </div>
+                </div>
+
+                <div className="mb-8 grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
-                      24h Return
+                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
+                      24h
                     </div>
                     {return24h === null ? (
-                      <div className="text-xl font-bold text-muted-foreground">--</div>
+                      <div className="text-base font-bold text-muted-foreground">--</div>
                     ) : (
-                      <div className={`flex items-center gap-1.5 text-xl font-bold ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
-                        {return24h >= 0 ? <TrendingUp className="h-5 w-5" /> : <TrendingDown className="h-5 w-5" />}
+                      <div className={`text-base font-bold tabular-nums ${return24h >= 0 ? "text-success" : "text-destructive"}`}>
                         {return24h >= 0 ? "+" : ""}{return24h.toFixed(2)}%
                       </div>
                     )}
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">
+                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
+                      7d
+                    </div>
+                    {return7d === null ? (
+                      <div className="text-base font-bold text-muted-foreground">--</div>
+                    ) : (
+                      <div className={`text-base font-bold tabular-nums ${return7d >= 0 ? "text-success" : "text-destructive"}`}>
+                        {return7d >= 0 ? "+" : ""}{return7d.toFixed(2)}%
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground mb-1.5 font-medium uppercase tracking-[0.14em]">
                       Holders
                     </div>
-                    <div className="flex items-center gap-1.5 text-xl font-bold text-foreground">
-                      <Users className="h-5 w-5" />
+                    <div className="flex items-center gap-1 text-base font-bold text-foreground tabular-nums">
+                      <Users className="h-3.5 w-3.5" />
                       {index.holders}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1">
-                  <div className="text-xs text-muted-foreground mb-3 font-medium uppercase tracking-wide">
+                  <div className="text-[10px] text-muted-foreground mb-3 font-medium uppercase tracking-[0.14em]">
                     Asset Allocation ({index.tokens.length})
                   </div>
                   <div className="flex flex-wrap gap-2">

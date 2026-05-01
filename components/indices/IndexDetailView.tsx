@@ -74,13 +74,20 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       : 100
   const feePctLabel = `${(feeBps / 100).toFixed(feeBps % 10 === 0 ? 1 : 2)}%`
 
+  // Pass per-token target weights (when defined) so the API returns a
+  // properly weighted aggregate price — the same NAV formula used elsewhere.
+  const weightsQuery =
+    index.weights && index.weights.length === index.tokens.length
+      ? `&weights=${index.weights.join(",")}`
+      : ""
+
   // Two separate fetches:
   //  - 90d daily data (used for 7d/30d/90d slices)
   //  - 24h hourly data (API returns hourly points for days=1)
   // This is necessary because 90d data only has daily granularity — slicing it
   // to the last 24h would yield just 1 point and no chart line.
   const { data: history90dData, isLoading: history90dLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=90${weightsQuery}`,
     fetcher,
     {
       refreshInterval: 600000,
@@ -90,7 +97,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   )
 
   const { data: history24hData, isLoading: history24hLoading } = useSWR<HistoryResponse>(
-    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1`,
+    `/api/prices/history?tokens=${index.tokens.join(",")}&days=1${weightsQuery}`,
     fetcher,
     {
       refreshInterval: 300000, // 5 min — more frequent for 24h view
