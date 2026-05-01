@@ -116,7 +116,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             </h3>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <div className="text-xs text-muted-foreground font-medium">Index Price</div>
+            <div className="text-xs text-muted-foreground font-medium">Position Value</div>
             <div className="text-xl font-bold text-foreground tabular-nums">
               {chartPrice !== null ? chartPrice.toFixed(4) : hasLivePrices ? totalValueCHZ.toFixed(2) : "--"} CHZ
             </div>
