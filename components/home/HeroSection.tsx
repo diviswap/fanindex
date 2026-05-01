@@ -14,15 +14,11 @@ const INDEX_TICKERS = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"] as const
  * Positions are intentionally spread so no two cards share the same
  * vertical band on the globe. Layout (% from each edge):
  *
- *  FTLX  — top-left corner  (top ~5%, left -6%)
- *  FGMX  — top-right corner (top ~14%, right -6%)
- *  FSLX  — mid-left         (top ~42%, left -12%)
- *  FFLX  — lower-left       (bottom ~22%, left -8%)
- *  FELX  — bottom-right     (bottom ~6%, right -2%)
- *
- * FFLX and FSLX are on the same side (left) but clearly separated
- * vertically: FSLX at top-42% (~58% from top) vs FFLX at bottom-22%
- * (~78% from top) — 20 percentage points apart.
+ *  FTLX  — top-left corner       (top ~10%, left -4%)
+ *  FFLX  — top-center            (top ~-4%, x-centered)
+ *  FGMX  — top-right corner      (top ~10%, right -6%)
+ *  FSLX  — mid-left              (top ~46%, left -12%)
+ *  FELX  — bottom-right          (bottom ~6%, right -2%)
  */
 const TICKER_META: Record<
   (typeof INDEX_TICKERS)[number],
@@ -31,25 +27,25 @@ const TICKER_META: Record<
   FTLX: {
     label: "Fan Token Leaders",
     category: "Benchmark",
-    position: "top-[5%] left-[0%] sm:left-[-4%]",
+    position: "top-[10%] left-[0%] sm:left-[-4%]",
     delay: "0s",
   },
   FGMX: {
     label: "Fan Gaming",
     category: "Esports",
-    position: "top-[14%] right-[0%] sm:right-[-6%]",
+    position: "top-[10%] right-[0%] sm:right-[-6%]",
     delay: "0.6s",
   },
   FSLX: {
     label: "Spanish League",
     category: "Football",
-    position: "top-[42%] left-[0%] sm:left-[-12%]",
+    position: "top-[46%] left-[0%] sm:left-[-12%]",
     delay: "2.4s",
   },
   FFLX: {
     label: "Fan Fight",
     category: "Combat",
-    position: "bottom-[22%] left-[2%] sm:left-[-8%]",
+    position: "top-[-4%] left-1/2 -translate-x-1/2",
     delay: "1.2s",
   },
   FELX: {
@@ -90,53 +86,48 @@ export function HeroSection() {
 
       {/*
         Layout:
-        Mobile  → two columns: copy (left) | globe (right), both visible side-by-side,
-                  globe clipped by container edge on the right.
-        Desktop → same two columns but fully proportional with more breathing room.
+        Mobile  → single column, stacked: copy on top, globe below with full width.
+                  This allows the title, subtitle, buttons and globe to breathe.
+        Desktop → two columns, fully proportional with more breathing room.
       */}
-      <div className="relative mx-auto grid max-w-7xl grid-cols-[1.1fr_minmax(0,180px)] items-center gap-3 px-4 pt-20 pb-10 sm:grid-cols-[1fr_auto] sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
+      <div className="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-8 px-4 pt-24 pb-12 sm:grid-cols-[1fr_auto] sm:gap-6 sm:px-8 sm:pt-28 sm:pb-8 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:px-12 lg:pt-36 lg:pb-32">
 
         {/* Left — copy */}
         <div className="relative z-10 min-w-0">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/[0.06] px-2.5 py-1 backdrop-blur sm:gap-2.5 sm:px-3.5 sm:py-1.5">
+          <div className="inline-flex items-center gap-2 rounded-full border border-success/25 bg-success/[0.06] px-3 py-1.5 backdrop-blur sm:gap-2.5 sm:px-3.5">
             <span className="relative flex h-1.5 w-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
             </span>
-            <span className="text-[9px] font-medium uppercase tracking-[0.12em] text-foreground/90 sm:text-[11px] sm:tracking-[0.14em] whitespace-nowrap">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-foreground/90 sm:text-[11px] sm:tracking-[0.14em] whitespace-nowrap">
               Live on Chiliz
             </span>
           </div>
 
-          <h1 className="mt-3 text-balance text-[22px] font-semibold leading-[1.1] tracking-tight text-foreground sm:mt-7 sm:text-5xl sm:leading-[1.05] lg:text-[4.5rem]">
+          <h1 className="mt-4 text-balance text-[34px] font-semibold leading-[1.05] tracking-tight text-foreground sm:mt-7 sm:text-5xl sm:leading-[1.05] lg:text-[4.5rem]">
             The Index Layer for{" "}
             <span className="whitespace-nowrap text-success">Fan Tokens</span>
           </h1>
 
-          <p className="mt-2.5 max-w-xl text-pretty text-[12px] leading-snug text-muted-foreground sm:mt-6 sm:text-base sm:leading-relaxed lg:text-lg">
-            <span className="hidden sm:inline">
-              Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
-            </span>
-            <span className="sm:hidden">
-              Tokenized sports indices &amp; portfolio infrastructure for SportFi.
-            </span>
+          <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-base sm:leading-relaxed lg:text-lg">
+            Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.
           </p>
 
-          <div className="mt-4 flex flex-col items-stretch gap-2 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
+          <div className="mt-6 flex flex-col items-stretch gap-3 sm:mt-9 sm:flex-row sm:items-center sm:gap-3">
             <Link href="/indices">
               <Button
                 size="lg"
-                className="h-9 w-full rounded-full bg-success px-4 text-[12px] font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
+                className="h-12 w-full rounded-full bg-success px-6 text-sm font-semibold text-success-foreground hover:bg-success/90 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 Explore Indices
-                <ArrowRight className="ml-1.5 h-3.5 w-3.5 sm:ml-2 sm:h-4 sm:w-4" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
             <Link href="/fan-tokens">
               <Button
                 size="lg"
                 variant="outline"
-                className="h-9 w-full rounded-full border-border bg-card/40 px-4 text-[12px] font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
+                className="h-12 w-full rounded-full border-border bg-card/40 px-6 text-sm font-semibold text-foreground backdrop-blur hover:bg-card/70 sm:h-12 sm:w-auto sm:px-7 sm:text-sm"
               >
                 View Market
               </Button>
@@ -153,12 +144,10 @@ export function HeroSection() {
 
         {/* Right — globe + floating cards */}
         {/*
-          Mobile: 180px column so globe fits beside copy without forcing
-          a stack. Negative right margin lets it bleed off the right edge
-          for a cinematic crop.
+          Mobile: full-width column, centered, so the globe is large and prominent.
           sm+: natural sizing within the grid column.
         */}
-        <div className="relative w-full max-w-[180px] flex-shrink-0 justify-self-end -mr-6 sm:w-full sm:max-w-[640px] sm:mr-0 sm:mx-auto lg:mx-0">
+        <div className="relative mx-auto w-full max-w-[420px] flex-shrink-0 sm:max-w-[640px] sm:justify-self-end lg:mx-0">
           {/* Preserve aspect ratio */}
           <div className="relative aspect-square w-full overflow-visible">
             {/* Soft glow behind globe */}
@@ -176,7 +165,7 @@ export function HeroSection() {
               alt="Global SportFi network visualization"
               fill
               priority
-              sizes="(max-width: 640px) 260px, (max-width: 1024px) 90vw, 640px"
+              sizes="(max-width: 640px) 420px, (max-width: 1024px) 90vw, 640px"
               className="object-contain"
               style={{
                 mixBlendMode: "screen",
