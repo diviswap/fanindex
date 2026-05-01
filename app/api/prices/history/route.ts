@@ -114,7 +114,8 @@ export async function GET(request: NextRequest) {
 
   try {
     // Fetch CHZ price history for conversion
-    const chzHistory = await getChzHistory(days)
+    // Use fetchDays so we get CHZ prices matching the range of token history
+    const chzHistory = await getChzHistory(fetchDays)
     
   // Fetch history for all tokens in parallel
   const tokenHistories = await Promise.all(
