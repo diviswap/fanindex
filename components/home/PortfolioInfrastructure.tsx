@@ -202,7 +202,7 @@ function PositionRow({ position }: { position: any }) {
           </div>
           <div className="mt-0.5 truncate text-xs text-muted-foreground">{position.name}</div>
           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-[11px] text-muted-foreground">
-            <span>{position.units.toLocaleString()} units</span>
+            <span>{position.units.toLocaleString("en-US")} units</span>
             <span>·</span>
             <span>NAV {position.navNow.toFixed(2)} CHZ</span>
             <span>·</span>
