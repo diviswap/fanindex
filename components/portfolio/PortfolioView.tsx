@@ -152,7 +152,7 @@ function AvailableIndexCard({
   }, [history90d])
 
   return (
-    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden min-h-[520px]">
+    <div className="relative border border-border bg-card backdrop-blur-sm p-4 sm:p-5 rounded-2xl shadow-sm hover:shadow-md hover:border-success/30 transition-all duration-300 overflow-hidden min-h-[520px] flex flex-col">
       {/* Subtle video bg */}
       <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-60 dark:opacity-15 pointer-events-none">
         <video
@@ -163,37 +163,39 @@ function AvailableIndexCard({
         <div className="absolute inset-0 bg-background/60 dark:bg-background/40" />
       </div>
 
-      <div className="relative z-10 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-start justify-between gap-2 mb-3">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
-              {index.symbol && (
-                <span className="font-mono text-[10px] font-bold tracking-wider text-muted-foreground bg-muted/80 border border-border px-1.5 py-0.5 rounded">
-                  {index.symbol}
+      <div className="relative z-10 h-full flex flex-col gap-3">
+        {/* Header — fixed height */}
+        <div className="h-20">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                {index.symbol && (
+                  <span className="font-mono text-[10px] font-bold tracking-wider text-muted-foreground bg-muted/80 border border-border px-1.5 py-0.5 rounded">
+                    {index.symbol}
+                  </span>
+                )}
+                <span
+                  className={`inline-flex items-center px-1.5 py-0.5 rounded border border-border text-[10px] font-semibold uppercase tracking-wider ${typeColors[index.type]}`}
+                >
+                  {typeLabels[index.type]}
                 </span>
-              )}
-              <span
-                className={`inline-flex items-center px-1.5 py-0.5 rounded border border-border text-[10px] font-semibold uppercase tracking-wider ${typeColors[index.type]}`}
-              >
-                {typeLabels[index.type]}
-              </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-foreground text-balance leading-tight">
+                {index.name}
+              </h3>
             </div>
-            <h3 className="text-base sm:text-lg font-bold text-foreground text-balance leading-tight">
-              {index.name}
-            </h3>
-          </div>
-          <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-success/20 text-success border border-success/30">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+            <span className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-success/20 text-success border border-success/30">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+              </span>
+              Live
             </span>
-            Live
-          </span>
+          </div>
         </div>
 
-        {/* Price + 24h delta */}
-        <div className="mb-2 flex items-baseline gap-2 flex-wrap">
+        {/* Price + 24h delta — fixed height */}
+        <div className="h-10 flex items-baseline gap-2 flex-wrap">
           <span className="font-mono text-2xl sm:text-3xl font-bold text-foreground tabular-nums">
             {displayPrice}
           </span>
@@ -212,25 +214,27 @@ function AvailableIndexCard({
           )}
         </div>
 
-        {/* Sparkline */}
-        <Sparkline
-          data={sparkData}
-          color={
-            return90d !== null && return90d < 0
-              ? "var(--destructive)"
-              : "var(--success)"
-          }
-          height={44}
-          className="mb-3"
-        />
+        {/* Sparkline — fixed height */}
+        <div className="h-14 flex items-center">
+          <Sparkline
+            data={sparkData}
+            color={
+              return90d !== null && return90d < 0
+                ? "var(--destructive)"
+                : "var(--success)"
+            }
+            height={44}
+            className="w-full"
+          />
+        </div>
 
-        {/* Returns row */}
-        <div className="mb-3 grid grid-cols-2 gap-2 rounded-lg border border-border/60 bg-muted/30 p-2">
+        {/* Returns row — fixed height */}
+        <div className="h-14 grid grid-cols-2 gap-2 rounded-lg border border-border/60 bg-muted/30 p-2">
           {[
             { label: "24h", value: return24h },
             { label: "90d", value: return90d },
           ].map(({ label, value }) => (
-            <div key={label} className="text-center px-1">
+            <div key={label} className="text-center flex flex-col justify-center">
               <div className="text-[9px] text-muted-foreground mb-0.5 font-medium uppercase tracking-[0.14em]">
                 {label}
               </div>
@@ -245,38 +249,41 @@ function AvailableIndexCard({
           ))}
         </div>
 
-        {/* Tokens */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          {index.tokens.slice(0, 6).map((symbol) => {
-            const tokenData = getTokenBySymbol(symbol)
-            return (
-              <span
-                key={symbol}
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border"
-              >
-                {tokenData?.icon && (
-                  <Image
-                    src={tokenData.icon}
-                    alt={symbol}
-                    width={14}
-                    height={14}
-                    className="rounded-full"
-                  />
-                )}
-                {symbol}
+        {/* Tokens — flex-grow to take remaining space */}
+        <div className="flex-1 min-h-12 flex flex-col">
+          <div className="flex flex-wrap gap-1 content-start">
+            {index.tokens.slice(0, 6).map((symbol) => {
+              const tokenData = getTokenBySymbol(symbol)
+              return (
+                <span
+                  key={symbol}
+                  className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border"
+                >
+                  {tokenData?.icon && (
+                    <Image
+                      src={tokenData.icon}
+                      alt={symbol}
+                      width={14}
+                      height={14}
+                      className="rounded-full"
+                    />
+                  )}
+                  {symbol}
+                </span>
+              )
+            })}
+            {index.tokens.length > 6 && (
+              <span className="px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border">
+                +{index.tokens.length - 6}
               </span>
-            )
-          })}
-          {index.tokens.length > 6 && (
-            <span className="px-1.5 py-0.5 rounded bg-muted/80 text-[10px] font-mono font-semibold text-muted-foreground border border-border">
-              +{index.tokens.length - 6}
-            </span>
-          )}
+            )}
+          </div>
         </div>
 
+        {/* Button — fixed height at bottom */}
         <Button
           onClick={onBuy}
-          className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-9 text-sm mt-auto"
+          className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-9 text-sm"
         >
           <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
           Buy Index

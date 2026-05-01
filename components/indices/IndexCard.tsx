@@ -124,11 +124,11 @@ export function IndexCard({ index }: IndexCardProps) {
   return (
     <>
       <Link href={`/indices/${index.symbol ?? index.id}`} className="block h-full group">
-          <div className="h-full min-h-[580px] border border-border bg-card/80 backdrop-blur-sm p-5 sm:p-7 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1">
-            <div className="relative z-10 h-full flex flex-col">
-              <div className="flex-1 flex flex-col">
-                {/* Header row — symbol + type chip + name */}
-                <div className="mb-5 flex items-start justify-between gap-3">
+          <div className="h-full min-h-[580px] border border-border bg-card/80 backdrop-blur-sm p-5 sm:p-7 rounded-2xl cursor-pointer transition-all duration-300 hover:border-border/80 hover:shadow-xl hover:shadow-success/5 hover:-translate-y-1 flex flex-col">
+            <div className="relative z-10 flex flex-col h-full gap-4">
+              {/* Header — fixed height */}
+              <div className="h-20">
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {index.symbol && (
@@ -147,36 +147,38 @@ export function IndexCard({ index }: IndexCardProps) {
                     </h3>
                   </div>
                 </div>
+              </div>
 
-                {/* NAV — primary metric, with 24h delta inline */}
-                <div className="mb-3">
-                  <div className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-[0.14em]">
-                    NAV
-                  </div>
-                  <div className="flex items-baseline gap-2 flex-wrap">
-                    <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
-                      {displayPrice}
-                    </span>
-                    <span className="text-sm font-medium text-muted-foreground">CHZ</span>
-                    {return24h !== null && (
-                      <span
-                        className={`ml-1 inline-flex items-center gap-0.5 text-sm font-semibold tabular-nums ${
-                          return24h >= 0 ? "text-success" : "text-destructive"
-                        }`}
-                      >
-                        {return24h >= 0 ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
-                        ) : (
-                          <TrendingDown className="h-3.5 w-3.5" />
-                        )}
-                        {return24h >= 0 ? "+" : ""}
-                        {return24h.toFixed(2)}%
-                      </span>
-                    )}
-                  </div>
+              {/* NAV section — fixed height */}
+              <div className="h-16">
+                <div className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-[0.14em]">
+                  NAV
                 </div>
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
+                    {displayPrice}
+                  </span>
+                  <span className="text-sm font-medium text-muted-foreground">CHZ</span>
+                  {return24h !== null && (
+                    <span
+                      className={`ml-1 inline-flex items-center gap-0.5 text-sm font-semibold tabular-nums ${
+                        return24h >= 0 ? "text-success" : "text-destructive"
+                      }`}
+                    >
+                      {return24h >= 0 ? (
+                        <TrendingUp className="h-3.5 w-3.5" />
+                      ) : (
+                        <TrendingDown className="h-3.5 w-3.5" />
+                      )}
+                      {return24h >= 0 ? "+" : ""}
+                      {return24h.toFixed(2)}%
+                    </span>
+                  )}
+                </div>
+              </div>
 
-                {/* Live 30-day sparkline */}
+              {/* Sparkline — fixed height */}
+              <div className="h-16 flex items-center">
                 <Sparkline
                   data={sparkData}
                   color={
@@ -185,81 +187,82 @@ export function IndexCard({ index }: IndexCardProps) {
                       : "var(--success)"
                   }
                   height={56}
-                  className="mb-4"
+                  className="w-full"
                 />
+              </div>
 
-                {/* Returns row — compact, equal-width */}
-                <div className="mb-5 grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/30 p-2">
-                  {[
-                    { label: "24h", value: return24h },
-                    { label: "7d", value: return7d },
-                    { label: "90d", value: return90d },
-                  ].map(({ label, value }) => (
-                    <div key={label} className="text-center px-1 py-1.5">
-                      <div className="text-[9px] text-muted-foreground mb-0.5 font-medium uppercase tracking-[0.14em]">
-                        {label}
-                      </div>
-                      {value === null ? (
-                        <div className="text-sm font-bold text-muted-foreground">--</div>
-                      ) : (
-                        <div className={`text-sm font-bold tabular-nums ${value >= 0 ? "text-success" : "text-destructive"}`}>
-                          {value >= 0 ? "+" : ""}{value.toFixed(2)}%
-                        </div>
-                      )}
+              {/* Returns row — fixed height */}
+              <div className="h-16 grid grid-cols-3 gap-2 rounded-xl border border-border/60 bg-muted/30 p-2">
+                {[
+                  { label: "24h", value: return24h },
+                  { label: "7d", value: return7d },
+                  { label: "90d", value: return90d },
+                ].map(({ label, value }) => (
+                  <div key={label} className="text-center flex flex-col justify-center">
+                    <div className="text-[9px] text-muted-foreground mb-0.5 font-medium uppercase tracking-[0.14em]">
+                      {label}
                     </div>
-                  ))}
-                </div>
-
-                {/* Allocation chips — compact */}
-                <div className="flex-1">
-                  <div className="text-[10px] text-muted-foreground mb-2 font-medium uppercase tracking-[0.14em]">
-                    {index.tokens.length} Constituents
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {index.tokens.slice(0, 5).map((symbol) => {
-                      const tokenData = getTokenBySymbol(symbol)
-                      return (
-                        <span
-                          key={symbol}
-                          className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-foreground border border-border"
-                        >
-                          {tokenData?.icon && (
-                            <Image
-                              src={tokenData.icon}
-                              alt={symbol}
-                              width={18}
-                              height={18}
-                              className="rounded-full"
-                            />
-                          )}
-                          {symbol}
-                        </span>
-                      )
-                    })}
-                    {index.tokens.length > 5 && (
-                      <span className="px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-muted-foreground border border-border">
-                        +{index.tokens.length - 5}
-                      </span>
+                    {value === null ? (
+                      <div className="text-sm font-bold text-muted-foreground">--</div>
+                    ) : (
+                      <div className={`text-sm font-bold tabular-nums ${value >= 0 ? "text-success" : "text-destructive"}`}>
+                        {value >= 0 ? "+" : ""}{value.toFixed(2)}%
+                      </div>
                     )}
                   </div>
+                ))}
+              </div>
+
+              {/* Constituents — flex-grow to take remaining space */}
+              <div className="flex-1 min-h-24 flex flex-col">
+                <div className="text-[10px] text-muted-foreground mb-2 font-medium uppercase tracking-[0.14em]">
+                  {index.tokens.length} Constituents
+                </div>
+                <div className="flex flex-wrap gap-1.5 content-start">
+                  {index.tokens.slice(0, 5).map((symbol) => {
+                    const tokenData = getTokenBySymbol(symbol)
+                    return (
+                      <span
+                        key={symbol}
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-foreground border border-border"
+                      >
+                        {tokenData?.icon && (
+                          <Image
+                            src={tokenData.icon}
+                            alt={symbol}
+                            width={18}
+                            height={18}
+                            className="rounded-full"
+                          />
+                        )}
+                        {symbol}
+                      </span>
+                    )
+                  })}
+                  {index.tokens.length > 5 && (
+                    <span className="px-2 py-1 rounded-md bg-muted/60 text-xs font-semibold text-muted-foreground border border-border">
+                      +{index.tokens.length - 5}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              <div className="flex gap-2 mt-5 pt-5 border-t border-border">
+              {/* Action buttons — fixed height at bottom */}
+              <div className="h-14 flex gap-2 pt-4 border-t border-border">
                 <Button
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
                     setShowBuyDialog(true)
                   }}
-                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-11 text-sm rounded-xl group/btn"
+                  className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-full text-sm rounded-xl group/btn"
                 >
                   <span>Invest</span>
                   <ArrowUpRight className="h-3.5 w-3.5 ml-1.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="border-border bg-card/50 text-foreground hover:bg-muted h-11 w-11 p-0 rounded-xl"
+                  className="border-border bg-card/50 text-foreground hover:bg-muted h-full w-14 p-0 rounded-xl"
                   onClick={(e) => {
                     e.preventDefault()
                     e.stopPropagation()
