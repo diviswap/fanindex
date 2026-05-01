@@ -147,12 +147,23 @@ export async function GET(request: NextRequest) {
       if (!data?.prices) continue
 
       for (const [timestamp, usdPrice] of data.prices) {
-        // Round timestamp for matching
+        // Round timestamp for matching — use the ORIGINAL `days` param for
+        // format consistency, not `fetchDays` (which was for fetching 2d data)
         const roundedTs = days <= 1
           ? Math.round(timestamp / 3600000) * 3600000
           : Math.round(timestamp / 86400000) * 86400000
 
-        const chzPrice = chzHistory.get(roundedTs) || 0.07 // Default CHZ price if not found
+        // Look up CHZ price — fall back gracefully if not in the map
+        let chzPrice = chzHistory.get(roundedTs)
+        if (!chzPrice) {
+          // Try adjacent hour/day in case of rounding mismatch
+          if (days <= 1) {
+            chzPrice = chzHistory.get(roundedTs - 3600000) || chzHistory.get(roundedTs + 3600000)
+          } else {
+            chzPrice = chzHistory.get(roundedTs - 86400000) || chzHistory.get(roundedTs + 86400000)
+          }
+        }
+        chzPrice = chzPrice || 0.07 // Final fallback
 
         if (!priceDataMap.has(roundedTs)) {
           priceDataMap.set(roundedTs, new Map())
@@ -169,7 +180,7 @@ export async function GET(request: NextRequest) {
     // When weights are supplied, use a weighted average across whichever
     // constituents have data at that timestamp (re-normalised). Otherwise,
     // fall back to a simple equal-weighted average.
-    const chartData = Array.from(priceDataMap.entries())
+    let chartData = Array.from(priceDataMap.entries())
       .filter(([_, m]) => m.size > 0)
       .map(([timestamp, m]) => {
         let aggregate = 0
@@ -201,20 +212,11 @@ export async function GET(request: NextRequest) {
       .sort((a, b) => a.timestamp - b.timestamp)
 
     // For 24h data, filter to last 24 hours from the 2 days of data fetched
+    // Only keep points within the last 24h from now
     if (days === 1 && chartData.length > 0) {
       const now = Date.now()
       const oneDayAgo = now - 24 * 60 * 60 * 1000
-      const recentData = chartData.filter(d => d.timestamp >= oneDayAgo)
-      
-      // Return only last 24h of data
-      if (recentData.length > 0) {
-        return NextResponse.json({
-          tokens: tokenSymbols,
-          days,
-          data: recentData,
-          source: "coingecko"
-        })
-      }
+      chartData = chartData.filter(d => d.timestamp >= oneDayAgo)
     }
 
     return NextResponse.json({
