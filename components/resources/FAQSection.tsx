@@ -10,7 +10,7 @@ const faqItems = [
   },
   {
     q: "What are the fees?",
-    a: "Entry Fee: 1% when buying in. Exit Fee: 0%. Management Fee: 0.25-1% annually depending on index type. Performance Fee: 20% of gains above benchmark (for managed indices). All fees are transparent and deducted automatically.",
+    a: "Entry Fee: 1% when buying in. Exit Fee: 0%. Management Fee: Only for managed indices (1-2% annually). Weighted and equal-weight indices have no management fees. Performance Fee: 20% of gains above benchmark (for managed indices only). All fees are transparent and deducted automatically.",
   },
   {
     q: "How often are indices rebalanced?",
@@ -22,7 +22,7 @@ const faqItems = [
   },
   {
     q: "Can I withdraw anytime?",
-    a: "Yes, you can withdraw anytime with zero exit fees. Simply redeem your NFT position and receive the equivalent value in underlying assets within 24 hours. No lockup period required.",
+    a: "Yes, you can withdraw instantly anytime with zero exit fees. Redeem your position and receive CHZ or Fan tokens according to your preference. Withdrawals are processed immediately on-chain. No lockup period or restrictions.",
   },
   {
     q: "What is the minimum investment?",
