@@ -8,16 +8,19 @@ import { useMemo } from "react"
 export function LiveIndicesSection() {
   // Get the first 5 indices to display
   const displayIndices = useMemo(() => {
-    return INDICES.slice(0, 5).map((index) => {
-      const nav = calculateIndexPrice(index.tokens, undefined, index.weights)
-      return {
-        name: index.name,
-        ticker: index.symbol,
-        nav: nav.toFixed(3),
-        type: index.type.charAt(0).toUpperCase() + index.type.slice(1),
-        constituents: index.tokens.length,
-      }
-    })
+    return INDICES.slice(0, 5)
+      .filter((index) => index.symbol) // Filter out indices without symbol
+      .map((index) => {
+        const nav = calculateIndexPrice(index.tokens, undefined, index.weights)
+        return {
+          name: index.name,
+          ticker: index.symbol ?? index.id,
+          id: index.id,
+          nav: nav.toFixed(3),
+          type: index.type.charAt(0).toUpperCase() + index.type.slice(1),
+          constituents: index.tokens.length,
+        }
+      })
   }, [])
 
   return (
@@ -50,7 +53,7 @@ export function LiveIndicesSection() {
             <tbody className="divide-y divide-border/30">
               {displayIndices.map((index) => (
                 <tr
-                  key={index.ticker}
+                  key={index.id}
                   className="hover:bg-muted/20 transition-colors"
                 >
                   <td className="px-6 py-4">
