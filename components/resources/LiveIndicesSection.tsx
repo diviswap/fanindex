@@ -2,8 +2,7 @@
 
 import { TrendingUp, BarChart3 } from "lucide-react"
 import Link from "next/link"
-import { INDICES } from "@/lib/data/indices.data"
-import { calculateIndexPrice } from "@/lib/data/indices"
+import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
 import { useMemo } from "react"
 
 export function LiveIndicesSection() {
