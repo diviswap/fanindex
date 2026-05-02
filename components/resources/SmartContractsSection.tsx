@@ -2,36 +2,45 @@
 
 import { Shield, Lock, Key, Database, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ETF_CONTRACTS, FANX_CONTRACTS } from "@/lib/contracts/abis"
 
 const contractSections = [
   {
     icon: Lock,
-    title: "Vault Contracts",
-    description: "Core smart contracts managing index positions and asset custody.",
-    chain: "Deployed on Chiliz Chain",
-    address: "0x1234567890abcdef1234567890abcdef12345678",
+    title: "ETF Vault Contracts",
+    description: "Core smart contracts managing index positions and asset custody for each index.",
+    chain: "FTLX (Fan Token Leaders Index)",
+    address: ETF_CONTRACTS.FTLX.vault,
   },
   {
     icon: Key,
-    title: "NFT Contracts",
+    title: "NFT Position Contracts",
     description: "ERC-721 smart contracts representing position ownership and metadata.",
-    chain: "ERC-721 Standard",
-    address: "0xabcdef1234567890abcdef1234567890abcdef12",
-  },
-  {
-    icon: Shield,
-    title: "Treasury Management",
-    description: "Multi-signature contracts controlling protocol treasury and funds.",
-    chain: "3-of-5 MultiSig",
-    address: "0x567890abcdef1234567890abcdef1234567890ab",
+    chain: "FTLX NFT",
+    address: ETF_CONTRACTS.FTLX.nft,
   },
   {
     icon: Database,
-    title: "Data Oracles",
-    description: "Price feed integration and market data aggregation contracts.",
-    chain: "Chainlink Integration",
-    address: "0xdef1234567890abcdef1234567890abcdef123456",
+    title: "FanX Router",
+    description: "DEX routing and swap aggregation for optimal liquidity management.",
+    chain: "FanX Protocol",
+    address: FANX_CONTRACTS.ROUTER,
   },
+  {
+    icon: Shield,
+    title: "Token Wrapper Factory",
+    description: "Factory contract for wrapped token infrastructure on Chiliz Chain.",
+    chain: "Chiliz Integration",
+    address: FANX_CONTRACTS.CHILIZ_WRAPPER_FACTORY,
+  },
+]
+
+const allIndices = [
+  { ticker: "FTLX", name: "Fan Token Leaders Index", vault: ETF_CONTRACTS.FTLX.vault, nft: ETF_CONTRACTS.FTLX.nft },
+  { ticker: "FGMX", name: "Fan Gaming Index", vault: ETF_CONTRACTS.FGMX.vault, nft: ETF_CONTRACTS.FGMX.nft },
+  { ticker: "FFLX", name: "Fan Fight Index", vault: ETF_CONTRACTS.FFLX.vault, nft: ETF_CONTRACTS.FFLX.nft },
+  { ticker: "FELX", name: "Fan English League Index", vault: ETF_CONTRACTS.FELX.vault, nft: ETF_CONTRACTS.FELX.nft },
+  { ticker: "FSLX", name: "Fan Spanish League Index", vault: ETF_CONTRACTS.FSLX.vault, nft: ETF_CONTRACTS.FSLX.nft },
 ]
 
 export function SmartContractsSection() {
@@ -129,6 +138,41 @@ export function SmartContractsSection() {
           </div>
         </div>
       </div>
-    </section>
-  )
-}
+
+      {/* All Indices Contracts */}
+      <div className="border border-border rounded-2xl bg-card/50 backdrop-blur-sm p-6 md:p-8">
+        <h3 className="text-2xl font-semibold text-foreground mb-6">Index Contract Addresses</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border/30">
+                <th className="text-left py-3 px-3 text-sm font-semibold text-muted-foreground">Index</th>
+                <th className="text-left py-3 px-3 text-sm font-semibold text-muted-foreground">Vault Contract</th>
+                <th className="text-left py-3 px-3 text-sm font-semibold text-muted-foreground">NFT Contract</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/20">
+              {allIndices.map((index) => (
+                <tr key={index.ticker} className="hover:bg-muted/10 transition-colors">
+                  <td className="py-4 px-3">
+                    <div>
+                      <p className="font-mono font-semibold text-success text-sm">{index.ticker}</p>
+                      <p className="text-xs text-muted-foreground">{index.name}</p>
+                    </div>
+                  </td>
+                  <td className="py-4 px-3">
+                    <code className="text-xs bg-muted/30 px-2 py-1 rounded font-mono text-muted-foreground truncate">
+                      {index.vault}
+                    </code>
+                  </td>
+                  <td className="py-4 px-3">
+                    <code className="text-xs bg-muted/30 px-2 py-1 rounded font-mono text-muted-foreground truncate">
+                      {index.nft}
+                    </code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
