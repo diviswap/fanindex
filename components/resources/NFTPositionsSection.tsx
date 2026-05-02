@@ -1,6 +1,7 @@
 "use client"
 
 import { Gem, Sparkles, Shield, TrendingUp } from "lucide-react"
+import Image from "next/image"
 
 const nftFeatures = [
   {
@@ -51,17 +52,15 @@ export function NFTPositionsSection() {
         <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
           {/* Visual Placeholder */}
           <div className="flex items-center justify-center">
-            <div className="relative w-48 h-64 md:w-56 md:h-80">
-              {/* Outer glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-success via-success/20 to-transparent rounded-2xl blur-2xl opacity-50" />
-              {/* NFT Card */}
-              <div className="absolute inset-0 bg-gradient-to-br from-card to-card/50 rounded-2xl border border-success/30 p-6 flex flex-col items-center justify-center space-y-4 backdrop-blur-xl">
-                <div className="text-6xl">🎯</div>
-                <div className="text-center space-y-2">
-                  <p className="text-sm font-semibold text-success">NFT Position</p>
-                  <p className="text-xs text-muted-foreground">Verified On-Chain</p>
-                </div>
-              </div>
+            <div className="relative w-full max-w-xs">
+              <Image
+                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/NFT-Docs-G66a0Ti7CsGjpvtj8A1XACOUOohPin.png"
+                alt="FanIndex NFT Position"
+                width={400}
+                height={500}
+                className="w-full h-auto"
+                priority
+              />
             </div>
           </div>
 

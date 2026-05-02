@@ -30,7 +30,7 @@ const faqItems = [
   },
   {
     q: "Can I create my own custom index?",
-    a: "Yes! FanIndex supports custom index creation. You can select any available assets, set custom weights, and share your index with the community. Custom indices must include a minimum of 3 assets.",
+    a: "Not yet. Custom index creation is planned for a future release. Currently, you can invest in pre-built indices created by FanIndex. We're working on enabling community-created indices, which will allow you to design and share custom allocations.",
   },
   {
     q: "How are index prices determined?",

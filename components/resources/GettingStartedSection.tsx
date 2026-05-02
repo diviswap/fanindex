@@ -1,27 +1,32 @@
 "use client"
 
 import { BookOpen, ArrowRight, Zap, TrendingUp, Lock, BarChart3 } from "lucide-react"
+import Link from "next/link"
 
 const gettingStartedItems = [
   {
     icon: Zap,
     title: "What Are Indices?",
     description: "Understand FanIndex's approach to diversified crypto investing. Learn how weighted indices work and why they're essential for portfolio management.",
+    href: "#methodology",
   },
   {
     icon: Lock,
     title: "Understanding Composition",
     description: "Learn how index composition affects returns. Deep dive into rebalancing, weighting schemes, and liquidity constraints.",
+    href: "#live-indices",
   },
   {
     icon: BarChart3,
     title: "Portfolio Best Practices",
     description: "Tips for managing a successful portfolio. Risk management, diversification strategies, and performance optimization.",
+    href: "#portfolio-analytics",
   },
   {
     icon: TrendingUp,
     title: "Start Investing",
     description: "Invest in pre-built indices or browse available options. Begin your journey with FanIndex in just a few clicks.",
+    href: "/indices",
   },
 ]
 
@@ -44,8 +49,9 @@ export function GettingStartedSection() {
         {gettingStartedItems.map((item) => {
           const Icon = item.icon
           return (
-            <div
+            <Link
               key={item.title}
+              href={item.href}
               className="group relative border border-border bg-card/50 backdrop-blur-sm p-6 rounded-2xl hover:border-success/30 hover:bg-card transition-all duration-300"
             >
               <div className="flex items-start gap-4">
@@ -60,7 +66,7 @@ export function GettingStartedSection() {
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-success opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
               </div>
-            </div>
+            </Link>
           )
         })}
       </div>
