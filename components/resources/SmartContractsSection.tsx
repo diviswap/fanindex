@@ -2,7 +2,7 @@
 
 import { Shield, Lock, Key, Database, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ETF_CONTRACTS, FANX_CONTRACTS } from "@/lib/contracts/abis"
+import { ETF_CONTRACTS } from "@/lib/contracts/abis"
 
 const contractSections = [
   {
@@ -21,17 +21,17 @@ const contractSections = [
   },
   {
     icon: Database,
-    title: "FanX Router",
-    description: "DEX routing and swap aggregation for optimal liquidity management.",
-    chain: "FanX Protocol",
-    address: FANX_CONTRACTS.ROUTER,
+    title: "Batch Buyer",
+    description: "Contract for efficient batch purchasing of index positions.",
+    chain: "FTLX Batch",
+    address: ETF_CONTRACTS.FTLX.batchBuyer,
   },
   {
     icon: Shield,
-    title: "Token Wrapper Factory",
-    description: "Factory contract for wrapped token infrastructure on Chiliz Chain.",
-    chain: "Chiliz Integration",
-    address: FANX_CONTRACTS.CHILIZ_WRAPPER_FACTORY,
+    title: "Secure Infrastructure",
+    description: "Multi-contract architecture ensuring security and composability.",
+    chain: "Chiliz Chain",
+    address: ETF_CONTRACTS.FTLX.vault,
   },
 ]
 
@@ -176,3 +176,6 @@ export function SmartContractsSection() {
           </table>
         </div>
       </div>
+    </section>
+  )
+}
