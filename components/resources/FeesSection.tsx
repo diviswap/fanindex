@@ -7,7 +7,7 @@ const feeItems = [
     icon: CreditCard,
     title: "Entry Fee",
     amount: "1%",
-    description: "One-time fee when creating or buying into an index position.",
+    description: "One-time fee when buying into an index position.",
     details: "Covers smart contract interactions and liquidity provision.",
   },
   {
@@ -20,9 +20,9 @@ const feeItems = [
   {
     icon: Zap,
     title: "Management Fee",
-    amount: "Varies",
-    description: "Annual management fee varies by index type and complexity.",
-    details: "Weighted indices: 0.5% · Equal-weight: 0.25% · Managed: 1%",
+    amount: "1-2%",
+    description: "Annual management fee for managed indices only.",
+    details: "Weighted & Equal-weight indices: No management fee · Managed indices: 1-2% annually",
   },
   {
     icon: AlertCircle,
@@ -98,7 +98,7 @@ export function FeesSection() {
           <div className="flex items-start gap-3">
             <span className="font-mono text-success">4.</span>
             <span>
-              Annual management fee: <span className="text-foreground font-semibold">0.5% ≈ 5 CHZ/year</span>
+              No annual management fee (weighted & equal-weight indices are fee-free)
             </span>
           </div>
           <div className="flex items-start gap-3">
@@ -106,6 +106,11 @@ export function FeesSection() {
             <span>
               Exit anytime with <span className="text-foreground font-semibold">zero exit fee</span>
             </span>
+          </div>
+          <div className="mt-4 pt-4 border-t border-border/30">
+            <p className="text-xs text-muted-foreground italic">
+              <span className="font-semibold text-foreground">Note:</span> Managed indices only apply an additional 1-2% annual management fee. Weighted and equal-weight indices have no management fees.
+            </p>
           </div>
         </div>
       </div>

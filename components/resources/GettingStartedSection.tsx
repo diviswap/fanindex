@@ -9,11 +9,6 @@ const gettingStartedItems = [
     description: "Understand FanIndex's approach to diversified crypto investing. Learn how weighted indices work and why they're essential for portfolio management.",
   },
   {
-    icon: TrendingUp,
-    title: "Create Your First Index",
-    description: "Step-by-step guide to building your custom index. Choose assets, set weights, and deploy in minutes.",
-  },
-  {
     icon: Lock,
     title: "Understanding Composition",
     description: "Learn how index composition affects returns. Deep dive into rebalancing, weighting schemes, and liquidity constraints.",
@@ -22,6 +17,11 @@ const gettingStartedItems = [
     icon: BarChart3,
     title: "Portfolio Best Practices",
     description: "Tips for managing a successful portfolio. Risk management, diversification strategies, and performance optimization.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Start Investing",
+    description: "Invest in pre-built indices or browse available options. Begin your journey with FanIndex in just a few clicks.",
   },
 ]
 
