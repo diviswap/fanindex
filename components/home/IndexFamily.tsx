@@ -157,7 +157,7 @@ function IndexFactCard({ item }: { item: FamilyCardItem }) {
         }}
       />
 
-      <div className="relative h-[420px] flex flex-col gap-2">
+      <div className="relative h-auto flex flex-col gap-2">
         {/* Header: icon + category badge — fixed height */}
         <div className="h-10 flex items-center justify-between">
           <div
