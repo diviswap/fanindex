@@ -9,24 +9,28 @@ const contractSections = [
     title: "Vault Contracts",
     description: "Core smart contracts managing index positions and asset custody.",
     chain: "Deployed on Chiliz Chain",
+    address: "0x1234567890abcdef1234567890abcdef12345678",
   },
   {
     icon: Key,
     title: "NFT Contracts",
     description: "ERC-721 smart contracts representing position ownership and metadata.",
     chain: "ERC-721 Standard",
+    address: "0xabcdef1234567890abcdef1234567890abcdef12",
   },
   {
     icon: Shield,
     title: "Treasury Management",
     description: "Multi-signature contracts controlling protocol treasury and funds.",
     chain: "3-of-5 MultiSig",
+    address: "0x567890abcdef1234567890abcdef1234567890ab",
   },
   {
     icon: Database,
     title: "Data Oracles",
     description: "Price feed integration and market data aggregation contracts.",
     chain: "Chainlink Integration",
+    address: "0xdef1234567890abcdef1234567890abcdef123456",
   },
 ]
 
@@ -61,10 +65,13 @@ export function SmartContractsSection() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">{section.title}</h3>
               <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
-              <div className="pt-4 border-t border-border/30">
+              <div className="space-y-3 pt-4 border-t border-border/30">
                 <p className="text-xs font-mono text-success bg-success/5 px-2 py-1 rounded inline-block">
                   {section.chain}
                 </p>
+                <div className="bg-card/70 p-2 rounded border border-border/30 break-all">
+                  <p className="text-xs text-muted-foreground font-mono">{section.address}</p>
+                </div>
               </div>
             </div>
           )

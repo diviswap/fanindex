@@ -50,22 +50,22 @@ export function NFTPositionsSection() {
         />
 
         <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
-          {/* Visual Placeholder */}
-          <div className="flex items-center justify-center">
-            <div className="relative w-full max-w-xs">
+          {/* Visual NFT Image */}
+          <div className="flex items-center justify-center md:order-2">
+            <div className="relative w-full">
               <Image
                 src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/NFT-Docs-G66a0Ti7CsGjpvtj8A1XACOUOohPin.png"
                 alt="FanIndex NFT Position"
-                width={400}
-                height={500}
-                className="w-full h-auto"
+                width={600}
+                height={750}
+                className="w-full h-auto drop-shadow-2xl"
                 priority
               />
             </div>
           </div>
 
           {/* Features */}
-          <div className="space-y-6">
+          <div className="space-y-6 md:order-1">
             <div>
               <h3 className="text-2xl font-bold text-foreground mb-2">Premium Index Ownership</h3>
               <p className="text-muted-foreground">
