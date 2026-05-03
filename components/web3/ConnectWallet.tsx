@@ -16,65 +16,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import {
-  Wallet,
-  LogOut,
-  ChevronDown,
-  User,
-  Copy,
-  ExternalLink,
-  Zap,
-  Shield,
-  CheckCircle2,
-  Sparkles,
-  Smartphone,
-  Globe,
-  ArrowRight,
-} from "lucide-react"
+import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, CheckCircle2, Sparkles } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-
-type WalletOption = {
-  id: string
-  connectorId: "injected" | "walletConnect"
-  name: string
-  description: string
-  logo: string | null
-  iconBg: string
-  badge?: string
-  featured?: boolean
-}
-
-const WALLET_OPTIONS: WalletOption[] = [
-  {
-    id: "socios",
-    connectorId: "walletConnect",
-    name: "Socios.com",
-    description: "Connect with the official Fan Token wallet",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Chiliz_2022.svg",
-    iconBg: "from-[#CD0124]/30 to-[#CD0124]/5",
-    badge: "Recommended",
-    featured: true,
-  },
-  {
-    id: "browser",
-    connectorId: "injected",
-    name: "Browser Wallet",
-    description: "MetaMask, Coinbase, Rabby, or any EIP-1193 wallet",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-    iconBg: "from-warning/30 to-warning/5",
-  },
-  {
-    id: "walletconnect",
-    connectorId: "walletConnect",
-    name: "WalletConnect",
-    description: "Scan with any compatible mobile wallet",
-    logo: null,
-    iconBg: "from-blue-500/30 to-blue-500/5",
-  },
-]
 
 export function ConnectWallet() {
   const { address, isConnected, connector } = useAccount()
@@ -83,28 +29,24 @@ export function ConnectWallet() {
   const { data: balance } = useBalance({ address })
   const [mounted, setMounted] = useState(false)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [connectingOption, setConnectingOption] = useState<string | null>(null)
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  const handleConnect = async (option: WalletOption) => {
-    const found = connectors.find((c) => c.id === option.connectorId)
-    if (!found) {
-      toast.error("Wallet connector not available yet, please try again.")
-      return
-    }
-    setConnectingOption(option.id)
+  const handleConnect = async (connectorId: string) => {
+    const found = connectors.find((c) => c.id === connectorId)
+    if (!found) return
+    setConnectingWallet(connectorId)
     try {
       await connect({ connector: found })
       setDialogOpen(false)
-      toast.success(`Connected via ${option.name}`)
     } catch (error) {
       // wagmi surfaces errors via its own error state
     } finally {
-      setConnectingOption(null)
+      setConnectingWallet(null)
     }
   }
 
@@ -122,26 +64,22 @@ export function ConnectWallet() {
     }
   }
 
-  const getConnectedWalletInfo = (connectorId: string | undefined) => {
-    if (!connectorId) {
-      return {
-        name: "Wallet",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-      }
-    }
+  const getWalletInfo = (connectorId: string) => {
     if (connectorId.includes("walletConnect")) {
       return {
         name: "WalletConnect",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Chiliz_2022.svg",
+        logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
+        description: "Scan with any mobile wallet",
+        popular: true,
       }
     }
     return {
       name: "Browser Wallet",
       logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+      description: "MetaMask, Coinbase, or any EIP-1193 wallet",
+      popular: true,
     }
   }
-
-  const connectorsLoading = connectors.length === 0
 
   if (!mounted) {
     return (
@@ -156,7 +94,9 @@ export function ConnectWallet() {
   }
 
   if (isConnected && address) {
-    const walletInfo = getConnectedWalletInfo(connector?.id)
+    const walletInfo = connector
+      ? getWalletInfo(connector.id)
+      : { name: "Wallet", logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg", description: "", popular: false }
 
     return (
       <DropdownMenu>
@@ -312,125 +252,78 @@ export function ConnectWallet() {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md p-0 bg-background/95 backdrop-blur-2xl border border-border/50 shadow-2xl rounded-2xl overflow-hidden">
-        {/* Decorative glows */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-20 -left-20 w-60 h-60 bg-success/15 rounded-full blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -bottom-20 -right-20 w-60 h-60 bg-success/10 rounded-full blur-3xl"
-        />
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden">
+        <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
         <div className="relative">
           {/* Header */}
-          <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-gradient-to-br from-success/8 via-transparent to-transparent">
-            <div className="flex items-center gap-3">
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-success/25 to-success/5 flex items-center justify-center border border-success/30">
-                <Wallet className="h-5 w-5 text-success" />
-                <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                  <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                </div>
+          <DialogHeader className="px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
+                <Wallet className="h-4 w-4 text-success" />
               </div>
-              <div className="flex-1 text-left">
-                <DialogTitle className="text-lg font-bold tracking-tight">Connect Wallet</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Choose how you want to connect to <span className="text-foreground font-medium">FanIndex</span>
-                </p>
+              <div>
+                <DialogTitle className="text-base font-bold">Connect Wallet</DialogTitle>
+                <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
               </div>
             </div>
           </DialogHeader>
 
           {/* Wallet Options */}
-          <div className="p-4 space-y-2">
-            {connectorsLoading ? (
-              <div className="flex flex-col items-center justify-center py-10 gap-3 text-muted-foreground">
-                <div className="w-7 h-7 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                <span className="text-xs">Loading wallets…</span>
+          <div className="p-3 space-y-1.5">
+            {connectors.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                <span className="text-xs">Loading wallets...</span>
               </div>
             ) : (
-              WALLET_OPTIONS.map((option) => {
-                const isConnecting = connectingOption === option.id
-                const connectorAvailable = connectors.some((c) => c.id === option.connectorId)
-                const disabled = !connectorAvailable || isConnecting
+              connectors.map((c) => {
+                const { name, logo, description, popular } = getWalletInfo(c.id)
+                const isConnecting = connectingWallet === c.id
 
                 return (
                   <button
-                    key={option.id}
-                    onClick={() => handleConnect(option)}
-                    disabled={disabled}
+                    key={c.id}
+                    onClick={() => handleConnect(c.id)}
+                    disabled={isConnecting}
                     className={cn(
-                      "w-full group relative flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-200 text-left",
-                      "bg-muted/20 hover:bg-success/5 border-border/60 hover:border-success/40",
-                      "focus:outline-none focus:ring-2 focus:ring-success/40",
-                      option.featured && "bg-gradient-to-br from-success/8 via-success/3 to-transparent border-success/30",
+                      "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+                      "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                      "focus:outline-none focus:ring-2 focus:ring-success/50",
                       isConnecting && "opacity-70 cursor-wait",
-                      disabled && !isConnecting && "opacity-50 cursor-not-allowed",
                     )}
                   >
-                    {/* Featured glow */}
-                    {option.featured && (
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 rounded-xl pointer-events-none opacity-50"
-                        style={{
-                          background:
-                            "radial-gradient(ellipse 60% 70% at 0% 0%, color-mix(in oklch, var(--success) 12%, transparent), transparent 60%)",
-                        }}
-                      />
-                    )}
-
-                    <div className="relative flex-shrink-0">
-                      <div
-                        className={cn(
-                          "w-12 h-12 rounded-xl flex items-center justify-center border border-border/60 group-hover:border-success/40 transition-all bg-gradient-to-br",
-                          option.iconBg,
-                        )}
-                      >
-                        {option.logo ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={option.logo}
-                            alt={option.name}
-                            width={28}
-                            height={28}
-                            className="rounded-md"
-                          />
-                        ) : option.id === "walletconnect" ? (
-                          <Smartphone className="h-5 w-5 text-blue-400" />
-                        ) : (
-                          <Globe className="h-5 w-5 text-foreground/70" />
-                        )}
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
                       </div>
-                      {option.featured && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center ring-2 ring-background">
+                      {popular && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
                           <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
                         </div>
                       )}
                     </div>
 
-                    <div className="relative flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-semibold text-sm text-foreground group-hover:text-success transition-colors">
-                          {option.name}
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
+                          {name}
                         </span>
-                        {option.badge && (
-                          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-success/15 text-success rounded-full border border-success/20">
-                            {option.badge}
+                        {popular && (
+                          <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                            Popular
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-muted-foreground truncate block leading-relaxed">
-                        {option.description}
-                      </span>
+                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
                     </div>
 
-                    <div className="relative flex-shrink-0">
+                    <div className="flex-shrink-0">
                       {isConnecting ? (
                         <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                       ) : (
-                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-success group-hover:translate-x-0.5 transition-all" />
+                        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
                       )}
                     </div>
                   </button>
@@ -439,37 +332,11 @@ export function ConnectWallet() {
             )}
           </div>
 
-          {/* Network info */}
-          <div className="px-5 pb-3">
-            <div className="flex items-center justify-between p-2.5 rounded-lg bg-muted/20 border border-border/40">
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <div className="w-1.5 h-1.5 rounded-full bg-success" />
-                  <div className="absolute inset-0 w-1.5 h-1.5 rounded-full bg-success animate-ping opacity-75" />
-                </div>
-                <span className="text-[11px] text-muted-foreground">
-                  Network <span className="text-foreground font-medium">Chiliz Chain</span>
-                </span>
-              </div>
-              <span className="text-[10px] font-mono text-muted-foreground/70">CHZ</span>
-            </div>
-          </div>
-
           {/* Footer */}
-          <div className="px-5 py-3 border-t border-border/50 bg-muted/15">
-            <div className="flex items-start gap-2 text-[11px] text-muted-foreground leading-relaxed">
+          <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
+            <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
               <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
-              <p>
-                By connecting, you agree to our{" "}
-                <Link href="/terms" className="text-success hover:underline font-medium">
-                  Terms
-                </Link>{" "}
-                &amp;{" "}
-                <Link href="/privacy" className="text-success hover:underline font-medium">
-                  Privacy Policy
-                </Link>
-                . Your keys, your coins.
-              </p>
+              <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
             </div>
           </div>
         </div>
