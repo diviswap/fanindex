@@ -69,37 +69,16 @@ export function ConnectWallet() {
       return {
         name: "WalletConnect",
         logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        description: "Scan with any mobile wallet app",
-        popular: false,
-        highlight: false,
+        description: "Scan with any mobile wallet",
+        popular: true,
       }
     }
     return {
       name: "Browser Wallet",
       logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-      description: "MetaMask, Coinbase, or any injected wallet",
+      description: "MetaMask, Coinbase, or any EIP-1193 wallet",
       popular: true,
-      highlight: false,
     }
-  }
-
-  const handleConnectSocios = () => {
-    // Socios uses WalletConnect protocol under the hood
-    const wc = connectors.find((c) => c.id.includes("walletConnect"))
-    if (!wc) return
-    setConnectingWallet("socios")
-    connect(
-      { connector: wc },
-      {
-        onSuccess: () => {
-          setDialogOpen(false)
-          setConnectingWallet(null)
-        },
-        onError: () => {
-          setConnectingWallet(null)
-        },
-      }
-    )
   }
 
   if (!mounted) {
@@ -278,136 +257,78 @@ export function ConnectWallet() {
 
         <div className="relative">
           {/* Header */}
-          <DialogHeader className="px-5 pt-5 pb-4 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
-                <Wallet className="h-5 w-5 text-success" />
+          <DialogHeader className="px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
+                <Wallet className="h-4 w-4 text-success" />
               </div>
               <div>
-                <DialogTitle className="text-base font-bold tracking-tight">Connect your wallet</DialogTitle>
-                <p className="text-xs text-muted-foreground mt-0.5">Select a wallet to access FanIndex</p>
+                <DialogTitle className="text-base font-bold">Connect Wallet</DialogTitle>
+                <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
               </div>
             </div>
           </DialogHeader>
 
           {/* Wallet Options */}
-          <div className="p-3 space-y-2">
+          <div className="p-3 space-y-1.5">
             {connectors.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-8 gap-2 text-muted-foreground">
+              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
                 <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                 <span className="text-xs">Loading wallets...</span>
               </div>
             ) : (
-              <>
-                {/* Socios.com — featured option */}
-                <button
-                  onClick={handleConnectSocios}
-                  disabled={connectingWallet === "socios"}
-                  className={cn(
-                    "w-full group relative flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all duration-200",
-                    "bg-[#1a1a1a] hover:bg-[#222] border-[#00B67A]/60 hover:border-[#00B67A]",
-                    "focus:outline-none focus:ring-2 focus:ring-[#00B67A]/50",
-                    connectingWallet === "socios" && "opacity-70 cursor-wait",
-                  )}
-                >
-                  {/* Socios glow */}
-                  <div className="absolute inset-0 rounded-xl bg-[#00B67A]/5 pointer-events-none" />
+              connectors.map((c) => {
+                const { name, logo, description, popular } = getWalletInfo(c.id)
+                const isConnecting = connectingWallet === c.id
 
-                  <div className="relative w-11 h-11 rounded-xl bg-black flex items-center justify-center border border-[#00B67A]/30 overflow-hidden flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Socios.com_logo.svg/1024px-Socios.com_logo.svg.png"
-                      alt="Socios.com"
-                      width={28}
-                      height={28}
-                      className="object-contain"
-                    />
-                  </div>
-
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-sm text-white">
-                        Socios.com
-                      </span>
-                      <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-[#00B67A]/20 text-[#00B67A] rounded border border-[#00B67A]/30">
-                        Recommended
-                      </span>
-                    </div>
-                    <span className="text-xs text-zinc-400 block mt-0.5">
-                      Connect with your Socios app via WalletConnect
-                    </span>
-                  </div>
-
-                  <div className="flex-shrink-0">
-                    {connectingWallet === "socios" ? (
-                      <div className="w-5 h-5 border-2 border-[#00B67A]/30 border-t-[#00B67A] rounded-full animate-spin" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-zinc-500 group-hover:text-[#00B67A] -rotate-90 transition-colors" />
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => handleConnect(c.id)}
+                    disabled={isConnecting}
+                    className={cn(
+                      "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+                      "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                      "focus:outline-none focus:ring-2 focus:ring-success/50",
+                      isConnecting && "opacity-70 cursor-wait",
                     )}
-                  </div>
-                </button>
-
-                {/* Divider */}
-                <div className="relative flex items-center gap-2 py-1">
-                  <div className="flex-1 h-px bg-border/40" />
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium px-1">or</span>
-                  <div className="flex-1 h-px bg-border/40" />
-                </div>
-
-                {/* Other connectors */}
-                {connectors.map((c) => {
-                  const { name, logo, description, popular } = getWalletInfo(c.id)
-                  const isConnecting = connectingWallet === c.id
-
-                  return (
-                    <button
-                      key={c.id}
-                      onClick={() => handleConnect(c.id)}
-                      disabled={isConnecting}
-                      className={cn(
-                        "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-                        "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
-                        "focus:outline-none focus:ring-2 focus:ring-success/50",
-                        isConnecting && "opacity-70 cursor-wait",
+                  >
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
+                      </div>
+                      {popular && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                        </div>
                       )}
-                    >
-                      <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={logo} alt={name} width={24} height={24} className="rounded" />
-                        </div>
+                    </div>
+
+                    <div className="flex-1 text-left min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
+                          {name}
+                        </span>
                         {popular && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                            <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1 text-left min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
-                            {name}
+                          <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                            Popular
                           </span>
-                          {popular && (
-                            <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                              Popular
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-muted-foreground truncate block">{description}</span>
-                      </div>
-
-                      <div className="flex-shrink-0">
-                        {isConnecting ? (
-                          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
                         )}
                       </div>
-                    </button>
-                  )
-                })}
-              </>
+                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      {isConnecting ? (
+                        <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
+                      )}
+                    </div>
+                  </button>
+                )
+              })
             )}
           </div>
 
