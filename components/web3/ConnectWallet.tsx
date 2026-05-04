@@ -65,9 +65,9 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
   }, [])
 
   return createPortal(
-    // Outer layer: purely visual backdrop, pointer-events disabled so it
-    // NEVER intercepts taps meant for the panel or the page.
+    // Backdrop — pointer-events ON so taps on it close the modal
     <div
+      onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -75,22 +75,20 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        // Backdrop visual only — no pointer events
         backgroundColor: "rgba(0,0,0,0.65)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
-        pointerEvents: "none",
       }}
     >
-      {/* Panel — re-enables pointer events only for itself */}
+      {/* Panel — stop propagation so taps inside don't close the modal */}
       <div
+        onClick={(e) => e.stopPropagation()}
         style={{
           position: "relative",
           width: "min(calc(100vw - 2rem), 24rem)",
           borderRadius: "0.75rem",
           overflow: "hidden",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
-          pointerEvents: "auto",
           overscrollBehavior: "contain",
         }}
         className="bg-background border border-border/50"
@@ -242,11 +240,13 @@ export function ConnectWallet() {
     const found = connectors.find((c) => c.id === connectorId)
     if (!found) return
 
-    // Close the modal immediately so WalletConnect's own modal (QR on desktop,
-    // wallet list / deep-link on mobile) can render without interference.
-    setModalOpen(false)
-    setConnectingWallet(isSocios ? "socios" : connectorId)
+    // IMPORTANT: call connect() FIRST, then close our modal.
+    // On iOS/Android, wagmi's connect() must be called synchronously within
+    // the tap event handler — any state update before it can cause a re-render
+    // that breaks the user-gesture chain required to open the WC modal.
     connect({ connector: found })
+    setConnectingWallet(isSocios ? "socios" : connectorId)
+    setModalOpen(false)
   }
 
   function handleDisconnect() {
