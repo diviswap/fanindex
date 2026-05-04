@@ -243,12 +243,36 @@ export function ConnectWallet() {
     reset()
     setConnectingWallet(key)
 
+    // For Socios on mobile, we configured the WC connector with showQrModal:false,
+    // so we MUST manually capture the WalletConnect URI and redirect into the
+    // Socios app via deep-link. Otherwise the connect call would hang forever.
+    let cleanupListener: (() => void) | null = null
+    if (isMobile && isSocios) {
+      const onMessage = (event: { type: string; data?: unknown }) => {
+        if (event.type === "display_uri" && typeof event.data === "string") {
+          const wcUri = event.data
+          // Try the Socios universal/custom-scheme deep link. This will open
+          // the Socios app with the WalletConnect session already attached.
+          // If the app isn't installed, the browser stays on the page.
+          const sociosLink = `socios://wc?uri=${encodeURIComponent(wcUri)}`
+          window.location.href = sociosLink
+        }
+      }
+      // wagmi connector exposes its EventEmitter through `emitter`
+      const emitter = (found as unknown as { emitter?: { on: (e: string, cb: typeof onMessage) => void; off: (e: string, cb: typeof onMessage) => void } }).emitter
+      if (emitter) {
+        emitter.on("message", onMessage)
+        cleanupListener = () => emitter.off("message", onMessage)
+      }
+    }
+
     try {
       await connect({ connector: found })
       setModalOpen(false)
     } catch {
       reset() // free the connector so it can be re-used immediately
     } finally {
+      cleanupListener?.()
       setConnectingWallet(null)
     }
   }
