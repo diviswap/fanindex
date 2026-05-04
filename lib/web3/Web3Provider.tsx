@@ -52,21 +52,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             showQrModal: true,
           }),
         )
-
-        // Add Socios.com connector (duplicate of WalletConnect with custom ID)
-        const sociosConnector = walletConnect({
-          projectId,
-          metadata: {
-            name: "FanIndex",
-            description: "Fan Token Investment Platform",
-            url: "https://fanindex.app",
-            icons: ["https://fanindex.app/logo.png"],
-          },
-          showQrModal: true,
-        })
-        // Override the ID to identify as socios
-        ;(sociosConnector as any).id = "socios"
-        connectors.push(sociosConnector)
       }
 
       import("./config").then(({ createWagmiConfig }) => {
