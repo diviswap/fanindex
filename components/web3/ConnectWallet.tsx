@@ -73,6 +73,14 @@ export function ConnectWallet() {
         popular: true,
       }
     }
+    if (connectorId.includes("socios")) {
+      return {
+        name: "Socios.com",
+        logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-emlvwb5FNFoczifks0VQ3K0ok6cRr6.png",
+        description: "Connect with Socios wallet",
+        popular: true,
+      }
+    }
     return {
       name: "Browser Wallet",
       logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
@@ -252,7 +260,7 @@ export function ConnectWallet() {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden" onInteractOutside={(e) => e.preventDefault()} onPointerDownOutside={() => setDialogOpen(false)}>
         <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
         <div className="relative">
