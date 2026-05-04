@@ -282,7 +282,7 @@ export function ConnectWallet() {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-visible">
         <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
         <div className="relative">
@@ -307,38 +307,45 @@ export function ConnectWallet() {
                 <span className="text-xs">Loading wallets...</span>
               </div>
             ) : (
+              // Build a flat list of wallet items including the Socios variant for the
+              // second WalletConnect connector, then render with a simple .map() so
+              // React can attach event handlers correctly on mobile (no IIFE quirks).
               (() => {
-                // Build a deduplicated list of wallet options to render.
-                // walletConnect appears twice in connectors (generic + Socios),
-                // so we render them as two distinct items manually.
-                const rendered: React.ReactNode[] = []
                 let wcCount = 0
-
-                connectors.forEach((c) => {
+                const items = connectors.map((c) => {
                   const isWC = c.id.toLowerCase().includes("walletconnect")
                   const isSocios = isWC && wcCount === 1
                   if (isWC) wcCount++
+                  return { connector: c, isSocios, key: isSocios ? "socios" : c.id }
+                })
 
+                return items.map(({ connector: c, isSocios, key }) => {
                   const { name, logo, description, popular } = getWalletInfo(c.id, isSocios)
-                  const key = isSocios ? "socios" : c.id
                   const isConnecting = connectingWallet === key
-
-                  rendered.push(
+                  return (
                     <button
                       key={key}
-                      onClick={() => handleConnect(c.id, isSocios)}
+                      type="button"
                       disabled={isConnecting}
+                      onClick={() => handleConnect(c.id, isSocios)}
+                      style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
                       className={cn(
                         "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-                        "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                        "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40 active:border-success/60",
                         "focus:outline-none focus:ring-2 focus:ring-success/50",
                         isConnecting && "opacity-70 cursor-wait",
                       )}
                     >
-                      <div className="relative">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors overflow-hidden">
+                      <div className="relative flex-shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={logo} alt={name} width={28} height={28} className={cn("rounded", isSocios && "w-full h-full object-cover")} />
+                          <img
+                            src={logo}
+                            alt={name}
+                            width={28}
+                            height={28}
+                            className={cn("rounded", isSocios && "w-full h-full object-cover")}
+                          />
                         </div>
                         {popular && (
                           <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
@@ -347,27 +354,21 @@ export function ConnectWallet() {
                         )}
                       </div>
 
-                      <div className="flex-1 text-left min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
-                            {name}
-                          </span>
-                        </div>
+                      <div className="flex-1 text-left min-w-0 pointer-events-none">
+                        <span className="font-medium text-sm text-foreground block">{name}</span>
                         <span className="text-xs text-muted-foreground truncate block">{description}</span>
                       </div>
 
-                      <div className="flex-shrink-0">
+                      <div className="flex-shrink-0 pointer-events-none">
                         {isConnecting ? (
                           <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                         ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
+                          <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
                         )}
                       </div>
                     </button>
                   )
                 })
-
-                return rendered
               })()
             )}
           </div>
