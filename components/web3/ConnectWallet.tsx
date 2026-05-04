@@ -282,10 +282,25 @@ export function ConnectWallet() {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-visible">
+      <DialogContent
+        className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-visible"
+        onPointerDownOutside={(e) => {
+          // Only close if the tap/click is truly outside the dialog panel
+          const target = e.target as HTMLElement
+          if (target.closest('[role="dialog"]')) e.preventDefault()
+        }}
+        onInteractOutside={(e) => {
+          const target = e.target as HTMLElement
+          if (target.closest('[role="dialog"]')) e.preventDefault()
+        }}
+      >
         <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
-        <div className="relative">
+        <div
+          className="relative"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Header */}
           <DialogHeader className="px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
             <div className="flex items-center gap-2.5">
