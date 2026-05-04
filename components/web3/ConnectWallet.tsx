@@ -31,16 +31,38 @@ export function ConnectWallet() {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [connectingWallet, setConnectingWallet] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  // Track which walletConnect index is for Socios (second one) vs generic (first one)
+  const [walletConnectIndices, setWalletConnectIndices] = useState<number[]>([])
 
   useEffect(() => {
     setMounted(true)
+    setIsMobile(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
   }, [])
 
-  const handleConnect = async (connectorId: string) => {
+  useEffect(() => {
+    const indices = connectors
+      .map((c, i) => (c.id.toLowerCase().includes("walletconnect") ? i : -1))
+      .filter((i) => i !== -1)
+    setWalletConnectIndices(indices)
+  }, [connectors])
+
+  const handleConnect = async (connectorId: string, isSocios = false) => {
     const found = connectors.find((c) => c.id === connectorId)
     if (!found) return
-    setConnectingWallet(connectorId)
+    setConnectingWallet(isSocios ? "socios" : connectorId)
     try {
+      // On mobile, WalletConnect needs to open the app via deep link.
+      // We trigger the connection and then redirect to the appropriate app URI.
+      if (isMobile && connectorId.toLowerCase().includes("walletconnect")) {
+        if (isSocios) {
+          // Socios deep link — opens Socios.com app directly
+          window.location.href = "socios://wc"
+        } else {
+          // Generic WalletConnect on mobile — use universal link
+          window.location.href = "https://walletconnect.com/wc"
+        }
+      }
       await connect({ connector: found })
       setDialogOpen(false)
     } catch (error) {
@@ -64,12 +86,20 @@ export function ConnectWallet() {
     }
   }
 
-  const getWalletInfo = (connectorId: string) => {
-    if (connectorId.includes("walletConnect")) {
+  const getWalletInfo = (connectorId: string, isSocios = false) => {
+    if (connectorId.toLowerCase().includes("walletconnect")) {
+      if (isSocios) {
+        return {
+          name: "Socios.com",
+          logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-vjCpeldsZ6hj0adYPfXyJS6J2Cd9qI.png",
+          description: isMobile ? "Open in Socios app" : "Scan with Socios.com app",
+          popular: true,
+        }
+      }
       return {
         name: "WalletConnect",
         logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        description: "Scan with any mobile wallet",
+        description: isMobile ? "Open in your wallet app" : "Scan with any mobile wallet",
         popular: true,
       }
     }
@@ -277,58 +307,68 @@ export function ConnectWallet() {
                 <span className="text-xs">Loading wallets...</span>
               </div>
             ) : (
-              connectors.map((c) => {
-                const { name, logo, description, popular } = getWalletInfo(c.id)
-                const isConnecting = connectingWallet === c.id
+              (() => {
+                // Build a deduplicated list of wallet options to render.
+                // walletConnect appears twice in connectors (generic + Socios),
+                // so we render them as two distinct items manually.
+                const rendered: React.ReactNode[] = []
+                let wcCount = 0
 
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => handleConnect(c.id)}
-                    disabled={isConnecting}
-                    className={cn(
-                      "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-                      "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
-                      "focus:outline-none focus:ring-2 focus:ring-success/50",
-                      isConnecting && "opacity-70 cursor-wait",
-                    )}
-                  >
-                    <div className="relative">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
-                      </div>
-                      {popular && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                        </div>
+                connectors.forEach((c) => {
+                  const isWC = c.id.toLowerCase().includes("walletconnect")
+                  const isSocios = isWC && wcCount === 1
+                  if (isWC) wcCount++
+
+                  const { name, logo, description, popular } = getWalletInfo(c.id, isSocios)
+                  const key = isSocios ? "socios" : c.id
+                  const isConnecting = connectingWallet === key
+
+                  rendered.push(
+                    <button
+                      key={key}
+                      onClick={() => handleConnect(c.id, isSocios)}
+                      disabled={isConnecting}
+                      className={cn(
+                        "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+                        "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                        "focus:outline-none focus:ring-2 focus:ring-success/50",
+                        isConnecting && "opacity-70 cursor-wait",
                       )}
-                    </div>
-
-                    <div className="flex-1 text-left min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
-                          {name}
-                        </span>
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={logo} alt={name} width={28} height={28} className={cn("rounded", isSocios && "w-full h-full object-cover")} />
+                        </div>
                         {popular && (
-                          <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                            Popular
-                          </span>
+                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                            <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                          </div>
                         )}
                       </div>
-                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
-                    </div>
 
-                    <div className="flex-shrink-0">
-                      {isConnecting ? (
-                        <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
-                      )}
-                    </div>
-                  </button>
-                )
-              })
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
+                            {name}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                      </div>
+
+                      <div className="flex-shrink-0">
+                        {isConnecting ? (
+                          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
+                        )}
+                      </div>
+                    </button>
+                  )
+                })
+
+                return rendered
+              })()
             )}
           </div>
 
