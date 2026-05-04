@@ -1,0 +1,292 @@
+{
+  "nav": {
+    "home": "Home",
+    "indices": "Indices",
+    "fanTokens": "Fan Tokens",
+    "portfolio": "Portfolio",
+    "whitepaper": "Whitepaper"
+  },
+  "hero": {
+    "badge": "Live on Chiliz",
+    "title": "The Index Layer for",
+    "titleHighlight": "Fan Tokens",
+    "description": "Tokenized sports indices, analytics, and portfolio infrastructure for the modern SportFi investor.",
+    "exploreIndices": "Explore Indices",
+    "viewMarket": "View Market",
+    "trust": {
+      "onChain": "On-Chain Infrastructure",
+      "nftPositions": "NFT-Based Positions",
+      "analytics": "Real-Time Analytics"
+    }
+  },
+  "why": {
+    "label": "Why FanIndex",
+    "title": "Structured Exposure for SportFi",
+    "items": {
+      "diversified": {
+        "title": "Diversified Exposure",
+        "description": "Reduce concentration risk across teams and leagues."
+      },
+      "transparent": {
+        "title": "On-Chain Transparency",
+        "description": "All index positions are verifiable on-chain."
+      },
+      "professional": {
+        "title": "Professional Infrastructure",
+        "description": "Built for long-term SportFi participation."
+      }
+    }
+  },
+  "indexFamily": {
+    "label": "Index Family",
+    "title": "The FanIndex Ecosystem",
+    "description": "A family of professionally structured indices providing transparent, diversified exposure to the SportFi market.",
+    "constituents": "assets",
+    "nav": "NAV",
+    "view": "View",
+    "items": {
+      "FTLX": {
+        "title": "Fan Token Leaders Index",
+        "tagline": "Benchmark",
+        "description": "The flagship benchmark tracking the largest and most liquid fan tokens."
+      },
+      "FGMX": {
+        "title": "Fan Gaming Index",
+        "tagline": "Esports",
+        "description": "Diversified exposure to leading esports organizations on Chiliz."
+      },
+      "FFLX": {
+        "title": "Fan Fight Index",
+        "tagline": "Combat Sports",
+        "description": "Structured exposure to top combat sports organizations."
+      },
+      "FELX": {
+        "title": "Fan English League Index",
+        "tagline": "Premier League",
+        "description": "Weighted exposure to leading English football clubs."
+      },
+      "FSLX": {
+        "title": "Fan Spanish League Index",
+        "tagline": "La Liga",
+        "description": "Weighted exposure to top Spanish football clubs."
+      }
+    }
+  },
+  "analytics": {
+    "label": "Analytics Platform",
+    "title": "Real-Time Fan Token Market Intelligence",
+    "description": "Institutional market data for the SportFi economy. Live pricing, capitalisation, volume, and supply metrics across the entire fan token universe.",
+    "openMarket": "Open Market Data",
+    "live": "Live · Chiliz Mainnet",
+    "feed": "CoinGecko Feed · 60s",
+    "terminal": "FANINDEX · TERMINAL",
+    "kpi": {
+      "chzPrice": "CHZ Price (USD)",
+      "marketCap": "Top 8 Market Cap",
+      "volume": "24h Volume",
+      "tracked": "Tracked Assets"
+    },
+    "table": {
+      "rank": "#",
+      "asset": "Asset",
+      "price": "Price (CHZ)",
+      "change": "24h",
+      "marketCap": "Market Cap",
+      "volume": "24h Volume",
+      "share": "Share"
+    }
+  },
+  "portfolio": {
+    "label": "Portfolio Infrastructure",
+    "title": "Track Your Indexed Positions",
+    "description": "Every index position is minted as a non-fungible token, custodied on-chain. View, transfer, or redeem your indexed exposure with institutional-grade transparency.",
+    "features": {
+      "nft": "NFT-based receipts for every indexed position",
+      "nav": "Real-time NAV and P&L from on-chain pricing",
+      "redeem": "Atomic redemption back to underlying assets"
+    },
+    "openPortfolio": "Open Portfolio",
+    "metrics": {
+      "value": "Portfolio Value",
+      "performance": "Performance",
+      "positions": "Active Positions",
+      "chain": "Chain Status",
+      "mainnet": "Mainnet"
+    }
+  },
+  "rebalance": {
+    "label": "Rebalance Engine",
+    "title": "Monthly Rebalanced Infrastructure",
+    "description": "FanIndex maintains its indices through a transparent, rule-based rebalance process — the same operational discipline expected from traditional ETF infrastructure.",
+    "principles": {
+      "monthly": {
+        "title": "Monthly Cadence",
+        "description": "Constituents and weights are reviewed and rebalanced on a fixed monthly schedule."
+      },
+      "rules": {
+        "title": "Rule-Based Methodology",
+        "description": "Selection driven by liquidity, market capitalisation, and on-chain activity thresholds."
+      },
+      "onchain": {
+        "title": "On-Chain Execution",
+        "description": "Rebalances are executed atomically through audited smart contracts on Chiliz."
+      },
+      "public": {
+        "title": "Public Factsheets",
+        "description": "Methodology, holdings, and rebalance events are documented and verifiable."
+      }
+    },
+    "factsheet": "Factsheet",
+    "weighted": "Weighted",
+    "constituents": "constituents",
+    "methodology": "Methodology",
+    "methodologyValue": "Liquidity-Weighted",
+    "rebalanceFreq": "Rebalance",
+    "rebalanceValue": "Monthly",
+    "totalWeight": "Total Weight"
+  },
+  "cta": {
+    "label": "The FanIndex Thesis",
+    "title": "Built for the Future of SportFi",
+    "description": "Fan Tokens created a new asset class. FanIndex is building the infrastructure around it.",
+    "launchApp": "Launch App",
+    "readWhitepaper": "Read Whitepaper"
+  },
+  "footer": {
+    "description": "The first ETF-like platform for Fan Tokens. Diversify your portfolio across leagues and teams on the Chiliz Chain.",
+    "copyright": "All rights reserved.",
+    "sections": {
+      "product": {
+        "label": "Product",
+        "indices": "Indices",
+        "portfolio": "Portfolio",
+        "fanTokens": "Fan Tokens"
+      },
+      "resources": {
+        "label": "Resources",
+        "docs": "Documentation",
+        "whitepaper": "Whitepaper"
+      },
+      "legal": {
+        "label": "Legal & Support",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "x": "X"
+      }
+    }
+  },
+  "wallet": {
+    "connect": "Connect",
+    "connecting": "Connecting...",
+    "title": "Connect Wallet",
+    "subtitle": "Choose your wallet to continue",
+    "loading": "Loading wallets...",
+    "popular": "Popular",
+    "scanWith": "Scan with any mobile wallet",
+    "connectSocios": "Connect with Socios wallet",
+    "browserWallet": "Browser Wallet",
+    "browserWalletDesc": "MetaMask, Coinbase, or any EIP-1193 wallet",
+    "terms": "By connecting, you agree to our Terms of Service and Privacy Policy.",
+    "connected": {
+      "chain": "Chiliz Chain",
+      "address": "Address",
+      "balance": "Balance",
+      "myPortfolio": "My Portfolio",
+      "viewExplorer": "View on Explorer",
+      "disconnect": "Disconnect",
+      "disconnected": "Wallet disconnected",
+      "copied": "Address copied to clipboard"
+    }
+  },
+  "indicesPage": {
+    "badge": "Live Sports Token Indices",
+    "title": "Fan Token",
+    "titleHighlight": "Indices",
+    "description": "Diversified exposure to the sports token economy. Live, on-chain, and rebalanced.",
+    "strategies": {
+      "label": "Index Strategies",
+      "title": "Three Approaches to SportFi Exposure",
+      "weighted": {
+        "title": "Weighted",
+        "description": "Tokens allocated proportionally based on market capitalization and liquidity for optimized, benchmark-grade exposure."
+      },
+      "equal": {
+        "title": "Equal-Weight",
+        "description": "Equal allocation across all constituents for democratized exposure, balanced risk distribution, and maximum diversification."
+      },
+      "managed": {
+        "title": "Managed",
+        "description": "Actively managed by the FanIndex team with dynamic adjustments, tactical rotation, and strategic allocation based on market conditions."
+      }
+    },
+    "methodology": {
+      "label": "Methodology",
+      "title": "How Index Prices Are Calculated",
+      "description": "Every FanIndex product uses a transparent, on-chain weighted pricing formula. Market prices are sourced in real time from CoinGecko and updated continuously.",
+      "rebalance": { "label": "Rebalance Frequency", "value": "Periodic", "sub": "Manually executed by the FanIndex team with future automation planned" },
+      "price": { "label": "Price Source", "value": "CoinGecko", "sub": "Live market prices fetched from the CoinGecko API in real time" },
+      "fee": { "label": "Entry Fee", "value": "1%", "sub": "Protocol fee applied on each purchase — zero exit fee" },
+      "position": { "label": "Position Type", "value": "NFT", "sub": "Each position is represented by a unique NFT certifying ownership" }
+    },
+    "roadmap": {
+      "label": "Roadmap",
+      "title": "Future Index Expansion",
+      "description": "The FanIndex suite will grow to cover every major segment of the global sports token economy.",
+      "items": [
+        "Italian League",
+        "Turkish League",
+        "National Teams",
+        "Brazil League",
+        "Asia Sports",
+        "Motorsports",
+        "Basketball",
+        "UFC / MMA",
+        "Global Tournaments",
+        "User-Created"
+      ]
+    }
+  },
+  "portfolioPage": {
+    "badge": "Live Portfolio Tracking",
+    "title": "My",
+    "titleHighlight": "Portfolio",
+    "description": "Track and manage your Fan Token index positions with real-time on-chain analytics.",
+    "trust": {
+      "prices": "Real-Time Prices",
+      "positions": "NFT Positions",
+      "updated": "Auto-Updated"
+    },
+    "howItWorks": {
+      "label": "How It Works",
+      "title": "NFT-Based Position Infrastructure",
+      "steps": {
+        "deposit": { "step": "01", "title": "Deposit CHZ", "description": "Select an index and deposit CHZ. Smart contracts execute proportional purchases of all underlying Fan Tokens automatically." },
+        "receive": { "step": "02", "title": "Receive NFT", "description": "A unique NFT is minted to your wallet. It certifies your position — index type, deposited value, allocation data, and timestamp." },
+        "track": { "step": "03", "title": "Track Performance", "description": "Monitor your positions, allocations, and real-time exposure directly on-chain with full transparency." },
+        "redeem": { "step": "04", "title": "Redeem Anytime", "description": "Burn your NFT to redeem. The protocol sells the underlying portfolio and returns CHZ to your wallet — zero exit fee." }
+      }
+    },
+    "error": {
+      "title": "Portfolio failed to load",
+      "description": "There was a problem loading the portfolio. Please refresh the page.",
+      "refresh": "Refresh Page"
+    }
+  },
+  "privacyPage": {
+    "back": "Back to home",
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated:",
+    "sections": {
+      "intro": { "title": "Introduction", "content": "FanIndex (\"we,\" \"our,\" or \"us\") operates the fanindex.pro website and related services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services." },
+      "collect": { "title": "Information We Collect", "intro": "We collect information you provide directly to us, such as:", "items": ["Wallet address and blockchain transaction data", "Email address (if you opt-in for communications)", "Usage data and analytics", "Device information and browser data"] },
+      "use": { "title": "How We Use Your Information", "intro": "We use the information we collect to:", "items": ["Provide and improve our services", "Process transactions and send related information", "Respond to your inquiries and requests", "Send promotional communications (with your consent)", "Comply with legal obligations", "Analyze usage patterns to enhance user experience"] },
+      "security": { "title": "Data Security", "content": "We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure." },
+      "blockchain": { "title": "Blockchain Transparency", "content": "Please be aware that transactions on the Chiliz Chain and other blockchain networks are public and transparent. Any information recorded on the blockchain is permanently visible to all network participants." },
+      "contact": { "title": "Contact Us", "content": "If you have any questions about this Privacy Policy, please contact us at privacy@fanindex.pro" }
+    }
+  },
+  "termsPage": {
+    "back": "Back to home",
+    "title": "Terms of Service"
+  }
+}

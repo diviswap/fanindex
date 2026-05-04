@@ -21,8 +21,10 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 export function ConnectWallet() {
+  const t = useTranslations("wallet")
   const { address, isConnected, connector } = useAccount()
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
@@ -52,14 +54,14 @@ export function ConnectWallet() {
 
   const handleDisconnect = () => {
     disconnect()
-    toast.success("Wallet disconnected")
+    toast.success(t("connected.disconnected"))
   }
 
   const copyAddress = () => {
     if (address) {
       navigator.clipboard.writeText(address)
       setCopied(true)
-      toast.success("Address copied to clipboard")
+      toast.success(t("connected.copied"))
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -69,7 +71,7 @@ export function ConnectWallet() {
       return {
         name: "WalletConnect",
         logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        description: "Scan with any mobile wallet",
+        description: t("scanWith"),
         popular: true,
       }
     }
@@ -77,14 +79,14 @@ export function ConnectWallet() {
       return {
         name: "Socios.com",
         logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-emlvwb5FNFoczifks0VQ3K0ok6cRr6.png",
-        description: "Connect with Socios wallet",
+        description: t("connectSocios"),
         popular: true,
       }
     }
     return {
-      name: "Browser Wallet",
+      name: t("browserWallet"),
       logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-      description: "MetaMask, Coinbase, or any EIP-1193 wallet",
+      description: t("browserWalletDesc"),
       popular: true,
     }
   }
@@ -96,7 +98,7 @@ export function ConnectWallet() {
         className="relative overflow-hidden gap-1.5 bg-gradient-to-r from-success to-success/80 text-success-foreground font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 h-9 sm:h-10 rounded-lg border border-success/30 shadow-md shadow-success/20"
       >
         <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        <span className="hidden sm:inline">Connect</span>
+        <span className="hidden sm:inline">{t("connect")}</span>
       </Button>
     )
   }
@@ -138,13 +140,7 @@ export function ConnectWallet() {
               <div className="relative">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-background to-muted flex items-center justify-center border border-success/30">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={walletInfo.logo}
-                    alt={walletInfo.name}
-                    width={24}
-                    height={24}
-                    className="rounded-lg"
-                  />
+                  <img src={walletInfo.logo} alt={walletInfo.name} width={24} height={24} className="rounded-lg" />
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-success flex items-center justify-center">
                   <CheckCircle2 className="h-2.5 w-2.5 text-success-foreground" />
@@ -154,7 +150,7 @@ export function ConnectWallet() {
                 <div className="font-semibold text-foreground text-sm">{walletInfo.name}</div>
                 <div className="text-xs text-success font-medium flex items-center gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-success" />
-                  Chiliz Chain
+                  {t("connected.chain")}
                 </div>
               </div>
             </div>
@@ -164,7 +160,9 @@ export function ConnectWallet() {
             {/* Address */}
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Address</span>
+                <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                  {t("connected.address")}
+                </span>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -184,7 +182,9 @@ export function ConnectWallet() {
               <div className="p-2.5 bg-success/5 rounded-lg border border-success/20">
                 <div className="flex items-center gap-1.5 mb-1">
                   <Zap className="h-3 w-3 text-success" />
-                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Balance</span>
+                  <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
+                    {t("connected.balance")}
+                  </span>
                 </div>
                 <div className="flex items-baseline gap-1.5">
                   <span className="text-lg font-bold text-foreground">
@@ -208,7 +208,7 @@ export function ConnectWallet() {
                 <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
                   <User className="h-4 w-4 text-success" />
                 </div>
-                <span className="font-medium text-sm">My Portfolio</span>
+                <span className="font-medium text-sm">{t("connected.myPortfolio")}</span>
               </Link>
             </DropdownMenuItem>
 
@@ -220,7 +220,7 @@ export function ConnectWallet() {
                 <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center">
                   <ExternalLink className="h-4 w-4 text-success" />
                 </div>
-                <span className="font-medium text-sm">View on Explorer</span>
+                <span className="font-medium text-sm">{t("connected.viewExplorer")}</span>
               </div>
             </DropdownMenuItem>
           </div>
@@ -236,7 +236,7 @@ export function ConnectWallet() {
                 <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center">
                   <LogOut className="h-4 w-4 text-red-400" />
                 </div>
-                <span className="font-medium text-sm">Disconnect</span>
+                <span className="font-medium text-sm">{t("connected.disconnect")}</span>
               </div>
             </DropdownMenuItem>
           </div>
@@ -255,12 +255,16 @@ export function ConnectWallet() {
           <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
           <div className="relative flex items-center gap-1.5">
             <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">{isPending ? "Connecting..." : "Connect"}</span>
-            <span className="sm:hidden">{isPending ? "..." : "Connect"}</span>
+            <span className="hidden sm:inline">{isPending ? t("connecting") : t("connect")}</span>
+            <span className="sm:hidden">{isPending ? "..." : t("connect")}</span>
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden" onInteractOutside={(e) => e.preventDefault()} onPointerDownOutside={() => setDialogOpen(false)}>
+      <DialogContent
+        className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden"
+        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={() => setDialogOpen(false)}
+      >
         <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
         <div className="relative">
@@ -271,8 +275,8 @@ export function ConnectWallet() {
                 <Wallet className="h-4 w-4 text-success" />
               </div>
               <div>
-                <DialogTitle className="text-base font-bold">Connect Wallet</DialogTitle>
-                <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
+                <DialogTitle className="text-base font-bold">{t("title")}</DialogTitle>
+                <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
               </div>
             </div>
           </DialogHeader>
@@ -282,7 +286,7 @@ export function ConnectWallet() {
             {connectors.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
                 <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                <span className="text-xs">Loading wallets...</span>
+                <span className="text-xs">{t("loading")}</span>
               </div>
             ) : (
               <>
@@ -321,7 +325,7 @@ export function ConnectWallet() {
                           </span>
                           {popular && (
                             <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                              Popular
+                              {t("popular")}
                             </span>
                           )}
                         </div>
@@ -338,7 +342,7 @@ export function ConnectWallet() {
                     </button>
                   )
                 })}
-                
+
                 {/* Socios.com Button - duplicated WalletConnect */}
                 {connectors.find((c) => c.id.includes("walletConnect")) && (
                   <button
@@ -372,10 +376,10 @@ export function ConnectWallet() {
                           Socios.com
                         </span>
                         <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                          Popular
+                          {t("popular")}
                         </span>
                       </div>
-                      <span className="text-xs text-muted-foreground truncate block">Connect with Socios wallet</span>
+                      <span className="text-xs text-muted-foreground truncate block">{t("connectSocios")}</span>
                     </div>
 
                     <div className="flex-shrink-0">
@@ -395,7 +399,7 @@ export function ConnectWallet() {
           <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
             <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
               <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
-              <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
+              <p>{t("terms")}</p>
             </div>
           </div>
         </div>

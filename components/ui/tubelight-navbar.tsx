@@ -13,6 +13,8 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { useTranslations } from "next-intl"
+import { LanguageSwitcher } from "@/components/ui/language-switcher"
 
 interface NavItem {
   name: string
@@ -26,12 +28,14 @@ interface NavBarProps {
 }
 
 export function NavBar({ items: itemsProp, className }: NavBarProps) {
+  const t = useTranslations("nav")
+
   const items = itemsProp || [
-    { name: "Home", url: "/", icon: Home },
-    { name: "Indices", url: "/indices", icon: Sparkles },
-    { name: "Fan Tokens", url: "/fan-tokens", icon: Coins },
-    { name: "Portfolio", url: "/portfolio", icon: Briefcase },
-    { name: "Whitepaper", url: "/whitepaper", icon: Info },
+    { name: t("home"), url: "/", icon: Home },
+    { name: t("indices"), url: "/indices", icon: Sparkles },
+    { name: t("fanTokens"), url: "/fan-tokens", icon: Coins },
+    { name: t("portfolio"), url: "/portfolio", icon: Briefcase },
+    { name: t("whitepaper"), url: "/whitepaper", icon: Info },
   ]
 
   const pathname = usePathname()
@@ -40,27 +44,29 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (pathname === "/portfolio") {
-      setActiveTab("Portfolio")
-    } else if (pathname === "/indices" || pathname?.startsWith("/indices/")) {
-      setActiveTab("Indices")
-    } else if (pathname === "/fan-tokens") {
-      setActiveTab("Fan Tokens")
-    } else if (pathname === "/") {
-      setActiveTab("Home")
-    } else if (pathname === "/whitepaper") {
-      setActiveTab("Whitepaper")
+    // Strip locale prefix for matching: /es/portfolio → /portfolio
+    const cleanPath = pathname.replace(/^\/(en|es)/, "") || "/"
+
+    if (cleanPath === "/portfolio") {
+      setActiveTab(t("portfolio"))
+    } else if (cleanPath === "/indices" || cleanPath?.startsWith("/indices/")) {
+      setActiveTab(t("indices"))
+    } else if (cleanPath === "/fan-tokens") {
+      setActiveTab(t("fanTokens"))
+    } else if (cleanPath === "/" || cleanPath === "") {
+      setActiveTab(t("home"))
+    } else if (cleanPath === "/whitepaper") {
+      setActiveTab(t("whitepaper"))
     }
-  }, [pathname])
+  }, [pathname, t])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Don't close if clicking on a dialog or its content
       const target = event.target as Node
       if (document.querySelector('[role="dialog"]')?.contains(target)) {
         return
       }
-      
+
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
         setIsMobileMenuOpen(false)
       }
@@ -143,8 +149,9 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
             </div>
           </div>
 
-          {/* Right Section: Theme + Connect */}
+          {/* Right Section: Language + Theme + Connect */}
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <ThemeToggle />
             <ConnectWallet />
           </div>
@@ -162,6 +169,7 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
 
           {/* Right Controls */}
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -210,7 +218,7 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
                     <ThemeToggle />
                   </div>
                 </div>
-                <div 
+                <div
                   className="flex items-center justify-stretch pt-2 px-4"
                   onClick={(e) => e.stopPropagation()}
                   onPointerDown={(e) => e.stopPropagation()}
