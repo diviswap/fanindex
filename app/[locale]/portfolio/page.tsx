@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, Component, type ReactNode } from "react"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
@@ -7,56 +8,67 @@ import { Footer } from "@/components/ui/footer-section"
 import { PortfolioView } from "@/components/portfolio/PortfolioView"
 import { Activity, PieChart, RefreshCw } from "lucide-react"
 
+function PortfolioErrorFallback() {
+  const t = useTranslations("portfolioPage.error")
+  return (
+    <div className="min-h-[50vh] flex flex-col items-center justify-center gap-6 text-center px-4">
+      <div className="p-4 rounded-full bg-destructive/10 border border-destructive/20">
+        <svg className="h-10 w-10 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{t("title")}</h2>
+        <p className="text-muted-foreground text-sm max-w-sm">{t("description")}</p>
+      </div>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-5 py-2.5 rounded-full bg-success text-success-foreground font-semibold text-sm hover:bg-success/90 transition-colors"
+      >
+        {t("refresh")}
+      </button>
+    </div>
+  )
+}
+
 class PortfolioErrorBoundary extends Component<
-  { children: ReactNode },
-  { hasError: boolean; error: Error | null }
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
 > {
-  constructor(props: { children: ReactNode }) {
+  constructor(props: { children: ReactNode; fallback: ReactNode }) {
     super(props)
-    this.state = { hasError: false, error: null }
+    this.state = { hasError: false }
   }
 
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error }
+  static getDerivedStateFromError() {
+    return { hasError: true }
   }
 
   render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-[50vh] flex flex-col items-center justify-center gap-6 text-center px-4">
-          <div className="p-4 rounded-full bg-destructive/10 border border-destructive/20">
-            <svg className="h-10 w-10 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">Portfolio failed to load</h2>
-            <p className="text-muted-foreground text-sm max-w-sm">
-              There was a problem loading the portfolio. Please refresh the page.
-            </p>
-            {this.state.error && (
-              <p className="text-xs text-muted-foreground/60 mt-2 font-mono max-w-sm truncate">
-                {this.state.error.message}
-              </p>
-            )}
-          </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-5 py-2.5 rounded-full bg-success text-success-foreground font-semibold text-sm hover:bg-success/90 transition-colors"
-          >
-            Refresh Page
-          </button>
-        </div>
-      )
-    }
+    if (this.state.hasError) return this.props.fallback
     return this.props.children
   }
 }
 
 export default function PortfolioPage() {
+  const t = useTranslations("portfolioPage")
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  const trustItems = [
+    { icon: Activity, label: t("trust.prices") },
+    { icon: PieChart, label: t("trust.positions") },
+    { icon: RefreshCw, label: t("trust.updated") },
+  ]
+
+  const steps = [
+    { step: t("howItWorks.steps.deposit.step"), title: t("howItWorks.steps.deposit.title"), description: t("howItWorks.steps.deposit.description") },
+    { step: t("howItWorks.steps.receive.step"), title: t("howItWorks.steps.receive.title"), description: t("howItWorks.steps.receive.description") },
+    { step: t("howItWorks.steps.track.step"), title: t("howItWorks.steps.track.title"), description: t("howItWorks.steps.track.description") },
+    { step: t("howItWorks.steps.redeem.step"), title: t("howItWorks.steps.redeem.title"), description: t("howItWorks.steps.redeem.description") },
+  ]
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
@@ -64,7 +76,7 @@ export default function PortfolioPage() {
       <NavBar />
 
       <main className="relative z-10 w-full">
-        {/* Hero header */}
+        {/* Hero */}
         <section className="relative w-full border-b border-border/40 overflow-hidden">
           <div
             aria-hidden
@@ -86,25 +98,20 @@ export default function PortfolioPage() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
               <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
-                Live Portfolio Tracking
+                {t("badge")}
               </span>
             </div>
 
             <h1 className="text-balance text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-3 sm:mb-6">
-              My{" "}
-              <span className="text-success">Portfolio</span>
+              {t("title")}{" "}
+              <span className="text-success">{t("titleHighlight")}</span>
             </h1>
             <p className="text-pretty text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed mb-8 sm:mb-12">
-              Track and manage your Fan Token index positions with real-time on-chain analytics.
+              {t("description")}
             </p>
 
-            {/* Trust bar */}
             <div className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 max-w-2xl">
-              {[
-                { icon: Activity, label: "Real-Time Prices" },
-                { icon: PieChart, label: "NFT Positions" },
-                { icon: RefreshCw, label: "Auto-Updated" },
-              ].map(({ icon: Icon, label }) => (
+              {trustItems.map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 bg-background px-3 py-3 sm:px-4 sm:py-3.5">
                   <Icon className="h-3.5 w-3.5 text-success shrink-0" />
                   <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.08em] text-muted-foreground truncate">
@@ -119,51 +126,26 @@ export default function PortfolioPage() {
         {/* Portfolio content */}
         <section className="relative w-full py-10 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <PortfolioErrorBoundary>
+            <PortfolioErrorBoundary fallback={<PortfolioErrorFallback />}>
               <PortfolioView />
             </PortfolioErrorBoundary>
           </div>
         </section>
 
-        {/* How it works — matching section style */}
+        {/* How it works */}
         <section className="relative w-full border-t border-border/40 py-16 sm:py-28">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
-                How It Works
+                {t("howItWorks.label")}
               </span>
               <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-                NFT-Based Position Infrastructure
+                {t("howItWorks.title")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 md:grid-cols-2">
-              {[
-                {
-                  step: "01",
-                  title: "Deposit CHZ",
-                  description:
-                    "Select an index and deposit CHZ. Smart contracts execute proportional purchases of all underlying Fan Tokens automatically.",
-                },
-                {
-                  step: "02",
-                  title: "Receive NFT",
-                  description:
-                    "A unique NFT is minted to your wallet. It certifies your position — index type, deposited value, allocation data, and timestamp.",
-                },
-                {
-                  step: "03",
-                  title: "Track Performance",
-                  description:
-                    "Monitor your positions, allocations, and real-time exposure directly on-chain with full transparency.",
-                },
-                {
-                  step: "04",
-                  title: "Redeem Anytime",
-                  description:
-                    "Burn your NFT to redeem. The protocol sells the underlying portfolio and returns CHZ to your wallet — zero exit fee.",
-                },
-              ].map(({ step, title, description }) => (
+              {steps.map(({ step, title, description }) => (
                 <div
                   key={step}
                   className="group relative bg-background p-8 transition-colors hover:bg-card/60 sm:p-10"

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useState, useMemo } from "react"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
@@ -9,24 +10,25 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, TrendingUp, TrendingDown, ArrowUpDown, ChevronRight } from "lucide-react"
 import Image from "next/image"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { cn } from "@/lib/utils"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 
 type SortField = "rank" | "name" | "price" | "change24h" | "change7d" | "marketCap" | "volume" | "percentOfSupply"
 type SortOrder = "asc" | "desc"
 
-const CHZ_MARKET_CAP = 301580000 // $301.58M
-const CHZ_CIRCULATING_SUPPLY = 10106836844 // 10.1B CHZ
-const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY // ~$0.02984 per CHZ
+const CHZ_MARKET_CAP = 301580000
+const CHZ_CIRCULATING_SUPPLY = 10106836844
+const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY
 
 export default function FanTokensPage() {
+  const t = useTranslations()
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [sortField, setSortField] = useState<SortField>("marketCap")
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
 
-  const { data: pricesData, isLoading: isPricesLoading } = useCoinGeckoPrices()
+  const { data: pricesData } = useCoinGeckoPrices()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -44,14 +46,11 @@ export default function FanTokensPage() {
 
   const tokensWithLivePrices = useMemo(() => {
     return FAN_TOKENS.map((token) => {
-      // Find live price data from CoinGecko API
       const livePrice = pricesData?.tokens?.find(
         (p) =>
           (token.cgId && p.cgId === token.cgId) ||
           (token.wrapped && p.address?.toLowerCase() === token.wrapped?.toLowerCase()),
       )
-
-      // If we have live price data, use it
       if (livePrice && livePrice.priceUSD > 0) {
         return {
           ...token,
@@ -63,8 +62,6 @@ export default function FanTokensPage() {
           volume: livePrice.volume24h.toFixed(0),
         }
       }
-
-      // Otherwise, use static data
       return token
     })
   }, [pricesData])
@@ -78,7 +75,6 @@ export default function FanTokensPage() {
     }
   }
 
-  // Filter and sort tokens
   const filteredTokens = useMemo(() => {
     const filtered = tokensWithLivePrices.filter((token) => {
       const matchesSearch =
@@ -88,35 +84,17 @@ export default function FanTokensPage() {
       return matchesSearch && matchesCategory
     })
 
-    // Sort tokens
     filtered.sort((a, b) => {
       let comparison = 0
       switch (sortField) {
-        case "rank":
-          comparison = a.rank - b.rank
-          break
-        case "name":
-          comparison = a.name.localeCompare(b.name)
-          break
-        case "price":
-          comparison = Number.parseFloat(a.price) - Number.parseFloat(b.price)
-          break
-        case "change24h":
-          comparison = Number.parseFloat(a.change24h) - Number.parseFloat(b.change24h)
-          break
-        case "change7d":
-          comparison = Number.parseFloat(a.change7d) - Number.parseFloat(b.change7d)
-          break
-        case "marketCap":
-          comparison =
-            Number.parseFloat(a.marketCap.replace(/,/g, "")) - Number.parseFloat(b.marketCap.replace(/,/g, ""))
-          break
-        case "volume":
-          comparison = Number.parseFloat(a.volume.replace(/,/g, "")) - Number.parseFloat(b.volume.replace(/,/g, ""))
-          break
-        case "percentOfSupply":
-          comparison = Number.parseFloat(a.percentOfSupply) - Number.parseFloat(b.percentOfSupply)
-          break
+        case "rank": comparison = a.rank - b.rank; break
+        case "name": comparison = a.name.localeCompare(b.name); break
+        case "price": comparison = Number.parseFloat(a.price) - Number.parseFloat(b.price); break
+        case "change24h": comparison = Number.parseFloat(a.change24h) - Number.parseFloat(b.change24h); break
+        case "change7d": comparison = Number.parseFloat(a.change7d) - Number.parseFloat(b.change7d); break
+        case "marketCap": comparison = Number.parseFloat(a.marketCap.replace(/,/g, "")) - Number.parseFloat(b.marketCap.replace(/,/g, "")); break
+        case "volume": comparison = Number.parseFloat(a.volume.replace(/,/g, "")) - Number.parseFloat(b.volume.replace(/,/g, "")); break
+        case "percentOfSupply": comparison = Number.parseFloat(a.percentOfSupply) - Number.parseFloat(b.percentOfSupply); break
       }
       return sortOrder === "asc" ? comparison : -comparison
     })
@@ -127,29 +105,22 @@ export default function FanTokensPage() {
   const formatNumberInCHZ = (valueUSD: string | number) => {
     const numUSD = typeof valueUSD === "string" ? Number.parseFloat(valueUSD.replace(/,/g, "")) : valueUSD
     const numCHZ = numUSD / CHZ_PRICE_USD
-
-    if (numCHZ >= 1000000) {
-      return `${(numCHZ / 1000000).toFixed(2)}M`
-    } else if (numCHZ >= 1000) {
-      return `${(numCHZ / 1000).toFixed(2)}K`
-    }
+    if (numCHZ >= 1000000) return `${(numCHZ / 1000000).toFixed(2)}M`
+    if (numCHZ >= 1000) return `${(numCHZ / 1000).toFixed(2)}K`
     return `${numCHZ.toFixed(2)}`
   }
 
-  const totalFanTokenMcap = useMemo(() => {
-    return filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.marketCap.replace(/,/g, "")), 0)
-  }, [filteredTokens])
-
-  const totalFanTokenSupply = useMemo(() => {
-    return filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.circulatingSupply.replace(/,/g, "")), 0)
-  }, [filteredTokens])
+  const totalFanTokenMcap = useMemo(
+    () => filteredTokens.reduce((sum, token) => sum + Number.parseFloat(token.marketCap.replace(/,/g, "")), 0),
+    [filteredTokens],
+  )
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
       <WebGLShader />
       <NavBar />
 
-      {/* Hero header — matches home section style */}
+      {/* Hero */}
       <section className="relative w-full border-b border-border/40 overflow-hidden">
         <div
           aria-hidden
@@ -184,7 +155,6 @@ export default function FanTokensPage() {
       </section>
 
       <main className="relative z-10 w-full mx-auto max-w-7xl px-3 sm:px-4 lg:px-12 py-10 sm:py-16 pb-20 sm:pb-24">
-
         {/* Search and Filters */}
         <div className="mb-6 sm:mb-8 space-y-3 sm:space-y-4">
           <div className="relative">
@@ -254,74 +224,43 @@ export default function FanTokensPage() {
               <thead>
                 <tr className="border-b border-border bg-muted/50">
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-left">
-                    <button
-                      onClick={() => handleSort("rank")}
-                      className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
+                    <button onClick={() => handleSort("rank")} className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
                       #
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-left sticky left-0 bg-muted/50 z-10">
-                    <button
-                      onClick={() => handleSort("name")}
-                      className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      Token
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("name")} className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      Token <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("price")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      Price
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("price")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      Price <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("change24h")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      24h
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("change24h")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      24h <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("change7d")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      7d
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("change7d")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      7d <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("marketCap")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      Market Cap
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("marketCap")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      Market Cap <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("volume")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider"
-                    >
-                      Volume
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("volume")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider">
+                      Volume <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                    <button
-                      onClick={() => handleSort("percentOfSupply")}
-                      className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider whitespace-nowrap"
-                    >
-                      % CHZ Supply
-                      <ArrowUpDown className="h-3 w-3" />
+                    <button onClick={() => handleSort("percentOfSupply")} className="flex items-center gap-1 ml-auto text-[10px] sm:text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider whitespace-nowrap">
+                      % CHZ Supply <ArrowUpDown className="h-3 w-3" />
                     </button>
                   </th>
                   <th className="w-8"></th>
@@ -335,7 +274,7 @@ export default function FanTokensPage() {
                       "border-b border-border hover:bg-muted/30 transition-colors active:bg-muted/50 cursor-pointer group",
                       index % 2 === 0 && "bg-muted/5",
                     )}
-                    onClick={() => window.location.href = `/fan-tokens/${token.symbol.toLowerCase()}`}
+                    onClick={() => (window.location.href = `/fan-tokens/${token.symbol.toLowerCase()}`)}
                   >
                     <td className="px-2 sm:px-4 py-3 sm:py-4">
                       <div className="text-xs sm:text-sm font-medium text-muted-foreground">{index + 1}</div>
@@ -350,25 +289,17 @@ export default function FanTokensPage() {
                               width={32}
                               height={32}
                               className="object-cover"
-                              onError={(e) => {
-                                e.currentTarget.style.display = "none"
-                              }}
+                              onError={(e) => { e.currentTarget.style.display = "none" }}
                             />
                           </div>
                         ) : (
                           <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-success/10 flex items-center justify-center flex-shrink-0">
-                            <span className="text-[10px] sm:text-xs font-bold text-success">
-                              {token.symbol.slice(0, 2)}
-                            </span>
+                            <span className="text-[10px] sm:text-xs font-bold text-success">{token.symbol.slice(0, 2)}</span>
                           </div>
                         )}
                         <div className="min-w-0">
-                          <div className="text-xs sm:text-sm font-semibold text-foreground whitespace-nowrap">
-                            {token.symbol}
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block whitespace-nowrap">
-                            {token.name}
-                          </div>
+                          <div className="text-xs sm:text-sm font-semibold text-foreground whitespace-nowrap">{token.symbol}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block whitespace-nowrap">{token.name}</div>
                         </div>
                       </div>
                     </td>
@@ -381,36 +312,14 @@ export default function FanTokensPage() {
                       </div>
                     </td>
                     <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                      <div
-                        className={cn(
-                          "inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap",
-                          Number.parseFloat(token.change24h) >= 0
-                            ? "text-success bg-success/10"
-                            : "text-red-500 bg-red-500/10",
-                        )}
-                      >
-                        {Number.parseFloat(token.change24h) >= 0 ? (
-                          <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        ) : (
-                          <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        )}
+                      <div className={cn("inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap", Number.parseFloat(token.change24h) >= 0 ? "text-success bg-success/10" : "text-red-500 bg-red-500/10")}>
+                        {Number.parseFloat(token.change24h) >= 0 ? <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> : <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
                         {Math.abs(Number.parseFloat(token.change24h)).toFixed(1)}%
                       </div>
                     </td>
                     <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
-                      <div
-                        className={cn(
-                          "inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap",
-                          Number.parseFloat(token.change7d) >= 0
-                            ? "text-success bg-success/10"
-                            : "text-red-500 bg-red-500/10",
-                        )}
-                      >
-                        {Number.parseFloat(token.change7d) >= 0 ? (
-                          <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        ) : (
-                          <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        )}
+                      <div className={cn("inline-flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded whitespace-nowrap", Number.parseFloat(token.change7d) >= 0 ? "text-success bg-success/10" : "text-red-500 bg-red-500/10")}>
+                        {Number.parseFloat(token.change7d) >= 0 ? <TrendingUp className="h-2.5 w-2.5 sm:h-3 sm:w-3" /> : <TrendingDown className="h-2.5 w-2.5 sm:h-3 sm:w-3" />}
                         {Math.abs(Number.parseFloat(token.change7d)).toFixed(1)}%
                       </div>
                     </td>
@@ -452,4 +361,3 @@ export default function FanTokensPage() {
     </div>
   )
 }
-

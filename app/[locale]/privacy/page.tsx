@@ -1,12 +1,15 @@
-import { ChevronRight } from "lucide-react"
-import Link from "next/link"
+"use client"
 
-export const metadata = {
-  title: "Privacy Policy | FanIndex",
-  description: "Privacy policy for FanIndex platform",
-}
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
+import { ChevronRight } from "lucide-react"
 
 export default function PrivacyPage() {
+  const t = useTranslations("privacyPage")
+
+  const collectItems = t.raw("sections.collect.items") as string[]
+  const useItems = t.raw("sections.use.items") as string[]
+
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-4xl mx-auto px-6 py-12 md:py-16">
@@ -14,67 +17,51 @@ export default function PrivacyPage() {
           <div className="space-y-2">
             <Link href="/" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
               <ChevronRight className="h-4 w-4 rotate-180" />
-              Back to home
+              {t("back")}
             </Link>
-            <h1 className="text-4xl md:text-5xl font-bold text-foreground">Privacy Policy</h1>
-            <p className="text-muted-foreground">Last updated: {new Date().toLocaleDateString()}</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">{t("title")}</h1>
+            <p className="text-muted-foreground">{t("lastUpdated")} {new Date().toLocaleDateString()}</p>
           </div>
 
           <div className="prose prose-invert max-w-none space-y-6">
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">Introduction</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                FanIndex ("we," "our," or "us") operates the fanindex.pro website and related services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our services.
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.intro.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.intro.content")}</p>
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">Information We Collect</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                We collect information you provide directly to us, such as:
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.collect.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.collect.intro")}</p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Wallet address and blockchain transaction data</li>
-                <li>Email address (if you opt-in for communications)</li>
-                <li>Usage data and analytics</li>
-                <li>Device information and browser data</li>
+                {collectItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">How We Use Your Information</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                We use the information we collect to:
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.use.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.use.intro")}</p>
               <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                <li>Provide and improve our services</li>
-                <li>Process transactions and send related information</li>
-                <li>Respond to your inquiries and requests</li>
-                <li>Send promotional communications (with your consent)</li>
-                <li>Comply with legal obligations</li>
-                <li>Analyze usage patterns to enhance user experience</li>
+                {useItems.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">Data Security</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the internet is 100% secure.
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.security.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.security.content")}</p>
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">Blockchain Transparency</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Please be aware that transactions on the Chiliz Chain and other blockchain networks are public and transparent. Any information recorded on the blockchain is permanently visible to all network participants.
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.blockchain.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.blockchain.content")}</p>
             </section>
 
             <section className="space-y-3">
-              <h2 className="text-2xl font-bold text-foreground">Contact Us</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                If you have any questions about this Privacy Policy, please contact us at privacy@fanindex.pro
-              </p>
+              <h2 className="text-2xl font-bold text-foreground">{t("sections.contact.title")}</h2>
+              <p className="text-muted-foreground leading-relaxed">{t("sections.contact.content")}</p>
             </section>
           </div>
         </div>

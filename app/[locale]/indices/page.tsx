@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { Footer } from "@/components/ui/footer-section"
 import { NavBar } from "@/components/ui/tubelight-navbar"
@@ -10,6 +11,8 @@ import { Shield, Zap, BarChart3 } from "lucide-react"
 import { INDICES } from "@/lib/data/indices"
 
 export default function IndicesPage() {
+  const t = useTranslations("indicesPage")
+
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -18,13 +21,62 @@ export default function IndicesPage() {
     ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"].includes(index.id),
   )
 
+  const strategies = [
+    {
+      icon: BarChart3,
+      color: "text-blue-500",
+      bg: "bg-blue-500/10",
+      title: t("strategies.weighted.title"),
+      description: t("strategies.weighted.description"),
+    },
+    {
+      icon: Shield,
+      color: "text-success",
+      bg: "bg-success/10",
+      title: t("strategies.equal.title"),
+      description: t("strategies.equal.description"),
+    },
+    {
+      icon: Zap,
+      color: "text-amber-400",
+      bg: "bg-amber-400/10",
+      title: t("strategies.managed.title"),
+      description: t("strategies.managed.description"),
+    },
+  ]
+
+  const methodology = [
+    {
+      label: t("methodology.rebalance.label"),
+      value: t("methodology.rebalance.value"),
+      sub: t("methodology.rebalance.sub"),
+    },
+    {
+      label: t("methodology.price.label"),
+      value: t("methodology.price.value"),
+      sub: t("methodology.price.sub"),
+    },
+    {
+      label: t("methodology.fee.label"),
+      value: t("methodology.fee.value"),
+      sub: t("methodology.fee.sub"),
+    },
+    {
+      label: t("methodology.position.label"),
+      value: t("methodology.position.value"),
+      sub: t("methodology.position.sub"),
+    },
+  ]
+
+  const roadmapItems = t.raw("roadmap.items") as string[]
+
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
       <WebGLShader />
       <NavBar />
 
       <main className="relative z-10 w-full">
-        {/* Hero header — same style as home sections */}
+        {/* Hero */}
         <section className="relative w-full border-b border-border/40 overflow-hidden">
           <div
             aria-hidden
@@ -46,16 +98,16 @@ export default function IndicesPage() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
               <span className="text-[10px] sm:text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/90">
-                Live Sports Token Indices
+                {t("badge")}
               </span>
             </div>
 
             <h1 className="text-balance text-4xl sm:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.05] text-foreground mb-4 sm:mb-6">
-              Fan Token{" "}
-              <span className="text-success">Indices</span>
+              {t("title")}{" "}
+              <span className="text-success">{t("titleHighlight")}</span>
             </h1>
             <p className="text-pretty text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Diversified exposure to the sports token economy. Live, on-chain, and rebalanced.
+              {t("description")}
             </p>
           </div>
         </section>
@@ -72,45 +124,20 @@ export default function IndicesPage() {
           </div>
         </section>
 
-        {/* Strategy types — same panel grid style as WhyFanIndex */}
+        {/* Strategy types */}
         <section className="relative w-full border-b border-border/40 py-16 sm:py-28">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
-                Index Strategies
+                {t("strategies.label")}
               </span>
               <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-                Three Approaches to SportFi Exposure
+                {t("strategies.title")}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40 md:grid-cols-3">
-              {[
-                {
-                  icon: BarChart3,
-                  color: "text-blue-500",
-                  bg: "bg-blue-500/10",
-                  title: "Weighted",
-                  description:
-                    "Tokens allocated proportionally based on market capitalization and liquidity for optimized, benchmark-grade exposure.",
-                },
-                {
-                  icon: Shield,
-                  color: "text-success",
-                  bg: "bg-success/10",
-                  title: "Equal-Weight",
-                  description:
-                    "Equal allocation across all constituents for democratized exposure, balanced risk distribution, and maximum diversification.",
-                },
-                {
-                  icon: Zap,
-                  color: "text-amber-400",
-                  bg: "bg-amber-400/10",
-                  title: "Managed",
-                  description:
-                    "Actively managed by the FanIndex team with dynamic adjustments, tactical rotation, and strategic allocation based on market conditions.",
-                },
-              ].map(({ icon: Icon, color, bg, title, description }) => (
+              {strategies.map(({ icon: Icon, color, bg, title, description }) => (
                 <div
                   key={title}
                   className="group relative bg-background p-8 transition-colors hover:bg-card/60 sm:p-10"
@@ -130,44 +157,23 @@ export default function IndicesPage() {
           </div>
         </section>
 
-        {/* Index methodology stats */}
+        {/* Methodology stats */}
         <section className="relative w-full border-b border-border/40 py-16 sm:py-28">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-2xl mb-10 sm:mb-16">
               <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
-                Methodology
+                {t("methodology.label")}
               </span>
               <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-                How Index Prices Are Calculated
+                {t("methodology.title")}
               </h2>
               <p className="mt-4 text-sm sm:text-base leading-relaxed text-muted-foreground">
-                Every FanIndex product uses a transparent, on-chain weighted pricing formula. Market prices are sourced in real time from CoinGecko and updated continuously.
+                {t("methodology.description")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-px overflow-hidden rounded-2xl border border-border/60 bg-border/40">
-              {[
-                {
-                  label: "Rebalance Frequency",
-                  value: "Periodic",
-                  sub: "Manually executed by the FanIndex team with future automation planned",
-                },
-                {
-                  label: "Price Source",
-                  value: "CoinGecko",
-                  sub: "Live market prices fetched from the CoinGecko API in real time",
-                },
-                {
-                  label: "Entry Fee",
-                  value: "1%",
-                  sub: "Protocol fee applied on each purchase — zero exit fee",
-                },
-                {
-                  label: "Position Type",
-                  value: "NFT",
-                  sub: "Each position is represented by a unique NFT certifying ownership",
-                },
-              ].map(({ label, value, sub }) => (
+              {methodology.map(({ label, value, sub }) => (
                 <div key={label} className="bg-background p-8 sm:p-10 hover:bg-card/60 transition-colors">
                   <div className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground mb-3">
                     {label}
@@ -182,7 +188,7 @@ export default function IndicesPage() {
           </div>
         </section>
 
-        {/* Future expansion */}
+        {/* Roadmap */}
         <section className="relative w-full py-16 sm:py-28">
           <div
             aria-hidden
@@ -194,28 +200,17 @@ export default function IndicesPage() {
           />
           <div className="relative mx-auto max-w-7xl px-5 sm:px-8 lg:px-12 text-center">
             <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-success">
-              Roadmap
+              {t("roadmap.label")}
             </span>
             <h2 className="mt-3 text-balance text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground mb-4 sm:mb-6">
-              Future Index Expansion
+              {t("roadmap.title")}
             </h2>
             <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed mb-10 sm:mb-16">
-              The FanIndex suite will grow to cover every major segment of the global sports token economy.
+              {t("roadmap.description")}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 max-w-4xl mx-auto">
-              {[
-                "Italian League",
-                "Turkish League",
-                "National Teams",
-                "Brazil League",
-                "Asia Sports",
-                "Motorsports",
-                "Basketball",
-                "UFC / MMA",
-                "Global Tournaments",
-                "User-Created",
-              ].map((item) => (
+              {roadmapItems.map((item) => (
                 <div
                   key={item}
                   className="rounded-xl border border-border/60 bg-card/40 px-4 py-3.5 text-sm font-medium text-muted-foreground backdrop-blur hover:border-success/30 hover:text-foreground transition-colors"
