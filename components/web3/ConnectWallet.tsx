@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils"
 
 export function ConnectWallet() {
   const { address, isConnected, connector } = useAccount()
-  const { connect, connectors, isPending } = useConnect()
+  const { connect, connectors, isPending, reset } = useConnect()
   const { disconnect } = useDisconnect()
   const { data: balance } = useBalance({ address })
   const [mounted, setMounted] = useState(false)
@@ -41,26 +41,28 @@ export function ConnectWallet() {
     setWalletConnectIndices(indices)
   }, [connectors])
 
+  // Reset wagmi error state and close the modal cleanly so the connector
+  // is freed and can be re-used on the next attempt.
+  const closeDialog = () => {
+    reset()
+    setConnectingWallet(null)
+    setDialogOpen(false)
+  }
+
   const handleConnect = async (connectorId: string, isSocios = false) => {
     const found = connectors.find((c) => c.id === connectorId)
     if (!found) return
+
+    // Reset any previous error so the connector is in a clean state.
+    reset()
     setConnectingWallet(isSocios ? "socios" : connectorId)
+
     try {
-      // On mobile, WalletConnect needs to open the app via deep link.
-      // We trigger the connection and then redirect to the appropriate app URI.
-      if (isMobile && connectorId.toLowerCase().includes("walletconnect")) {
-        if (isSocios) {
-          // Socios deep link — opens Socios.com app directly
-          window.location.href = "socios://wc"
-        } else {
-          // Generic WalletConnect on mobile — use universal link
-          window.location.href = "https://walletconnect.com/wc"
-        }
-      }
       await connect({ connector: found })
       setDialogOpen(false)
     } catch (error) {
-      // wagmi surfaces errors via its own error state
+      // User dismissed WalletConnect QR / deep-link — reset so next tap works.
+      reset()
     } finally {
       setConnectingWallet(null)
     }
@@ -293,7 +295,7 @@ export function ConnectWallet() {
           className="fixed inset-0 z-50 flex items-center justify-center"
           // Backdrop — clicking/tapping here closes the modal
           onPointerDown={(e) => {
-            if (e.target === e.currentTarget) setDialogOpen(false)
+            if (e.target === e.currentTarget) closeDialog()
           }}
           style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
         >
@@ -317,7 +319,7 @@ export function ConnectWallet() {
               </div>
               <button
                 type="button"
-                onClick={() => setDialogOpen(false)}
+                onClick={closeDialog}
                 style={{ touchAction: "manipulation" }}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
               >
