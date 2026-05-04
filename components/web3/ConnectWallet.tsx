@@ -10,83 +10,64 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, CheckCircle2, Sparkles, X } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom"
 import { toast } from "sonner"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 // ---------------------------------------------------------------------------
-// Wallet picker entries — both options invoke the same WalletConnect
-// connector underneath. The "Socios" tile is purely cosmetic so users who
-// recognize that brand have a familiar entry point.
+// Wallet metadata helpers
 // ---------------------------------------------------------------------------
-type PickerItem = {
-  key: "walletconnect" | "socios" | "injected"
-  name: string
-  description: (mobile: boolean) => string
-  logo: string
-  isSociosLogo?: boolean
-  // Which wagmi connector ID this entry should use.
-  // "walletconnect" matches the WC connector; "injected" the browser one.
-  target: "walletconnect" | "injected"
+function getWalletInfo(connectorId: string, isSocios: boolean, isMobile: boolean) {
+  if (connectorId.toLowerCase().includes("walletconnect")) {
+    if (isSocios) {
+      return {
+        name: "Socios.com",
+        logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-vjCpeldsZ6hj0adYPfXyJS6J2Cd9qI.png",
+        description: isMobile ? "Open in Socios app" : "Scan with Socios.com app",
+        isSociosLogo: true,
+      }
+    }
+    return {
+      name: "WalletConnect",
+      logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
+      description: isMobile ? "Open in your wallet app" : "Scan with any mobile wallet",
+      isSociosLogo: false,
+    }
+  }
+  return {
+    name: "Browser Wallet",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
+    description: "MetaMask, Coinbase, or any EIP-1193 wallet",
+    isSociosLogo: false,
+  }
 }
 
-const PICKER_ITEMS: PickerItem[] = [
-  {
-    key: "walletconnect",
-    name: "WalletConnect",
-    description: (mobile) => (mobile ? "Open in your wallet app" : "Scan with any mobile wallet"),
-    logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-    target: "walletconnect",
-  },
-  {
-    key: "socios",
-    name: "Socios.com",
-    description: (mobile) => (mobile ? "Open in Socios app" : "Scan with Socios.com app"),
-    logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-vjCpeldsZ6hj0adYPfXyJS6J2Cd9qI.png",
-    isSociosLogo: true,
-    target: "walletconnect",
-  },
-  {
-    key: "injected",
-    name: "Browser Wallet",
-    description: () => "MetaMask, Coinbase, or any EIP-1193 wallet",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-    target: "injected",
-  },
-]
-
 // ---------------------------------------------------------------------------
-// Wallet picker modal — rendered via portal so it sits above everything.
-// IMPORTANT: we use a SOLID interactive backdrop (no `pointer-events:none` +
-// `backdrop-filter` combo, which is broken on iOS Safari and was the reason
-// taps appeared to do nothing on mobile).
+// Wallet picker modal — rendered via portal so it sits above everything and
+// its touch events are completely isolated from the rest of the page.
 // ---------------------------------------------------------------------------
 interface WalletModalProps {
   onClose: () => void
-  onSelect: (item: PickerItem) => void
-  connectingKey: string | null
+  onSelect: (connectorId: string, isSocios: boolean) => void
+  connectingWallet: string | null
+  walletItems: { connectorId: string; isSocios: boolean; key: string }[]
   isMobile: boolean
-  items: PickerItem[]
 }
 
-function WalletModal({ onClose, onSelect, connectingKey, isMobile, items }: WalletModalProps) {
-  // Lock body scroll while modal is open.
+function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobile }: WalletModalProps) {
+  // Lock body scroll while modal is open
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = "hidden"
-    return () => {
-      document.body.style.overflow = prev
-    }
+    return () => { document.body.style.overflow = prev }
   }, [])
 
   return createPortal(
+    // Outer layer: purely visual backdrop, pointer-events disabled so it
+    // NEVER intercepts taps meant for the panel or the page.
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Connect wallet"
-      onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -94,22 +75,22 @@ function WalletModal({ onClose, onSelect, connectingKey, isMobile, items }: Wall
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "rgba(0,0,0,0.7)",
-        // Plain solid backdrop — NO backdrop-filter, NO pointer-events:none.
-        // Both of those broke tap handling on iOS in the previous version.
-        padding: "1rem",
+        // Backdrop visual only — no pointer events
+        backgroundColor: "rgba(0,0,0,0.65)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
+        pointerEvents: "none",
       }}
     >
-      {/* Panel — stop click-through so taps inside don't close the modal */}
+      {/* Panel — re-enables pointer events only for itself */}
       <div
-        onClick={(e) => e.stopPropagation()}
         style={{
           position: "relative",
           width: "min(calc(100vw - 2rem), 24rem)",
-          maxHeight: "calc(100vh - 2rem)",
           borderRadius: "0.75rem",
           overflow: "hidden",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+          pointerEvents: "auto",
           overscrollBehavior: "contain",
         }}
         className="bg-background border border-border/50"
@@ -137,58 +118,65 @@ function WalletModal({ onClose, onSelect, connectingKey, isMobile, items }: Wall
         </div>
 
         {/* Options */}
-        <div className="p-3 space-y-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 12rem)" }}>
-          {items.map((item) => {
-            const isConnecting = connectingKey === item.key
-            return (
-              <button
-                key={item.key}
-                type="button"
-                disabled={isConnecting}
-                onClick={() => {
-                  if (!isConnecting) onSelect(item)
-                }}
-                style={{
-                  touchAction: "manipulation",
-                  WebkitTapHighlightColor: "transparent",
-                  minHeight: "64px",
-                  cursor: isConnecting ? "wait" : "pointer",
-                } as React.CSSProperties}
-                className={cn(
-                  "w-full flex items-center gap-3 px-3 rounded-xl border transition-colors text-left",
-                  "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
-                  isConnecting && "opacity-60",
-                )}
-              >
-                <div className="relative flex-shrink-0">
-                  <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.logo}
-                      alt={item.name}
-                      width={item.isSociosLogo ? 44 : 28}
-                      height={item.isSociosLogo ? 44 : 28}
-                      className={cn("rounded", item.isSociosLogo && "w-full h-full object-cover")}
-                    />
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                    <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                  </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="font-semibold text-sm text-foreground block">{item.name}</span>
-                  <span className="text-xs text-muted-foreground block truncate">{item.description(isMobile)}</span>
-                </div>
-                <div className="flex-shrink-0 pr-1">
-                  {isConnecting ? (
-                    <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                  ) : (
-                    <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
+        <div className="p-3 space-y-2">
+          {walletItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+              <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+              <span className="text-xs">Loading wallets...</span>
+            </div>
+          ) : (
+            walletItems.map(({ connectorId, isSocios, key }) => {
+              const { name, logo, description, isSociosLogo } = getWalletInfo(connectorId, isSocios, isMobile)
+              const isConnecting = connectingWallet === key
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  disabled={isConnecting}
+                  onClick={() => { if (!isConnecting) onSelect(connectorId, isSocios) }}
+                  style={{
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
+                    // Minimum 48px touch target for mobile
+                    minHeight: "64px",
+                    cursor: isConnecting ? "wait" : "pointer",
+                  } as React.CSSProperties}
+                  className={cn(
+                    "w-full flex items-center gap-3 px-3 rounded-xl border transition-colors text-left",
+                    "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
+                    isConnecting && "opacity-60",
                   )}
-                </div>
-              </button>
-            )
-          })}
+                >
+                  <div className="relative flex-shrink-0">
+                    <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={logo}
+                        alt={name}
+                        width={isSociosLogo ? 44 : 28}
+                        height={isSociosLogo ? 44 : 28}
+                        className={cn("rounded", isSociosLogo && "w-full h-full object-cover")}
+                      />
+                    </div>
+                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                      <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="font-semibold text-sm text-foreground block">{name}</span>
+                    <span className="text-xs text-muted-foreground block truncate">{description}</span>
+                  </div>
+                  <div className="flex-shrink-0 pr-1">
+                    {isConnecting ? (
+                      <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
+                    )}
+                  </div>
+                </button>
+              )
+            })
+          )}
         </div>
 
         {/* Footer */}
@@ -200,7 +188,7 @@ function WalletModal({ onClose, onSelect, connectingKey, isMobile, items }: Wall
         </div>
       </div>
     </div>,
-    document.body,
+    document.body
   )
 }
 
@@ -215,7 +203,7 @@ export function ConnectWallet() {
 
   const [mounted, setMounted] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const [connectingKey, setConnectingKey] = useState<string | null>(null)
+  const [connectingWallet, setConnectingWallet] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -224,56 +212,68 @@ export function ConnectWallet() {
     setIsMobile(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
   }, [])
 
-  // Filter the picker items based on which connectors are actually loaded.
-  // We always show WalletConnect + Socios (same connector under the hood);
-  // the injected option is only shown if a browser wallet is detected.
-  const items = useMemo(() => {
-    const hasInjected = connectors.some((c) => c.id === "injected" || c.type === "injected")
-    const hasWC = connectors.some((c) => c.id.toLowerCase().includes("walletconnect"))
-    return PICKER_ITEMS.filter((it) => {
-      if (it.target === "injected") return hasInjected
-      if (it.target === "walletconnect") return hasWC
-      return true
+  // Build the deduplicated wallet items list once per connectors change.
+  // The second WalletConnect entry becomes the Socios option.
+  const walletItems = useMemo(() => {
+    let wcCount = 0
+    return connectors.map((c) => {
+      const isWC = c.id.toLowerCase().includes("walletconnect")
+      const isSocios = isWC && wcCount === 1
+      if (isWC) wcCount++
+      return { connectorId: c.id, isSocios, key: isSocios ? "socios" : c.id }
     })
   }, [connectors])
 
   function openModal() {
-    reset()
+    reset() // clear any stale wagmi error before showing the picker
     setModalOpen(true)
   }
 
   function closeModal() {
     reset()
-    setConnectingKey(null)
+    setConnectingWallet(null)
     setModalOpen(false)
   }
 
-  async function handleSelect(item: PickerItem) {
-    // Find the wagmi connector matching this picker item.
-    const found =
-      item.target === "walletconnect"
-        ? connectors.find((c) => c.id.toLowerCase().includes("walletconnect"))
-        : connectors.find((c) => c.id === "injected" || c.type === "injected")
+  async function handleSelect(connectorId: string, isSocios: boolean) {
+    const found = connectors.find((c) => c.id === connectorId)
+    if (!found) return
 
-    if (!found) {
-      toast.error("Wallet connector not available yet, please try again.")
-      return
-    }
-
+    const key = isSocios ? "socios" : connectorId
     reset()
-    setConnectingKey(item.key)
+    setConnectingWallet(key)
 
-    // Close our picker BEFORE invoking connect, so the WalletConnect modal
-    // (or the wallet app on mobile) is never blocked by our overlay.
-    setModalOpen(false)
+    // For Socios on mobile, we configured the WC connector with showQrModal:false,
+    // so we MUST manually capture the WalletConnect URI and redirect into the
+    // Socios app via deep-link. Otherwise the connect call would hang forever.
+    let cleanupListener: (() => void) | null = null
+    if (isMobile && isSocios) {
+      const onMessage = (event: { type: string; data?: unknown }) => {
+        if (event.type === "display_uri" && typeof event.data === "string") {
+          const wcUri = event.data
+          // Try the Socios universal/custom-scheme deep link. This will open
+          // the Socios app with the WalletConnect session already attached.
+          // If the app isn't installed, the browser stays on the page.
+          const sociosLink = `socios://wc?uri=${encodeURIComponent(wcUri)}`
+          window.location.href = sociosLink
+        }
+      }
+      // wagmi connector exposes its EventEmitter through `emitter`
+      const emitter = (found as unknown as { emitter?: { on: (e: string, cb: typeof onMessage) => void; off: (e: string, cb: typeof onMessage) => void } }).emitter
+      if (emitter) {
+        emitter.on("message", onMessage)
+        cleanupListener = () => emitter.off("message", onMessage)
+      }
+    }
 
     try {
       await connect({ connector: found })
-    } catch (err) {
-      console.error("[v0] connect error:", err)
-      reset()
+      setModalOpen(false)
+    } catch {
+      reset() // free the connector so it can be re-used immediately
     } finally {
-      setConnectingKey(null)
+      cleanupListener?.()
+      setConnectingWallet(null)
     }
   }
 
@@ -306,24 +306,9 @@ export function ConnectWallet() {
 
   // --- Connected state ---
   if (isConnected && address) {
-    const walletInfo = (() => {
-      if (!connector) {
-        return {
-          name: "Wallet",
-          logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-        }
-      }
-      if (connector.id.toLowerCase().includes("walletconnect")) {
-        return {
-          name: "WalletConnect",
-          logo: "https://avatars.githubusercontent.com/u/37784886?s=200&v=4",
-        }
-      }
-      return {
-        name: "Browser Wallet",
-        logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg",
-      }
-    })()
+    const walletInfo = connector
+      ? getWalletInfo(connector.id, false, isMobile)
+      : { name: "Wallet", logo: "https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg", description: "", isSociosLogo: false }
 
     return (
       <DropdownMenu>
@@ -351,6 +336,7 @@ export function ConnectWallet() {
           sideOffset={6}
           className="w-64 sm:w-72 p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden"
         >
+          {/* Header */}
           <div className="relative px-3 py-3 bg-gradient-to-br from-success/10 via-success/5 to-transparent border-b border-border/50">
             <div className="relative flex items-center gap-3">
               <div className="relative">
@@ -373,6 +359,7 @@ export function ConnectWallet() {
           </div>
 
           <div className="p-2.5 space-y-2">
+            {/* Address */}
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Address</span>
@@ -385,6 +372,7 @@ export function ConnectWallet() {
               </code>
             </div>
 
+            {/* Balance */}
             {balance && (
               <div className="p-2.5 bg-success/5 rounded-lg border border-success/20">
                 <div className="flex items-center gap-1.5 mb-1">
@@ -466,9 +454,9 @@ export function ConnectWallet() {
         <WalletModal
           onClose={closeModal}
           onSelect={handleSelect}
-          connectingKey={connectingKey}
+          connectingWallet={connectingWallet}
+          walletItems={walletItems}
           isMobile={isMobile}
-          items={items}
         />
       )}
     </>
