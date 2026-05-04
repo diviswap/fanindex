@@ -285,58 +285,109 @@ export function ConnectWallet() {
                 <span className="text-xs">Loading wallets...</span>
               </div>
             ) : (
-              connectors.map((c) => {
-                const { name, logo, description, popular } = getWalletInfo(c.id)
-                const isConnecting = connectingWallet === c.id
+              <>
+                {connectors.map((c) => {
+                  const { name, logo, description, popular } = getWalletInfo(c.id)
+                  const isConnecting = connectingWallet === c.id
 
-                return (
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => handleConnect(c.id)}
+                      disabled={isConnecting}
+                      className={cn(
+                        "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
+                        "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
+                        "focus:outline-none focus:ring-2 focus:ring-success/50",
+                        isConnecting && "opacity-70 cursor-wait",
+                      )}
+                    >
+                      <div className="relative">
+                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={logo} alt={name} width={24} height={24} className="rounded" />
+                        </div>
+                        {popular && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                            <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex-1 text-left min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
+                            {name}
+                          </span>
+                          {popular && (
+                            <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                              Popular
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                      </div>
+
+                      <div className="flex-shrink-0">
+                        {isConnecting ? (
+                          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
+                
+                {/* Socios.com Button - duplicated WalletConnect */}
+                {connectors.find((c) => c.id.includes("walletConnect")) && (
                   <button
-                    key={c.id}
-                    onClick={() => handleConnect(c.id)}
-                    disabled={isConnecting}
+                    onClick={() => {
+                      const walletConnectConnector = connectors.find((c) => c.id.includes("walletConnect"))
+                      if (walletConnectConnector) {
+                        handleConnect(walletConnectConnector.id)
+                      }
+                    }}
+                    disabled={connectingWallet === "socios"}
                     className={cn(
                       "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
                       "bg-muted/30 hover:bg-success/5 border-border/50 hover:border-success/40",
                       "focus:outline-none focus:ring-2 focus:ring-success/50",
-                      isConnecting && "opacity-70 cursor-wait",
+                      connectingWallet === "socios" && "opacity-70 cursor-wait",
                     )}
                   >
                     <div className="relative">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 group-hover:border-success/30 transition-colors overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={logo} alt={name} width={24} height={24} className="rounded" />
+                        <img src="/socios-logo.png" alt="Socios.com" width={24} height={24} className="rounded" />
                       </div>
-                      {popular && (
-                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                        </div>
-                      )}
+                      <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                        <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                      </div>
                     </div>
 
                     <div className="flex-1 text-left min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
-                          {name}
+                          Socios.com
                         </span>
-                        {popular && (
-                          <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
-                            Popular
-                          </span>
-                        )}
+                        <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                          Popular
+                        </span>
                       </div>
-                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                      <span className="text-xs text-muted-foreground truncate block">Connect with Socios wallet</span>
                     </div>
 
                     <div className="flex-shrink-0">
-                      {isConnecting ? (
+                      {connectingWallet === "socios" ? (
                         <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                       ) : (
                         <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-success -rotate-90 transition-colors" />
                       )}
                     </div>
                   </button>
-                )
-              })
+                )}
+              </>
             )}
           </div>
 
