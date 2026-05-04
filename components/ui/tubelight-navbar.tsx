@@ -55,7 +55,13 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+      // Don't close if clicking on a dialog or its content
+      const target = event.target as Node
+      if (document.querySelector('[role="dialog"]')?.contains(target)) {
+        return
+      }
+      
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
         setIsMobileMenuOpen(false)
       }
     }
@@ -204,7 +210,11 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
                     <ThemeToggle />
                   </div>
                 </div>
-                <div className="flex items-center justify-stretch pt-2">
+                <div 
+                  className="flex items-center justify-stretch pt-2 px-4"
+                  onClick={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
                   <ConnectWallet />
                 </div>
               </div>
