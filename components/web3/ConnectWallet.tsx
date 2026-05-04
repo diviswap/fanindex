@@ -50,47 +50,22 @@ export function ConnectWallet() {
   const handleConnect = async (connectorId: string, isSocios = false) => {
     const found = connectors.find((c) => c.id === connectorId)
     if (!found) return
-
-    const key = isSocios ? "socios" : connectorId
-    setConnectingWallet(key)
-
+    setConnectingWallet(isSocios ? "socios" : connectorId)
     try {
-      const isWC = connectorId.toLowerCase().includes("walletconnect")
-
-      if (isMobile && isWC) {
-        // On mobile, the WalletConnect QR modal doesn't render properly.
-        // Instead we listen for the WC URI emitted by the connector and
-        // redirect the user into the target wallet app via a deep link.
-        const handleMessage = (event: { type: string; data?: unknown }) => {
-          if (event.type === "display_uri") {
-            const wcUri = event.data as string
-            const encoded = encodeURIComponent(wcUri)
-
-            if (isSocios) {
-              // Try Socios custom scheme first, fall back to universal link
-              const sociosDeepLink = `socios://wc?uri=${encoded}`
-              const sociosFallback = `https://www.socios.com/app/wc?uri=${encoded}`
-              // Attempt to open the app; if it doesn't open within 1.5 s, use fallback
-              const timer = setTimeout(() => {
-                window.open(sociosFallback, "_blank")
-              }, 1500)
-              window.location.href = sociosDeepLink
-              // Clear the timer if the page hides (app opened successfully)
-              const clearTimer = () => clearTimeout(timer)
-              window.addEventListener("pagehide", clearTimer, { once: true })
-            } else {
-              // Generic WalletConnect — universal link handled by OS wallet picker
-              window.location.href = `https://walletconnect.com/wc?uri=${encoded}`
-            }
-            found.emitter?.off?.("message", handleMessage)
-          }
+      // On mobile, WalletConnect needs to open the app via deep link.
+      // We trigger the connection and then redirect to the appropriate app URI.
+      if (isMobile && connectorId.toLowerCase().includes("walletconnect")) {
+        if (isSocios) {
+          // Socios deep link — opens Socios.com app directly
+          window.location.href = "socios://wc"
+        } else {
+          // Generic WalletConnect on mobile — use universal link
+          window.location.href = "https://walletconnect.com/wc"
         }
-        found.emitter?.on?.("message", handleMessage)
       }
-
       await connect({ connector: found })
       setDialogOpen(false)
-    } catch (_error) {
+    } catch (error) {
       // wagmi surfaces errors via its own error state
     } finally {
       setConnectingWallet(null)
