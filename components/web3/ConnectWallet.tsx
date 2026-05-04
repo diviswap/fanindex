@@ -65,9 +65,7 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
   }, [])
 
   return createPortal(
-    // Backdrop — pointer-events ON so taps on it close the modal
     <div
-      onClick={onClose}
       style={{
         position: "fixed",
         inset: 0,
@@ -80,9 +78,8 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
         WebkitBackdropFilter: "blur(4px)",
       }}
     >
-      {/* Panel — stop propagation so taps inside don't close the modal */}
       <div
-        onClick={(e) => e.stopPropagation()}
+        style={{}}
         style={{
           position: "relative",
           width: "min(calc(100vw - 2rem), 24rem)",
