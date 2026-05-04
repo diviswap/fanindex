@@ -9,15 +9,21 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet"
 import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, CheckCircle2, Sparkles, X } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { createPortal } from "react-dom"
 import { toast } from "sonner"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 // ---------------------------------------------------------------------------
-// Wallet metadata helpers
+// Helpers
 // ---------------------------------------------------------------------------
 function getWalletInfo(connectorId: string, isSocios: boolean, isMobile: boolean) {
   if (connectorId.toLowerCase().includes("walletconnect")) {
@@ -45,57 +51,85 @@ function getWalletInfo(connectorId: string, isSocios: boolean, isMobile: boolean
 }
 
 // ---------------------------------------------------------------------------
-// Wallet picker modal — rendered via portal so it sits above everything and
-// its touch events are completely isolated from the rest of the page.
+// Wallet option button — shared between mobile and desktop panels
 // ---------------------------------------------------------------------------
-interface WalletModalProps {
+interface WalletOptionProps {
+  connectorId: string
+  isSocios: boolean
+  keyId: string
+  connectingWallet: string | null
+  isMobile: boolean
+  onSelect: (connectorId: string, isSocios: boolean) => void
+}
+
+function WalletOption({ connectorId, isSocios, keyId, connectingWallet, isMobile, onSelect }: WalletOptionProps) {
+  const { name, logo, description, isSociosLogo } = getWalletInfo(connectorId, isSocios, isMobile)
+  const isConnecting = connectingWallet === keyId
+
+  return (
+    <button
+      type="button"
+      disabled={isConnecting}
+      onClick={() => { if (!isConnecting) onSelect(connectorId, isSocios) }}
+      style={{
+        touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
+        minHeight: "64px",
+        cursor: isConnecting ? "wait" : "pointer",
+        width: "100%",
+      } as React.CSSProperties}
+      className={cn(
+        "flex items-center gap-3 px-3 rounded-xl border transition-colors text-left",
+        "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
+        isConnecting && "opacity-60",
+      )}
+    >
+      <div className="relative flex-shrink-0">
+        <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logo}
+            alt={name}
+            width={isSociosLogo ? 44 : 28}
+            height={isSociosLogo ? 44 : 28}
+            className={cn("rounded", isSociosLogo && "w-full h-full object-cover")}
+          />
+        </div>
+        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+        </div>
+      </div>
+      <div className="flex-1 min-w-0">
+        <span className="font-semibold text-sm text-foreground block">{name}</span>
+        <span className="text-xs text-muted-foreground block truncate">{description}</span>
+      </div>
+      <div className="flex-shrink-0 pr-1">
+        {isConnecting ? (
+          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
+        )}
+      </div>
+    </button>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Panel content — shared markup used by both Sheet (mobile) and portal (desktop)
+// ---------------------------------------------------------------------------
+interface PanelContentProps {
   onClose: () => void
   onSelect: (connectorId: string, isSocios: boolean) => void
   connectingWallet: string | null
   walletItems: { connectorId: string; isSocios: boolean; key: string }[]
   isMobile: boolean
+  hideHeader?: boolean // Sheet already renders its own header
 }
 
-function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobile }: WalletModalProps) {
-  // Lock body scroll while modal is open
-  useEffect(() => {
-    const prev = document.body.style.overflow
-    document.body.style.overflow = "hidden"
-    return () => { document.body.style.overflow = prev }
-  }, [])
-
-  return createPortal(
-    // Outer layer: purely visual backdrop, pointer-events disabled so it
-    // NEVER intercepts taps meant for the panel or the page.
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        // Backdrop visual only — no pointer events
-        backgroundColor: "rgba(0,0,0,0.65)",
-        backdropFilter: "blur(4px)",
-        WebkitBackdropFilter: "blur(4px)",
-        pointerEvents: "none",
-      }}
-    >
-      {/* Panel — re-enables pointer events only for itself */}
-      <div
-        style={{
-          position: "relative",
-          width: "min(calc(100vw - 2rem), 24rem)",
-          borderRadius: "0.75rem",
-          overflow: "hidden",
-          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
-          pointerEvents: "auto",
-          overscrollBehavior: "contain",
-        }}
-        className="bg-background border border-border/50"
-      >
-        {/* Header */}
+function PanelContent({ onClose, onSelect, connectingWallet, walletItems, isMobile, hideHeader }: PanelContentProps) {
+  return (
+    <>
+      {!hideHeader && (
         <div className="relative px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
@@ -109,83 +143,104 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
           <button
             type="button"
             onClick={onClose}
-            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" } as React.CSSProperties}
+            style={{ touchAction: "manipulation" } as React.CSSProperties}
             className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
+      )}
 
-        {/* Options */}
-        <div className="p-3 space-y-2">
-          {walletItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-              <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-              <span className="text-xs">Loading wallets...</span>
-            </div>
-          ) : (
-            walletItems.map(({ connectorId, isSocios, key }) => {
-              const { name, logo, description, isSociosLogo } = getWalletInfo(connectorId, isSocios, isMobile)
-              const isConnecting = connectingWallet === key
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  disabled={isConnecting}
-                  onClick={() => { if (!isConnecting) onSelect(connectorId, isSocios) }}
-                  style={{
-                    touchAction: "manipulation",
-                    WebkitTapHighlightColor: "transparent",
-                    // Minimum 48px touch target for mobile
-                    minHeight: "64px",
-                    cursor: isConnecting ? "wait" : "pointer",
-                  } as React.CSSProperties}
-                  className={cn(
-                    "w-full flex items-center gap-3 px-3 rounded-xl border transition-colors text-left",
-                    "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
-                    isConnecting && "opacity-60",
-                  )}
-                >
-                  <div className="relative flex-shrink-0">
-                    <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={logo}
-                        alt={name}
-                        width={isSociosLogo ? 44 : 28}
-                        height={isSociosLogo ? 44 : 28}
-                        className={cn("rounded", isSociosLogo && "w-full h-full object-cover")}
-                      />
-                    </div>
-                    <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                      <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                    </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="font-semibold text-sm text-foreground block">{name}</span>
-                    <span className="text-xs text-muted-foreground block truncate">{description}</span>
-                  </div>
-                  <div className="flex-shrink-0 pr-1">
-                    {isConnecting ? (
-                      <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
-                    )}
-                  </div>
-                </button>
-              )
-            })
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
-          <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
-            <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
-            <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
+      <div className="p-3 space-y-2">
+        {walletItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+            <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+            <span className="text-xs">Loading wallets...</span>
           </div>
+        ) : (
+          walletItems.map(({ connectorId, isSocios, key }) => (
+            <WalletOption
+              key={key}
+              connectorId={connectorId}
+              isSocios={isSocios}
+              keyId={key}
+              connectingWallet={connectingWallet}
+              isMobile={isMobile}
+              onSelect={onSelect}
+            />
+          ))
+        )}
+      </div>
+
+      <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
+        <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
+          <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
+          <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
         </div>
+      </div>
+    </>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Desktop modal — rendered into document.body via portal, centered on screen.
+// The backdrop is pointer-events:none so it can NEVER intercept clicks.
+// ---------------------------------------------------------------------------
+interface DesktopModalProps {
+  onClose: () => void
+  onSelect: (connectorId: string, isSocios: boolean) => void
+  connectingWallet: string | null
+  walletItems: { connectorId: string; isSocios: boolean; key: string }[]
+}
+
+function DesktopModal({ onClose, onSelect, connectingWallet, walletItems }: DesktopModalProps) {
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => { document.body.style.overflow = prev }
+  }, [])
+
+  // Allow Escape key to close
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) { if (e.key === "Escape") onClose() }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [onClose])
+
+  return createPortal(
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        // Visual backdrop only — pointer-events disabled so it NEVER intercepts clicks
+        backgroundColor: "rgba(0,0,0,0.65)",
+        backdropFilter: "blur(4px)",
+        WebkitBackdropFilter: "blur(4px)",
+        pointerEvents: "none",
+      }}
+    >
+      <div
+        style={{
+          width: "min(calc(100vw - 2rem), 24rem)",
+          borderRadius: "0.75rem",
+          overflow: "hidden",
+          boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+          pointerEvents: "auto", // only the panel receives events
+        }}
+        className="bg-background border border-border/50"
+      >
+        <PanelContent
+          onClose={onClose}
+          onSelect={onSelect}
+          connectingWallet={connectingWallet}
+          walletItems={walletItems}
+          isMobile={false}
+        />
       </div>
     </div>,
     document.body
@@ -193,7 +248,57 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
 }
 
 // ---------------------------------------------------------------------------
-// Main component
+// Mobile sheet — shadcn Sheet slides up from the bottom.
+// This is the native mobile pattern; touch events are handled by the browser
+// natively with no overlay competition.
+// ---------------------------------------------------------------------------
+interface MobileSheetProps {
+  open: boolean
+  onClose: () => void
+  onSelect: (connectorId: string, isSocios: boolean) => void
+  connectingWallet: string | null
+  walletItems: { connectorId: string; isSocios: boolean; key: string }[]
+}
+
+function MobileSheet({ open, onClose, onSelect, connectingWallet, walletItems }: MobileSheetProps) {
+  return (
+    <Sheet open={open} onOpenChange={(v) => { if (!v) onClose() }}>
+      <SheetContent
+        side="bottom"
+        className="bg-background border-t border-border/50 rounded-t-2xl p-0 max-h-[85vh] overflow-y-auto"
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-muted-foreground/30" />
+        </div>
+
+        <SheetHeader className="px-4 pt-2 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
+              <Wallet className="h-4 w-4 text-success" />
+            </div>
+            <div className="text-left">
+              <SheetTitle className="text-base font-bold text-foreground">Connect Wallet</SheetTitle>
+              <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
+            </div>
+          </div>
+        </SheetHeader>
+
+        <PanelContent
+          onClose={onClose}
+          onSelect={onSelect}
+          connectingWallet={connectingWallet}
+          walletItems={walletItems}
+          isMobile={true}
+          hideHeader={true}
+        />
+      </SheetContent>
+    </Sheet>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Main exported component
 // ---------------------------------------------------------------------------
 export function ConnectWallet() {
   const { address, isConnected, connector } = useAccount()
@@ -212,8 +317,6 @@ export function ConnectWallet() {
     setIsMobile(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
   }, [])
 
-  // Build the deduplicated wallet items list once per connectors change.
-  // The second WalletConnect entry becomes the Socios option.
   const walletItems = useMemo(() => {
     let wcCount = 0
     return connectors.map((c) => {
@@ -225,7 +328,7 @@ export function ConnectWallet() {
   }, [connectors])
 
   function openModal() {
-    reset() // clear any stale wagmi error before showing the picker
+    reset()
     setModalOpen(true)
   }
 
@@ -238,16 +341,14 @@ export function ConnectWallet() {
   async function handleSelect(connectorId: string, isSocios: boolean) {
     const found = connectors.find((c) => c.id === connectorId)
     if (!found) return
-
     const key = isSocios ? "socios" : connectorId
     reset()
     setConnectingWallet(key)
-
     try {
       await connect({ connector: found })
       setModalOpen(false)
     } catch {
-      reset() // free the connector so it can be re-used immediately
+      reset()
     } finally {
       setConnectingWallet(null)
     }
@@ -267,7 +368,7 @@ export function ConnectWallet() {
     }
   }
 
-  // --- SSR skeleton ---
+  // SSR skeleton
   if (!mounted) {
     return (
       <Button
@@ -280,7 +381,7 @@ export function ConnectWallet() {
     )
   }
 
-  // --- Connected state ---
+  // Connected state
   if (isConnected && address) {
     const walletInfo = connector
       ? getWalletInfo(connector.id, false, isMobile)
@@ -312,7 +413,6 @@ export function ConnectWallet() {
           sideOffset={6}
           className="w-64 sm:w-72 p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden"
         >
-          {/* Header */}
           <div className="relative px-3 py-3 bg-gradient-to-br from-success/10 via-success/5 to-transparent border-b border-border/50">
             <div className="relative flex items-center gap-3">
               <div className="relative">
@@ -335,7 +435,6 @@ export function ConnectWallet() {
           </div>
 
           <div className="p-2.5 space-y-2">
-            {/* Address */}
             <div className="p-2.5 bg-muted/30 rounded-lg border border-border/50">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Address</span>
@@ -348,7 +447,6 @@ export function ConnectWallet() {
               </code>
             </div>
 
-            {/* Balance */}
             {balance && (
               <div className="p-2.5 bg-success/5 rounded-lg border border-success/20">
                 <div className="flex items-center gap-1.5 mb-1">
@@ -409,7 +507,7 @@ export function ConnectWallet() {
     )
   }
 
-  // --- Disconnected state ---
+  // Disconnected state
   return (
     <>
       <Button
@@ -426,13 +524,24 @@ export function ConnectWallet() {
         </div>
       </Button>
 
-      {modalOpen && (
-        <WalletModal
+      {/* Mobile: bottom Sheet — native touch handling, no overlay competition */}
+      {isMobile && (
+        <MobileSheet
+          open={modalOpen}
           onClose={closeModal}
           onSelect={handleSelect}
           connectingWallet={connectingWallet}
           walletItems={walletItems}
-          isMobile={isMobile}
+        />
+      )}
+
+      {/* Desktop: portal modal — backdrop is pointer-events:none */}
+      {!isMobile && modalOpen && (
+        <DesktopModal
+          onClose={closeModal}
+          onSelect={handleSelect}
+          connectingWallet={connectingWallet}
+          walletItems={walletItems}
         />
       )}
     </>
