@@ -41,10 +41,18 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       ]
 
       if (projectId) {
+        // Shared QR-modal options: ensure WalletConnect's modal sits ABOVE
+        // our own picker (which uses z-index 9999) on every platform.
+        const qrModalOptions = {
+          themeVariables: {
+            "--wcm-z-index": "100000",
+            "--w3m-z-index": "100000",
+          },
+        }
+
         // Standard WalletConnect — always show its built-in modal.
         // - Desktop: renders the QR code
         // - Mobile: renders the wallet list with native deep-links
-        // (this is what was missing on mobile before)
         connectors.push(
           walletConnect({
             projectId,
@@ -55,6 +63,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               icons: ["https://fanindex.pro/logo.png"],
             },
             showQrModal: true,
+            qrModalOptions,
           }),
         )
 
@@ -72,6 +81,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               icons: ["https://fanindex.pro/logo.png"],
             },
             showQrModal: !isMobile,
+            qrModalOptions,
           }),
         )
       }

@@ -243,32 +243,42 @@ export function ConnectWallet() {
     reset()
     setConnectingWallet(key)
 
-    // For Socios on mobile, we configured the WC connector with showQrModal:false,
-    // so we MUST manually capture the WalletConnect URI and redirect into the
-    // Socios app via deep-link. Otherwise the connect call would hang forever.
+    // Register the display_uri listener BEFORE calling connect, so we never
+    // miss the URI emission (it can fire synchronously on mobile).
     let cleanupListener: (() => void) | null = null
-    if (isMobile && isSocios) {
+    const emitter = (found as unknown as {
+      emitter?: {
+        on: (e: string, cb: (event: { type: string; data?: unknown }) => void) => void
+        off: (e: string, cb: (event: { type: string; data?: unknown }) => void) => void
+      }
+    }).emitter
+
+    if (isMobile && emitter) {
       const onMessage = (event: { type: string; data?: unknown }) => {
-        if (event.type === "display_uri" && typeof event.data === "string") {
-          const wcUri = event.data
-          // Try the Socios universal/custom-scheme deep link. This will open
-          // the Socios app with the WalletConnect session already attached.
-          // If the app isn't installed, the browser stays on the page.
-          const sociosLink = `socios://wc?uri=${encodeURIComponent(wcUri)}`
-          window.location.href = sociosLink
+        if (event.type !== "display_uri" || typeof event.data !== "string") return
+        const wcUri = event.data
+
+        if (isSocios) {
+          // Open Socios app directly via its custom-scheme deep-link.
+          window.location.href = `socios://wc?uri=${encodeURIComponent(wcUri)}`
         }
+        // For the generic WalletConnect option we let WC's own modal handle
+        // wallet selection (showQrModal:true), so no manual redirect needed.
       }
-      // wagmi connector exposes its EventEmitter through `emitter`
-      const emitter = (found as unknown as { emitter?: { on: (e: string, cb: typeof onMessage) => void; off: (e: string, cb: typeof onMessage) => void } }).emitter
-      if (emitter) {
-        emitter.on("message", onMessage)
-        cleanupListener = () => emitter.off("message", onMessage)
-      }
+      emitter.on("message", onMessage)
+      cleanupListener = () => emitter.off("message", onMessage)
+    }
+
+    // Close our picker modal IMMEDIATELY so it never sits on top of the
+    // WalletConnect modal or blocks the deep-link redirect on mobile.
+    setModalOpen(false)
+
+    if (isMobile) {
+      toast.info(isSocios ? "Opening Socios..." : "Opening your wallet...")
     }
 
     try {
       await connect({ connector: found })
-      setModalOpen(false)
     } catch {
       reset() // free the connector so it can be re-used immediately
     } finally {
