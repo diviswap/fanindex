@@ -3,21 +3,15 @@
 import { useAccount, useConnect, useDisconnect, useBalance } from "wagmi"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, CheckCircle2, Sparkles } from "lucide-react"
+import { Wallet, LogOut, ChevronDown, User, Copy, ExternalLink, Zap, Shield, CheckCircle2, Sparkles, X } from "lucide-react"
 import { useEffect, useState } from "react"
+import { createPortal } from "react-dom"
 import { toast } from "sonner"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -267,136 +261,137 @@ export function ConnectWallet() {
     )
   }
 
+  // Build wallet items list outside render for clarity
+  let wcCount = 0
+  const walletItems = connectors.map((c) => {
+    const isWC = c.id.toLowerCase().includes("walletconnect")
+    const isSocios = isWC && wcCount === 1
+    if (isWC) wcCount++
+    return { connector: c, isSocios, key: isSocios ? "socios" : c.id }
+  })
+
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <Button
-          disabled={isPending}
-          className="group relative overflow-hidden gap-1.5 bg-gradient-to-r from-success to-success/90 text-success-foreground font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 h-9 sm:h-10 rounded-lg border border-success/30 shadow-md shadow-success/20 transition-all duration-300 hover:shadow-success/30 active:scale-[0.98]"
-        >
-          <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-          <div className="relative flex items-center gap-1.5">
-            <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden sm:inline">{isPending ? "Connecting..." : "Connect"}</span>
-            <span className="sm:hidden">{isPending ? "..." : "Connect"}</span>
-          </div>
-        </Button>
-      </DialogTrigger>
-      <DialogContent
-        className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-visible"
-        onPointerDownOutside={(e) => {
-          // Only close if the tap/click is truly outside the dialog panel
-          const target = e.target as HTMLElement
-          if (target.closest('[role="dialog"]')) e.preventDefault()
-        }}
-        onInteractOutside={(e) => {
-          const target = e.target as HTMLElement
-          if (target.closest('[role="dialog"]')) e.preventDefault()
-        }}
+    <>
+      {/* Trigger button */}
+      <Button
+        disabled={isPending}
+        onClick={() => setDialogOpen(true)}
+        className="group relative overflow-hidden gap-1.5 bg-gradient-to-r from-success to-success/90 text-success-foreground font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 h-9 sm:h-10 rounded-lg border border-success/30 shadow-md shadow-success/20 transition-all duration-300 hover:shadow-success/30 active:scale-[0.98]"
+        style={{ touchAction: "manipulation" }}
       >
-        <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-
-        <div
-          className="relative"
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Header */}
-          <DialogHeader className="px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
-                <Wallet className="h-4 w-4 text-success" />
-              </div>
-              <div>
-                <DialogTitle className="text-base font-bold">Connect Wallet</DialogTitle>
-                <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
-              </div>
-            </div>
-          </DialogHeader>
-
-          {/* Wallet Options */}
-          <div className="p-3 space-y-1.5">
-            {connectors.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
-                <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                <span className="text-xs">Loading wallets...</span>
-              </div>
-            ) : (
-              // Build a flat list of wallet items including the Socios variant for the
-              // second WalletConnect connector, then render with a simple .map() so
-              // React can attach event handlers correctly on mobile (no IIFE quirks).
-              (() => {
-                let wcCount = 0
-                const items = connectors.map((c) => {
-                  const isWC = c.id.toLowerCase().includes("walletconnect")
-                  const isSocios = isWC && wcCount === 1
-                  if (isWC) wcCount++
-                  return { connector: c, isSocios, key: isSocios ? "socios" : c.id }
-                })
-
-                return items.map(({ connector: c, isSocios, key }) => {
-                  const { name, logo, description, popular } = getWalletInfo(c.id, isSocios)
-                  const isConnecting = connectingWallet === key
-                  return (
-                    <button
-                      key={key}
-                      type="button"
-                      disabled={isConnecting}
-                      onClick={() => handleConnect(c.id, isSocios)}
-                      style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
-                      className={cn(
-                        "w-full group relative flex items-center gap-3 p-3 rounded-xl border transition-all duration-200",
-                        "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40 active:border-success/60",
-                        "focus:outline-none focus:ring-2 focus:ring-success/50",
-                        isConnecting && "opacity-70 cursor-wait",
-                      )}
-                    >
-                      <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={logo}
-                            alt={name}
-                            width={28}
-                            height={28}
-                            className={cn("rounded", isSocios && "w-full h-full object-cover")}
-                          />
-                        </div>
-                        {popular && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
-                            <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex-1 text-left min-w-0 pointer-events-none">
-                        <span className="font-medium text-sm text-foreground block">{name}</span>
-                        <span className="text-xs text-muted-foreground truncate block">{description}</span>
-                      </div>
-
-                      <div className="flex-shrink-0 pointer-events-none">
-                        {isConnecting ? (
-                          <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
-                        )}
-                      </div>
-                    </button>
-                  )
-                })
-              })()
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
-            <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
-              <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
-              <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
-            </div>
-          </div>
+        <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        <div className="relative flex items-center gap-1.5">
+          <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">{isPending ? "Connecting..." : "Connect"}</span>
+          <span className="sm:hidden">{isPending ? "..." : "Connect"}</span>
         </div>
-      </DialogContent>
-    </Dialog>
+      </Button>
+
+      {/* Custom portal modal — bypasses Radix Dialog which intercepts touch events on mobile */}
+      {dialogOpen && typeof document !== "undefined" && createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          // Backdrop — clicking/tapping here closes the modal
+          onPointerDown={(e) => {
+            if (e.target === e.currentTarget) setDialogOpen(false)
+          }}
+          style={{ backgroundColor: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+        >
+          {/* Panel */}
+          <div
+            className="relative w-[calc(100vw-2rem)] max-w-sm bg-background border border-border/50 rounded-xl shadow-2xl overflow-hidden"
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <div className="absolute top-0 left-0 w-32 h-32 bg-success/10 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+
+            {/* Header */}
+            <div className="relative px-4 pt-4 pb-3 border-b border-border/50 bg-gradient-to-br from-success/5 to-transparent flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-success/20 to-success/5 flex items-center justify-center border border-success/30">
+                  <Wallet className="h-4 w-4 text-success" />
+                </div>
+                <div>
+                  <p className="text-base font-bold text-foreground">Connect Wallet</p>
+                  <p className="text-xs text-muted-foreground">Choose your wallet to continue</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDialogOpen(false)}
+                style={{ touchAction: "manipulation" }}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Wallet Options */}
+            <div className="p-3 space-y-1.5">
+              {walletItems.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
+                  <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                  <span className="text-xs">Loading wallets...</span>
+                </div>
+              ) : walletItems.map(({ connector: c, isSocios, key }) => {
+                const { name, logo, description, popular } = getWalletInfo(c.id, isSocios)
+                const isConnecting = connectingWallet === key
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    disabled={isConnecting}
+                    onClick={() => handleConnect(c.id, isSocios)}
+                    style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+                    className={cn(
+                      "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors",
+                      "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
+                      isConnecting && "opacity-70 cursor-wait",
+                    )}
+                  >
+                    <div className="relative flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={logo}
+                          alt={name}
+                          width={28}
+                          height={28}
+                          className={cn("rounded", isSocios && "w-full h-full object-cover")}
+                        />
+                      </div>
+                      {popular && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                          <Sparkles className="h-2.5 w-2.5 text-success-foreground" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 text-left min-w-0">
+                      <span className="font-medium text-sm text-foreground block">{name}</span>
+                      <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                    </div>
+                    <div className="flex-shrink-0">
+                      {isConnecting ? (
+                        <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-muted-foreground -rotate-90" />
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 border-t border-border/50 bg-muted/20">
+              <div className="flex items-start gap-2 text-[10px] text-muted-foreground">
+                <Shield className="h-3.5 w-3.5 text-success flex-shrink-0 mt-0.5" />
+                <p>By connecting, you agree to our Terms of Service and Privacy Policy.</p>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   )
 }
