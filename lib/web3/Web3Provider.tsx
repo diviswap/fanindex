@@ -33,7 +33,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     // This keeps @metamask/sdk, WalletConnect, pino, and react-native deps
     // completely out of the SSR/static bundle.
     const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || ""
-    const isMobile = typeof window !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
 
     import("wagmi/connectors").then(({ injected, walletConnect }) => {
       const connectors: any[] = [
@@ -41,35 +40,16 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       ]
 
       if (projectId) {
-        // Standard WalletConnect — on mobile show QR modal so the user can
-        // choose any wallet via deep-link; on desktop always show the QR modal.
         connectors.push(
           walletConnect({
             projectId,
             metadata: {
               name: "FanIndex",
               description: "Fan Token Investment Platform",
-              url: "https://fanindex.pro",
-              icons: ["https://fanindex.pro/logo.png"],
+              url: "https://fanindex.app",
+              icons: ["https://fanindex.app/logo.png"],
             },
-            // On mobile we disable the built-in modal and handle redirect
-            // ourselves so the OS can pick up the deep-link natively.
-            showQrModal: !isMobile,
-          }),
-        )
-
-        // Socios connector — same WalletConnect protocol but pre-configured
-        // to redirect directly into the Socios.com app on mobile.
-        connectors.push(
-          walletConnect({
-            projectId,
-            metadata: {
-              name: "FanIndex",
-              description: "Fan Token Investment Platform",
-              url: "https://fanindex.pro",
-              icons: ["https://fanindex.pro/logo.png"],
-            },
-            showQrModal: !isMobile,
+            showQrModal: true,
           }),
         )
       }
