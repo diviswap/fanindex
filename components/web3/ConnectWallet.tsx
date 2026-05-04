@@ -212,16 +212,20 @@ export function ConnectWallet() {
     setIsMobile(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent))
   }, [])
 
-  // Build the deduplicated wallet items list once per connectors change.
-  // The second WalletConnect entry becomes the Socios option.
+  // Build the wallet items list.
+  // There is a single WalletConnect connector — we expose it twice:
+  // once as "WalletConnect" and once as "Socios", exactly like the
+  // working reference app (getUniqueConnectors adds Socios reusing the WC connector).
   const walletItems = useMemo(() => {
-    let wcCount = 0
-    return connectors.map((c) => {
-      const isWC = c.id.toLowerCase().includes("walletconnect")
-      const isSocios = isWC && wcCount === 1
-      if (isWC) wcCount++
-      return { connectorId: c.id, isSocios, key: isSocios ? "socios" : c.id }
-    })
+    const items: { connectorId: string; isSocios: boolean; key: string }[] = []
+    for (const c of connectors) {
+      items.push({ connectorId: c.id, isSocios: false, key: c.id })
+      // If this is the WalletConnect connector, also add a Socios entry
+      if (c.id.toLowerCase().includes("walletconnect")) {
+        items.push({ connectorId: c.id, isSocios: true, key: "socios" })
+      }
+    }
+    return items
   }, [connectors])
 
   function openModal() {

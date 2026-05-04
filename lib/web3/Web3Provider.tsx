@@ -41,10 +41,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
       ]
 
       if (projectId) {
-        // Standard WalletConnect — always show its built-in modal.
-        // - Desktop: renders the QR code
-        // - Mobile: renders the wallet list with native deep-links
-        // (this is what was missing on mobile before)
+        // Single WalletConnect connector — showQrModal:true so the built-in
+        // WC modal handles both desktop (QR) and mobile (wallet list + deep-links).
+        // Both "WalletConnect" and "Socios" buttons in ConnectWallet.tsx reuse
+        // this same connector instance, exactly like the working reference app.
         connectors.push(
           walletConnect({
             projectId,
@@ -55,23 +55,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
               icons: ["https://fanindex.pro/logo.png"],
             },
             showQrModal: true,
-          }),
-        )
-
-        // Socios connector — same WC protocol, but on mobile we suppress the
-        // built-in WC modal and redirect directly to the Socios app via the
-        // `display_uri` event (handled in ConnectWallet.tsx). On desktop we
-        // fall back to the standard QR modal so the user can scan it.
-        connectors.push(
-          walletConnect({
-            projectId,
-            metadata: {
-              name: "FanIndex",
-              description: "Fan Token Investment Platform",
-              url: "https://fanindex.pro",
-              icons: ["https://fanindex.pro/logo.png"],
-            },
-            showQrModal: !isMobile,
           }),
         )
       }
