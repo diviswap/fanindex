@@ -76,7 +76,7 @@ export function ConnectWallet() {
     if (connectorId.includes("socios")) {
       return {
         name: "Socios.com",
-        logo: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-emlvwb5FNFoczifks0VQ3K0ok6cRr6.png",
+        logo: "/socios-logo.png",
         description: "Connect with Socios wallet",
         popular: true,
       }
