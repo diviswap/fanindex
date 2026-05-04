@@ -57,19 +57,17 @@ interface WalletModalProps {
 }
 
 function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobile }: WalletModalProps) {
-  const backdropRef = useRef<HTMLDivElement>(null)
-
-  // Close only when the backdrop itself is tapped, not the panel
-  function handleBackdropPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.target === backdropRef.current) {
-      onClose()
-    }
-  }
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => { document.body.style.overflow = prev }
+  }, [])
 
   return createPortal(
+    // Outer layer: purely visual backdrop, pointer-events disabled so it
+    // NEVER intercepts taps meant for the panel or the page.
     <div
-      ref={backdropRef}
-      onPointerDown={handleBackdropPointerDown}
       style={{
         position: "fixed",
         inset: 0,
@@ -77,20 +75,23 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        // Backdrop visual only — no pointer events
         backgroundColor: "rgba(0,0,0,0.65)",
         backdropFilter: "blur(4px)",
         WebkitBackdropFilter: "blur(4px)",
+        pointerEvents: "none",
       }}
     >
-      {/* Panel — stops all pointer events from reaching the backdrop */}
+      {/* Panel — re-enables pointer events only for itself */}
       <div
-        onPointerDown={(e) => e.stopPropagation()}
         style={{
           position: "relative",
           width: "min(calc(100vw - 2rem), 24rem)",
           borderRadius: "0.75rem",
           overflow: "hidden",
           boxShadow: "0 25px 50px -12px rgba(0,0,0,0.8)",
+          pointerEvents: "auto",
+          overscrollBehavior: "contain",
         }}
         className="bg-background border border-border/50"
       >
@@ -107,17 +108,17 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
           </div>
           <button
             type="button"
-            onPointerDown={(e) => { e.stopPropagation(); onClose() }}
-            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            onClick={onClose}
+            style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" } as React.CSSProperties}
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
             aria-label="Close"
           >
-            <X className="h-4 w-4" />
+            <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Options */}
-        <div className="p-3 space-y-1.5">
+        <div className="p-3 space-y-2">
           {walletItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-6 gap-2 text-muted-foreground">
               <div className="w-6 h-6 border-2 border-success/30 border-t-success rounded-full animate-spin" />
@@ -132,26 +133,28 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
                   key={key}
                   type="button"
                   disabled={isConnecting}
-                  // Use onPointerDown for fastest response on mobile
-                  onPointerDown={(e) => {
-                    e.stopPropagation()
-                    if (!isConnecting) onSelect(connectorId, isSocios)
-                  }}
-                  style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" }}
+                  onClick={() => { if (!isConnecting) onSelect(connectorId, isSocios) }}
+                  style={{
+                    touchAction: "manipulation",
+                    WebkitTapHighlightColor: "transparent",
+                    // Minimum 48px touch target for mobile
+                    minHeight: "64px",
+                    cursor: isConnecting ? "wait" : "pointer",
+                  } as React.CSSProperties}
                   className={cn(
-                    "w-full flex items-center gap-3 p-3 rounded-xl border transition-colors text-left",
+                    "w-full flex items-center gap-3 px-3 rounded-xl border transition-colors text-left",
                     "bg-muted/30 active:bg-success/10 hover:bg-success/5 border-border/50 hover:border-success/40",
-                    isConnecting && "opacity-60 cursor-wait",
+                    isConnecting && "opacity-60",
                   )}
                 >
                   <div className="relative flex-shrink-0">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
+                    <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-background to-muted flex items-center justify-center border border-border/50 overflow-hidden">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={logo}
                         alt={name}
-                        width={isSociosLogo ? 40 : 28}
-                        height={isSociosLogo ? 40 : 28}
+                        width={isSociosLogo ? 44 : 28}
+                        height={isSociosLogo ? 44 : 28}
                         className={cn("rounded", isSociosLogo && "w-full h-full object-cover")}
                       />
                     </div>
@@ -160,10 +163,10 @@ function WalletModal({ onClose, onSelect, connectingWallet, walletItems, isMobil
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="font-medium text-sm text-foreground block">{name}</span>
+                    <span className="font-semibold text-sm text-foreground block">{name}</span>
                     <span className="text-xs text-muted-foreground block truncate">{description}</span>
                   </div>
-                  <div className="flex-shrink-0">
+                  <div className="flex-shrink-0 pr-1">
                     {isConnecting ? (
                       <div className="w-5 h-5 border-2 border-success/30 border-t-success rounded-full animate-spin" />
                     ) : (
@@ -411,7 +414,7 @@ export function ConnectWallet() {
     <>
       <Button
         disabled={isPending}
-        onPointerDown={openModal}
+        onClick={openModal}
         style={{ touchAction: "manipulation", WebkitTapHighlightColor: "transparent" } as React.CSSProperties}
         className="group relative overflow-hidden gap-1.5 bg-gradient-to-r from-success to-success/90 text-success-foreground font-medium text-xs sm:text-sm px-3 sm:px-4 py-2 h-9 sm:h-10 rounded-lg border border-success/30 shadow-md shadow-success/20 transition-all duration-300 hover:shadow-success/30 active:scale-[0.98]"
       >
