@@ -288,5 +288,19 @@
   "termsPage": {
     "back": "Volver al inicio",
     "title": "Términos de Servicio"
+  },
+  "resources": {
+    "sections": {
+      "gettingStarted": "Primeros Pasos",
+      "methodology": "Metodología",
+      "liveIndices": "Indices En Vivo",
+      "nftPositions": "Posiciones NFT",
+      "analytics": "Analítica",
+      "fees": "Comisiones",
+      "smartContracts": "Contratos Inteligentes",
+      "faq": "Preguntas Frecuentes",
+      "riskDisclosure": "Aviso de Riesgo",
+      "roadmap": "Hoja de Ruta"
+    }
   }
 }

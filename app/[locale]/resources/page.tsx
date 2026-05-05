@@ -10,69 +10,60 @@ import { FAQSection } from "@/components/resources/FAQSection"
 import { RiskDisclosureSection } from "@/components/resources/RiskDisclosureSection"
 import { RoadmapSection } from "@/components/resources/RoadmapSection"
 import { ResourcesFooter } from "@/components/resources/ResourcesFooter"
+import { getTranslations } from "next-intl/server"
+import type { Metadata } from "next"
 
-export const metadata = {
-  title: "Resources & Documentation | FanIndex",
-  description:
-    "Complete guide to FanIndex. Learn about index methodology, NFT positions, smart contracts, fees, analytics, and more.",
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const isEs = locale === "es"
+  return {
+    title: isEs
+      ? "Recursos y Documentación | FanIndex"
+      : "Resources & Documentation | FanIndex",
+    description: isEs
+      ? "Guía completa de FanIndex. Aprende sobre metodología de índices, posiciones NFT, contratos inteligentes, comisiones, analítica y más."
+      : "Complete guide to FanIndex. Learn about index methodology, NFT positions, smart contracts, fees, analytics, and more.",
+  }
 }
 
-export default function ResourcesPage() {
+export default async function ResourcesPage() {
+  const t = await getTranslations("resources")
+
   const sections = [
-    "Getting Started",
-    "Methodology",
-    "Live Indices",
-    "NFT Positions",
-    "Analytics",
-    "Fees",
-    "Smart Contracts",
-    "FAQ",
-    "Risk Disclosure",
-    "Roadmap",
+    t("sections.gettingStarted"),
+    t("sections.methodology"),
+    t("sections.liveIndices"),
+    t("sections.nftPositions"),
+    t("sections.analytics"),
+    t("sections.fees"),
+    t("sections.smartContracts"),
+    t("sections.faq"),
+    t("sections.riskDisclosure"),
+    t("sections.roadmap"),
   ]
 
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-6xl mx-auto px-6 py-12 md:py-16">
         <div className="space-y-20">
-          {/* Hero */}
           <ResourcesHero sections={sections} />
-
-          {/* Getting Started */}
           <GettingStartedSection />
-
-          {/* Methodology */}
           <MethodologySection />
-
-          {/* Live Indices */}
           <LiveIndicesSection />
-
-          {/* NFT Positions */}
           <NFTPositionsSection />
-
-          {/* Portfolio Analytics */}
           <PortfolioAnalyticsSection />
-
-          {/* Fees */}
           <FeesSection />
-
-          {/* Smart Contracts */}
           <SmartContractsSection />
-
-          {/* FAQ */}
           <FAQSection />
-
-          {/* Risk Disclosure */}
           <RiskDisclosureSection />
-
-          {/* Roadmap */}
           <RoadmapSection />
-
-          {/* Footer */}
           <ResourcesFooter />
         </div>
       </main>
     </div>
   )
 }
-

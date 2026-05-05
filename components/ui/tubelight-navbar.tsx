@@ -4,12 +4,12 @@ import type React from "react"
 
 import { useEffect, useState, useRef } from "react"
 import { motion } from "framer-motion"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import type { LucideIcon } from "lucide-react"
 import { Home, Info, Sparkles, Briefcase, Menu, X, Coins } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ConnectWallet } from "@/components/web3/ConnectWallet"
-import { usePathname } from "next/navigation"
+import { usePathname } from "@/i18n/navigation"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -44,18 +44,16 @@ export function NavBar({ items: itemsProp, className }: NavBarProps) {
   const mobileMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Strip locale prefix for matching: /es/portfolio → /portfolio
-    const cleanPath = pathname.replace(/^\/(en|es)/, "") || "/"
-
-    if (cleanPath === "/portfolio") {
+    // usePathname from @/i18n/navigation returns the path without locale prefix
+    if (pathname === "/portfolio") {
       setActiveTab(t("portfolio"))
-    } else if (cleanPath === "/indices" || cleanPath?.startsWith("/indices/")) {
+    } else if (pathname === "/indices" || pathname?.startsWith("/indices/")) {
       setActiveTab(t("indices"))
-    } else if (cleanPath === "/fan-tokens") {
+    } else if (pathname === "/fan-tokens") {
       setActiveTab(t("fanTokens"))
-    } else if (cleanPath === "/" || cleanPath === "") {
+    } else if (pathname === "/" || pathname === "") {
       setActiveTab(t("home"))
-    } else if (cleanPath === "/whitepaper") {
+    } else if (pathname === "/whitepaper") {
       setActiveTab(t("whitepaper"))
     }
   }, [pathname, t])

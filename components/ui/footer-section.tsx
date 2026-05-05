@@ -1,10 +1,10 @@
 "use client"
-import type React from "react"
 import type { ComponentProps, ReactNode } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { FileText } from "lucide-react"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 export function Footer() {
   const t = useTranslations("footer")
@@ -41,17 +41,6 @@ export function Footer() {
     },
   ]
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith("#") && href.length > 1) {
-      e.preventDefault()
-      const targetId = href.substring(1)
-      const element = document.getElementById(targetId)
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth", block: "start" })
-      }
-    }
-  }
-
   return (
     <footer className="md:rounded-t-6xl relative w-full max-w-6xl mx-auto flex flex-col items-center justify-center rounded-t-4xl border-t border-border bg-[radial-gradient(35%_128px_at_50%_0%,theme(backgroundColor.success/8%),transparent)] px-6 py-12 lg:py-16">
       <div className="bg-success/20 absolute top-0 right-1/2 left-1/2 h-px w-1/3 -translate-x-1/2 -translate-y-1/2 rounded-full blur" />
@@ -78,19 +67,31 @@ export function Footer() {
                 <ul className="text-muted-foreground mt-4 space-y-2 text-sm">
                   {section.links.map((link) => {
                     let Icon = (link as any).icon
+                    const isExternal = link.href.startsWith("http")
                     if (link.href === "https://x.com/FanIndexes") {
                       Icon = XIcon
                     }
                     return (
                       <li key={link.title}>
-                        <a
-                          href={link.href}
-                          onClick={(e) => handleLinkClick(e, link.href)}
-                          className="hover:text-success inline-flex items-center transition-all duration-300"
-                        >
-                          {Icon && <Icon className="me-1 size-4" />}
-                          {link.title}
-                        </a>
+                        {isExternal ? (
+                          <a
+                            href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-success inline-flex items-center transition-all duration-300"
+                          >
+                            {Icon && <Icon className="me-1 size-4" />}
+                            {link.title}
+                          </a>
+                        ) : (
+                          <Link
+                            href={link.href as any}
+                            className="hover:text-success inline-flex items-center transition-all duration-300"
+                          >
+                            {Icon && <Icon className="me-1 size-4" />}
+                            {link.title}
+                          </Link>
+                        )}
                       </li>
                     )
                   })}
