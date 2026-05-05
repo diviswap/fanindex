@@ -1,7 +1,8 @@
-import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { ChevronRight } from "lucide-react"
 import { NavBar } from "@/components/ui/tubelight-navbar"
 import { Footer } from "@/components/ui/footer-section"
+import { Link } from "@/i18n/navigation"
 
 export const metadata = {
   title: "Whitepaper v2 | FanIndex",
@@ -533,6 +534,7 @@ const SECTIONS = [
 ]
 
 export default function WhitepaperPage() {
+  const t = useTranslations("whitepaperPage")
   return (
     <div className="relative flex w-full flex-col min-h-screen bg-background">
       <NavBar />
@@ -559,16 +561,15 @@ export default function WhitepaperPage() {
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-10"
             >
               <ChevronRight className="h-4 w-4 rotate-180" />
-              Back to home
+              {t("back")}
             </Link>
 
             <h1 className="text-balance text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight leading-[1.08] text-foreground mb-4">
-              The Index Layer for{" "}
-              <span className="text-success">Fan Tokens</span>
+              {t("title")}{" "}
+              <span className="text-success">{t("titleHighlight")}</span>
             </h1>
             <p className="text-muted-foreground text-base sm:text-lg mt-3 max-w-2xl leading-relaxed">
-              FanIndex is the decentralized SportFi infrastructure platform that transforms Fan Tokens
-              into structured, index-based financial products on the Chiliz Chain.
+              {t("description")}
             </p>
           </div>
         </section>
@@ -583,7 +584,7 @@ export default function WhitepaperPage() {
               className="mb-16 rounded-2xl border border-border/60 bg-card/40 p-6 sm:p-8 backdrop-blur"
             >
               <div className="text-[11px] font-medium uppercase tracking-[0.18em] text-success mb-5">
-                Contents
+                {t("tableOfContents")}
               </div>
               <ol className="space-y-2">
                 {SECTIONS.map((s) => (

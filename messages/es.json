@@ -302,5 +302,64 @@
       "riskDisclosure": "Aviso de Riesgo",
       "roadmap": "Hoja de Ruta"
     }
+  },
+  "fanTokensPage": {
+    "badge": "Estadísticas de Fan Tokens en Vivo",
+    "title": "Mercado de",
+    "titleHighlight": "Fan Tokens",
+    "description": "Precios en tiempo real, capitalización de mercado y datos de operación para 80+ fan tokens en Chiliz Chain.",
+    "searchPlaceholder": "Buscar fan tokens...",
+    "categories": {
+      "all": "Todos los Tokens",
+      "football": "Fútbol",
+      "esports": "Esports",
+      "motorsport": "Automovilismo",
+      "combat": "Deporte de Combate",
+      "rugby": "Rugby",
+      "other": "Otro"
+    },
+    "stats": {
+      "totalTokens": "Total de Tokens",
+      "totalMarketCap": "Cap. Mercado Total",
+      "volume24h": "Volumen 24h",
+      "percentSupply": "% Suministro CHZ"
+    },
+    "table": {
+      "rank": "#",
+      "name": "Nombre",
+      "price": "Precio (CHZ)",
+      "change24h": "24h",
+      "change7d": "7d",
+      "marketCap": "Cap. de Mercado",
+      "volume": "Volumen 24h",
+      "percentOfSupply": "% del Suministro"
+    }
+  },
+  "whitepaperPage": {
+    "back": "Volver al inicio",
+    "title": "La Capa de Índices para",
+    "titleHighlight": "Fan Tokens",
+    "description": "FanIndex es la plataforma de infraestructura SportFi descentralizada que transforma Fan Tokens en productos financieros estructurados basados en índices en Chiliz Chain.",
+    "tableOfContents": "Contenido",
+    "sections": {
+      "executiveSummary": "1. Resumen Ejecutivo",
+      "vision": "2. Visión",
+      "marketContext": "3. Contexto de Mercado",
+      "platform": "4. La Plataforma FanIndex",
+      "indexArchitecture": "5. Arquitectura de Índices",
+      "indexSuite": "6. Suite de Índices Actual",
+      "futureExpansion": "7. Expansión Futura",
+      "pricingMethodology": "8. Metodología de Precios",
+      "nftInfrastructure": "9. Infraestructura de Posiciones NFT",
+      "buyRedeem": "10. Flujo de Compra y Redención",
+      "rebalancing": "11. Rebalanceo",
+      "technicalArchitecture": "12. Arquitectura Técnica",
+      "feeStructure": "13. Estructura de Comisiones",
+      "revenue": "14. Asignación de Ingresos",
+      "governance": "15. Gobernanza",
+      "roadmap": "16. Hoja de Ruta",
+      "risks": "17. Riesgos",
+      "conclusion": "18. Conclusión"
+    }
   }
 }

@@ -302,5 +302,64 @@
       "riskDisclosure": "Risk Disclosure",
       "roadmap": "Roadmap"
     }
+  },
+  "fanTokensPage": {
+    "badge": "Live Fan Token Statistics",
+    "title": "Fan Token",
+    "titleHighlight": "Market",
+    "description": "Real-time prices, market caps, and trading data for 80+ fan tokens on Chiliz Chain.",
+    "searchPlaceholder": "Search fan tokens...",
+    "categories": {
+      "all": "All Tokens",
+      "football": "Football",
+      "esports": "Esports",
+      "motorsport": "Motorsport",
+      "combat": "Combat",
+      "rugby": "Rugby",
+      "other": "Other"
+    },
+    "stats": {
+      "totalTokens": "Total Tokens",
+      "totalMarketCap": "Total Market Cap",
+      "volume24h": "24h Volume",
+      "percentSupply": "% CHZ Supply"
+    },
+    "table": {
+      "rank": "#",
+      "name": "Name",
+      "price": "Price (CHZ)",
+      "change24h": "24h",
+      "change7d": "7d",
+      "marketCap": "Market Cap",
+      "volume": "24h Volume",
+      "percentOfSupply": "% of Supply"
+    }
+  },
+  "whitepaperPage": {
+    "back": "Back to home",
+    "title": "The Index Layer for",
+    "titleHighlight": "Fan Tokens",
+    "description": "FanIndex is the decentralized SportFi infrastructure platform that transforms Fan Tokens into structured, index-based financial products on the Chiliz Chain.",
+    "tableOfContents": "Contents",
+    "sections": {
+      "executiveSummary": "1. Executive Summary",
+      "vision": "2. Vision",
+      "marketContext": "3. Market Context",
+      "platform": "4. The FanIndex Platform",
+      "indexArchitecture": "5. Index Architecture",
+      "indexSuite": "6. Current Index Suite",
+      "futureExpansion": "7. Future Index Expansion",
+      "pricingMethodology": "8. Pricing Methodology",
+      "nftInfrastructure": "9. NFT Position Infrastructure",
+      "buyRedeem": "10. Buy & Redeem Flow",
+      "rebalancing": "11. Rebalancing",
+      "technicalArchitecture": "12. Technical Architecture",
+      "feeStructure": "13. Fee Structure",
+      "revenue": "14. Revenue Allocation",
+      "governance": "15. Governance",
+      "roadmap": "16. Roadmap",
+      "risks": "17. Risks",
+      "conclusion": "18. Conclusion"
+    }
   }
 }
