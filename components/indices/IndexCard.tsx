@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button"
 
 import { TrendingUp, TrendingDown, Share2, ArrowUpRight } from "lucide-react"
 import { useState, useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
 import { Sparkline } from "@/components/ui/sparkline"
-import Link from "next/link"
+import { Link } from "@/i18n/navigation"
 import { useReadContract } from "wagmi"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useIndexNav } from "@/lib/hooks/use-index-nav"
@@ -42,6 +43,7 @@ interface IndexCardProps {
 }
 
 export function IndexCard({ index }: IndexCardProps) {
+  const t = useTranslations("indexCard")
   const [showBuyDialog, setShowBuyDialog] = useState(false)
   const [showShareModal, setShowShareModal] = useState(false)
 
@@ -116,9 +118,9 @@ export function IndexCard({ index }: IndexCardProps) {
   }
 
   const typeLabels = {
-    weighted: "Weighted",
-    equal: "Equal-Weight",
-    managed: "Managed",
+    weighted: t("weighted"),
+    equal: t("equalWeight"),
+    managed: t("managed"),
   }
 
   return (
@@ -152,7 +154,7 @@ export function IndexCard({ index }: IndexCardProps) {
               {/* NAV section — fixed height */}
               <div className="h-16">
                 <div className="text-[10px] text-muted-foreground mb-1 font-medium uppercase tracking-[0.14em]">
-                  NAV
+                  {t("nav")}
                 </div>
                 <div className="flex items-baseline gap-2 flex-wrap">
                   <span className="font-mono text-3xl sm:text-4xl font-bold tracking-tight text-foreground tabular-nums">
@@ -216,7 +218,7 @@ export function IndexCard({ index }: IndexCardProps) {
               {/* Constituents — flex-grow to take remaining space */}
               <div className="flex-1 min-h-24 flex flex-col">
                 <div className="text-[10px] text-muted-foreground mb-2 font-medium uppercase tracking-[0.14em]">
-                  {index.tokens.length} Constituents
+                  {index.tokens.length} {t("constituents")}
                 </div>
                 <div className="flex flex-wrap gap-1.5 content-start">
                   {index.tokens.slice(0, 5).map((symbol) => {
@@ -257,7 +259,7 @@ export function IndexCard({ index }: IndexCardProps) {
                   }}
                   className="flex-1 bg-success hover:bg-success/90 text-success-foreground font-semibold h-full text-sm rounded-xl group/btn"
                 >
-                  <span>Invest</span>
+                  <span>{t("invest")}</span>
                   <ArrowUpRight className="h-3.5 w-3.5 ml-1.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                 </Button>
                 <Button

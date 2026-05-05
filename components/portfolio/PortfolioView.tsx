@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useAccount, useBalance, useReadContracts } from "wagmi"
 import { formatUnits, erc20Abi } from "viem"
 import { Button } from "@/components/ui/button"
@@ -189,7 +190,7 @@ function AvailableIndexCard({
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
               </span>
-              Live
+              {t("live")}
             </span>
           </div>
         </div>
@@ -286,7 +287,7 @@ function AvailableIndexCard({
           className="w-full bg-success hover:bg-success/90 text-success-foreground font-semibold h-9 text-sm"
         >
           <ShoppingCart className="h-3.5 w-3.5 mr-1.5" />
-          Buy Index
+          {t("buy")}
         </Button>
       </div>
     </div>
@@ -296,6 +297,7 @@ function AvailableIndexCard({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function PortfolioView() {
+  const t = useTranslations("portfolioView")
   const { address, isConnected } = useAccount()
 
   // Get native CHZ balance
@@ -463,7 +465,7 @@ export function PortfolioView() {
       items.push({
         id: "chz",
         name: "CHZ",
-        sublabel: "Native balance",
+        sublabel: t("native"),
         value: portfolioStats.chzValue,
         category: "chz",
       })
@@ -481,7 +483,7 @@ export function PortfolioView() {
         items.push({
           id: `nft-${h.tokenId.toString()}`,
           name: h.indexName,
-          sublabel: `Position #${h.tokenId.toString()}`,
+          sublabel: `${t("position")} #${h.tokenId.toString()}`,
           value: val,
           category: "nft",
         })

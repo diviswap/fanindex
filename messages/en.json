@@ -361,5 +361,25 @@
       "risks": "17. Risks",
       "conclusion": "18. Conclusion"
     }
+  },
+  "resourcesHero": {
+    "backToHome": "Back to home",
+    "title": "Resources & Documentation",
+    "description": "Everything you need to understand FanIndex. From getting started to advanced analytics, smart contracts, and institutional-grade portfolio management."
+  },
+  "indexCard": {
+    "nav": "NAV",
+    "constituents": "Constituents",
+    "invest": "Invest",
+    "weighted": "Weighted",
+    "equalWeight": "Equal-Weight",
+    "managed": "Managed"
+  },
+  "portfolioView": {
+    "native": "Native balance",
+    "position": "Position",
+    "buy": "Buy Index",
+    "live": "Live",
+    "notConnected": "Connect your wallet to view your portfolio"
   }
 }

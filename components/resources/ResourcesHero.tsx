@@ -1,13 +1,15 @@
 "use client"
 
 import { ChevronRight, ArrowDown } from "lucide-react"
-import Link from "next/link"
+import { useTranslations } from "next-intl"
+import { Link } from "@/i18n/navigation"
 
 interface ResourcesHeroProps {
   sections: string[]
 }
 
 export function ResourcesHero({ sections }: ResourcesHeroProps) {
+  const t = useTranslations("resourcesHero")
   return (
     <div className="space-y-8 mb-16">
       {/* Breadcrumb */}
@@ -16,16 +18,16 @@ export function ResourcesHero({ sections }: ResourcesHeroProps) {
         className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ChevronRight className="h-4 w-4 rotate-180" />
-        Back to home
+        {t("backToHome")}
       </Link>
 
       {/* Hero */}
       <div className="space-y-4">
         <h1 className="text-5xl md:text-6xl font-bold text-foreground text-balance leading-tight">
-          Resources & Documentation
+          {t("title")}
         </h1>
         <p className="text-lg md:text-xl text-muted-foreground max-w-3xl leading-relaxed">
-          Everything you need to understand FanIndex. From getting started to advanced analytics, smart contracts, and institutional-grade portfolio management.
+          {t("description")}
         </p>
       </div>
 
