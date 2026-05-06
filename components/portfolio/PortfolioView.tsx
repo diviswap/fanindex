@@ -95,6 +95,7 @@ function AvailableIndexCard({
   index: IndexData
   onBuy: () => void
 }) {
+  const t = useTranslations("portfolioView")
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
   // Same weights query and 90d fetch as IndexCard
