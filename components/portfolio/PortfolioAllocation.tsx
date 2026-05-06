@@ -4,6 +4,7 @@ import { useMemo, useState } from "react"
 import { PieChart, Pie, Cell, ResponsiveContainer, Sector } from "recharts"
 import Image from "next/image"
 import { Coins, Layers, Wallet } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 export interface AllocationItem {
   /** Stable id used for keys */
@@ -28,10 +29,10 @@ interface PortfolioAllocationProps {
 // Theme-aware palettes per category. Each category gets its own hue family,
 // and constituents within the category get progressively lighter shades so
 // adjacent slices are visually distinct without breaking the design system.
-const CATEGORY_META = {
-  nft:   { label: "NFT Positions", icon: Layers, base: "#22c55e", shades: ["#22c55e", "#16a34a", "#15803d", "#166534", "#14532d"] },
-  chz:   { label: "CHZ Balance",   icon: Coins,  base: "#f59e0b", shades: ["#f59e0b"] },
-  token: { label: "Fan Tokens",    icon: Wallet, base: "#3b82f6", shades: ["#3b82f6", "#2563eb", "#1d4ed8", "#1e40af", "#1e3a8a"] },
+const CATEGORY_COLORS = {
+  nft:   { icon: Layers, base: "#22c55e", shades: ["#22c55e", "#16a34a", "#15803d", "#166534", "#14532d"] },
+  chz:   { icon: Coins,  base: "#f59e0b", shades: ["#f59e0b"] },
+  token: { icon: Wallet, base: "#3b82f6", shades: ["#3b82f6", "#2563eb", "#1d4ed8", "#1e40af", "#1e3a8a"] },
 } as const
 
 function formatCHZ(v: number): string {
@@ -62,6 +63,13 @@ const renderActiveShape = (props: any) => {
 
 export function PortfolioAllocation({ items, totalValue }: PortfolioAllocationProps) {
   const [activeIdx, setActiveIdx] = useState<number | null>(null)
+  const t = useTranslations("portfolioAllocationComponent")
+
+  const CATEGORY_META = {
+    nft:   { label: t("nftPositions"), icon: CATEGORY_COLORS.nft.icon, base: CATEGORY_COLORS.nft.base, shades: CATEGORY_COLORS.nft.shades },
+    chz:   { label: t("chzBalance"),   icon: CATEGORY_COLORS.chz.icon, base: CATEGORY_COLORS.chz.base, shades: CATEGORY_COLORS.chz.shades },
+    token: { label: t("fanTokens"),    icon: CATEGORY_COLORS.token.icon, base: CATEGORY_COLORS.token.base, shades: CATEGORY_COLORS.token.shades },
+  }
 
   // Assign stable colors per item by giving each category its own shade scale.
   const enriched = useMemo(() => {
@@ -71,7 +79,7 @@ export function PortfolioAllocation({ items, totalValue }: PortfolioAllocationPr
       .filter((i) => i.value > 0)
       .sort((a, b) => b.value - a.value) // largest first
       .map((item) => {
-        const meta = CATEGORY_META[item.category]
+        const meta = CATEGORY_COLORS[item.category]
         const idx = counters[item.category]++
         const color = meta.shades[idx % meta.shades.length]
         return { ...item, color }
@@ -104,7 +112,7 @@ export function PortfolioAllocation({ items, totalValue }: PortfolioAllocationPr
           color: enriched[activeIdx].color,
         }
       : {
-          label: "Total Value",
+          label: t("totalValue"),
           value: totalValue,
           percent: 100,
           color: "var(--success)",
@@ -115,9 +123,12 @@ export function PortfolioAllocation({ items, totalValue }: PortfolioAllocationPr
       {/* Header */}
       <div className="flex items-start justify-between gap-3 p-5 sm:p-7 border-b border-border/60">
         <div>
-          <h3 className="text-lg sm:text-xl font-bold text-foreground">Portfolio Allocation</h3>
+          <h3 className="text-lg sm:text-xl font-bold text-foreground">{t("title")}</h3>
           <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-            {enriched.length} asset{enriched.length === 1 ? "" : "s"} across {Object.values(byCategory).filter(c => c.count > 0).length} categories
+            {enriched.length !== 1 ? t("assets_other", { count: enriched.length }) : t("assets_one", { count: enriched.length })} {" "}
+            {Object.values(byCategory).filter(c => c.count > 0).length !== 1 
+              ? t("categories_other", { count: Object.values(byCategory).filter(c => c.count > 0).length })
+              : t("categories_one", { count: Object.values(byCategory).filter(c => c.count > 0).length })}
           </p>
         </div>
       </div>
@@ -153,7 +164,7 @@ export function PortfolioAllocation({ items, totalValue }: PortfolioAllocationPr
                   {pct.toFixed(1)}%
                 </span>
                 <span className="text-[10px] text-muted-foreground">
-                  {data.count} {data.count === 1 ? "asset" : "assets"}
+                  {data.count} {data.count === 1 ? t("asset") : t("assets")}
                 </span>
               </div>
               {/* Mini progress bar */}

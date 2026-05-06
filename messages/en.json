@@ -287,7 +287,82 @@
   },
   "termsPage": {
     "back": "Back to home",
-    "title": "Terms of Service"
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated",
+    "contents": "Contents",
+    "sections": {
+      "agreement": {
+        "title": "1. Agreement to Terms",
+        "p1": "By accessing and using the FanIndex website, platform, and services (collectively, the \"Platform\"), you accept and agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this Platform.",
+        "p2": "These terms apply to all users of the Platform, including investors, visitors, and any other persons who access or use the service."
+      },
+      "platform": {
+        "title": "2. Platform Description",
+        "p1": "FanIndex is a decentralized SportFi infrastructure platform built on the Chiliz Chain. The Platform enables users to gain diversified exposure to Fan Token ecosystems through professionally structured, tokenized index products.",
+        "p2": "FanIndex provides the following core services:",
+        "ul1": ["Tokenized sports indices composed of Fan Tokens", "On-chain portfolio infrastructure and position tracking", "Fan Token market analytics and real-time price data", "NFT-based investment position certificates", "Transparent on-chain index methodologies"],
+        "p3": "All index operations, including purchases and redemptions, are executed transparently on the Chiliz Chain via smart contracts. The Platform does not custody assets in a traditional financial sense — all positions are held on-chain and represented by NFTs."
+      },
+      "investmentProcess": {
+        "title": "3. Investment Process",
+        "p1": "When a user invests in a FanIndex product, the following process occurs automatically via smart contract:",
+        "ul1": ["CHZ is deposited into the protocol by the user", "Smart contracts execute proportional purchases of the underlying Fan Tokens", "Fan Tokens are held by the protocol treasury on-chain", "A unique NFT representing the position is minted to the investor's wallet"],
+        "p2": "Redemptions are processed by burning the position NFT, after which the underlying portfolio is liquidated and CHZ is returned to the investor. There is no exit fee on redemptions.",
+        "p3": "A 1% protocol entry fee is applied to all purchases. Actively managed index products may carry an additional annualized management fee of 1–2% as disclosed on the relevant product page."
+      },
+      "indexMethodology": {
+        "title": "4. Index Methodology",
+        "p1": "FanIndex indices are constructed using a transparent, rules-based methodology. The value of each index is calculated using a weighted pricing model applied to real-time market prices sourced from CoinGecko and other market data providers.",
+        "p2": "Indices may be structured as market-cap weighted, equal-weight, or actively managed products. The applicable methodology is disclosed on each product's individual page.",
+        "p3": "Indices are periodically rebalanced to maintain target allocations. Rebalancing is currently executed manually by the FanIndex team. Future protocol versions may introduce automated smart contract rebalancing and DAO governance mechanisms.",
+        "p4": "FanIndex reserves the right to update index methodologies, add or remove constituents, and adjust rebalancing schedules in accordance with market conditions and protocol improvements. Material changes will be disclosed to users."
+      },
+      "risks": {
+        "title": "5. Risk Disclosures",
+        "p1": "Investing in Fan Token indices involves significant risk. You should carefully consider the following risk factors before using the Platform:",
+        "ul1": ["Market Volatility: Fan Tokens are highly volatile digital assets. The value of index positions may fluctuate substantially and may decline to zero.", "Liquidity Risk: Some Fan Tokens within an index may experience periods of low liquidity, which may affect the ability to rebalance or redeem positions at expected prices.", "Smart Contract Risk: Despite security audits and multisig treasury management, smart contracts may contain vulnerabilities.", "Regulatory Risk: Digital asset regulations continue to evolve globally. Changes in applicable laws may impact the availability of FanIndex services in certain jurisdictions.", "Concentration Risk: Individual index products are concentrated in the Fan Token ecosystem and are not diversified across broader asset classes."],
+        "p2": "You should only invest amounts you can afford to lose entirely. FanIndex does not provide investment advice."
+      },
+      "eligibility": {
+        "title": "6. User Eligibility",
+        "p1": "By using the Platform, you represent and warrant that you are of legal age in your jurisdiction to enter into binding contracts, and that your use of the Platform does not violate any applicable laws or regulations in your jurisdiction.",
+        "p2": "The Platform is not available to persons located in jurisdictions where decentralized finance products, digital assets, or blockchain-based financial instruments are restricted or prohibited. You are solely responsible for ensuring compliance with local laws.",
+        "p3": "FanIndex reserves the right to restrict access to the Platform in any jurisdiction at any time without prior notice."
+      },
+      "nftPositions": {
+        "title": "7. NFT Position Certificates",
+        "p1": "Each investment position in a FanIndex product is represented by a unique NFT minted to your wallet. The NFT contains the following on-chain data:",
+        "ul1": ["Index type and identifier", "Deposited CHZ value", "Proportional allocation data at time of purchase", "Mint timestamp and ownership information"],
+        "p2": "The NFT acts as proof of ownership, a portfolio certificate, and a redeemable claim on the underlying assets. Transfer of the NFT constitutes transfer of the underlying position."
+      },
+      "intellectualProperty": {
+        "title": "8. Intellectual Property",
+        "p1": "All content on the FanIndex Platform, including but not limited to index methodologies, brand assets, interface designs, documentation, and software, is the proprietary intellectual property of FanIndex and its licensors.",
+        "p2": "Permission is granted to access and use the Platform for personal, non-commercial purposes only."
+      },
+      "disclaimers": {
+        "title": "9. Disclaimers",
+        "p1": "The Platform and its services are provided on an \"as is\" and \"as available\" basis without warranties of any kind, whether express or implied. FanIndex expressly disclaims all warranties.",
+        "p2": "Nothing on the Platform constitutes financial, investment, legal, or tax advice. You should consult independent professional advisers before making any investment decisions."
+      },
+      "limitation": {
+        "title": "10. Limitation of Liability",
+        "p1": "To the fullest extent permitted by applicable law, FanIndex, its founders, contributors, partners, and affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of or inability to use the Platform."
+      },
+      "governance": {
+        "title": "11. Protocol Governance",
+        "p1": "FanIndex plans to introduce decentralized governance mechanisms in future protocol versions, allowing the community to participate in index proposals, methodology adjustments, treasury decisions, and ecosystem expansion."
+      },
+      "modifications": {
+        "title": "12. Modifications to Terms",
+        "p1": "FanIndex reserves the right to modify these Terms of Service at any time. Updated terms will be posted to this page with a revised effective date. Continued use of the Platform following any modification constitutes acceptance of the updated terms."
+      },
+      "contact": {
+        "title": "13. Contact",
+        "p1": "If you have any questions, concerns, or legal inquiries regarding these Terms of Service or the FanIndex Platform, please contact us at:",
+        "email": "legal@fanindex.pro"
+      }
+    }
   },
   "resources": {
     "sections": {
@@ -454,7 +529,32 @@
     "position": "Position",
     "buy": "Buy Index",
     "live": "Live",
-    "notConnected": "Connect your wallet to view your portfolio"
+    "notConnected": "Connect your wallet to view your portfolio",
+    "connectTitle": "Connect Your Wallet",
+    "connectDescription": "Connect your wallet to view your portfolio, track your positions, and manage your fan token investments.",
+    "totalValue": "Total Portfolio Value",
+    "share": "Share",
+    "chzBalance": "CHZ Balance",
+    "nativeLabel": "Native",
+    "activeNFTs": "Active NFTs",
+    "positionsLabel": "Positions",
+    "chainStatus": "Chain Status",
+    "chainId": "Chain ID 88888",
+    "myNFTPositions": "My NFT Positions",
+    "readingChain": "Reading from Chiliz Mainnet...",
+    "positionsOnChain_one": "{{count}} position on-chain",
+    "positionsOnChain_other": "{{count}} positions on-chain",
+    "refresh": "Refresh",
+    "noPositionsTitle": "No positions yet",
+    "noPositionsDescription": "Buy your first FanIndex NFT below to start tracking your on-chain portfolio.",
+    "fanTokens": "Fan Tokens",
+    "readingBalances": "Reading balances from Chiliz...",
+    "tokensInWallet_one": "{{count}} token in wallet",
+    "tokensInWallet_other": "{{count}} tokens in wallet",
+    "noFanTokensTitle": "No fan tokens yet",
+    "noFanTokensDescription": "You don't have any fan tokens in your wallet. Visit the Fan Tokens page to explore available tokens.",
+    "availableIndices": "Available Indices",
+    "availableIndicesDescription": "Invest in live on-chain indices on the Chiliz network"
   },
   "gettingStarted": {
     "title": "Getting Started",
@@ -760,6 +860,32 @@
       "description": "We encountered an error loading your portfolio. Please try again.",
       "refresh": "Refresh Page"
     }
+  },
+  "transactionHistory": {
+    "title": "Transaction History",
+    "liveLabel": "Live",
+    "txCount_one": "{{count}} transaction",
+    "txCount_other": "{{count}} transactions",
+    "emptyDescription": "Transactions will appear here after you buy or sell",
+    "noTransactions": "No transactions yet",
+    "noTransactionsHint": "Buy or sell a position to see your transaction history",
+    "justNow": "Just now",
+    "block": "Block",
+    "confirming": "Confirming...",
+    "view": "View"
+  },
+  "portfolioAllocationComponent": {
+    "title": "Portfolio Allocation",
+    "assets_one": "{{count}} asset",
+    "assets_other": "{{count}} assets",
+    "categories_one": "{{count}} category",
+    "categories_other": "{{count}} categories",
+    "nftPositions": "NFT Positions",
+    "chzBalance": "CHZ Balance",
+    "fanTokens": "Fan Tokens",
+    "asset": "asset",
+    "assets": "assets",
+    "totalValue": "Total Value"
   },
   "whitepaperContent": {
     "executiveSummary": {

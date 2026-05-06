@@ -44,11 +44,7 @@ const typeColors: Record<string, string> = {
   managed: "text-success",
 }
 
-const typeLabels: Record<string, string> = {
-  weighted: "Weighted",
-  equal: "Equal-Weight",
-  managed: "Managed",
-}
+// typeLabels is now resolved via useTranslations inside the component
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
@@ -96,6 +92,12 @@ function AvailableIndexCard({
   onBuy: () => void
 }) {
   const t = useTranslations("portfolioView")
+  const tIndex = useTranslations("indexCard")
+  const typeLabels: Record<string, string> = {
+    weighted: tIndex("weighted"),
+    equal: tIndex("equalWeight"),
+    managed: tIndex("managed"),
+  }
   const { prices: liveTokenPrices } = useCoinGeckoPrices()
 
   // Same weights query and 90d fetch as IndexCard
@@ -564,10 +566,9 @@ export function PortfolioView() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 border-2 border-success/20 mb-4">
             <Wallet className="h-10 w-10 text-success" />
           </div>
-          <h2 className="text-3xl font-bold text-foreground">Connect Your Wallet</h2>
+          <h2 className="text-3xl font-bold text-foreground">{t("connectTitle")}</h2>
           <p className="text-lg text-muted-foreground">
-            Connect your wallet to view your portfolio, track your positions, and manage your fan
-            token investments.
+            {t("connectDescription")}
           </p>
         </div>
       </div>
@@ -594,7 +595,7 @@ export function PortfolioView() {
           <div className="relative flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="text-[11px] sm:text-xs text-muted-foreground mb-2 font-medium uppercase tracking-[0.12em]">
-                Total Portfolio Value
+                {t("totalValue")}
               </div>
               {isLoadingOnChain || isLoadingBalance || isLoadingFanTokens ? (
                 <div className="h-10 sm:h-12 w-40 bg-muted rounded animate-pulse mb-2" />
@@ -617,10 +618,10 @@ export function PortfolioView() {
             <button
               onClick={() => setShowSharePortfolio(true)}
               className="shrink-0 inline-flex items-center gap-1.5 rounded-lg border border-border bg-background/60 hover:bg-muted px-2.5 py-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors"
-              title="Share portfolio"
+              title={t("share")}
             >
               <Share2 className="h-3 w-3" />
-              <span className="hidden sm:inline">Share</span>
+              <span className="hidden sm:inline">{t("share")}</span>
             </button>
           </div>
         </div>
@@ -631,7 +632,7 @@ export function PortfolioView() {
           <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-amber-500/20 transition-all">
             <div className="flex items-start justify-between mb-2">
               <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
-                CHZ Balance
+                {t("chzBalance")}
               </div>
               <Coins className="h-3.5 w-3.5 text-amber-400 shrink-0" />
             </div>
@@ -642,14 +643,14 @@ export function PortfolioView() {
                 {chzValue > 0 ? chzValue.toFixed(2) : "0"}
               </div>
             )}
-            <div className="text-[10px] text-muted-foreground mt-0.5">Native</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">{t("nativeLabel")}</div>
           </div>
 
           {/* Active NFTs */}
           <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-blue-500/20 transition-all">
             <div className="flex items-start justify-between mb-2">
               <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
-                Active NFTs
+                {t("activeNFTs")}
               </div>
               <Layers className="h-3.5 w-3.5 text-blue-400 shrink-0" />
             </div>
@@ -660,15 +661,15 @@ export function PortfolioView() {
                 {activeNFTs}
               </div>
             )}
-            <div className="text-[10px] text-muted-foreground mt-0.5">Positions</div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">{t("positionsLabel")}</div>
           </div>
         </div>
 
         {/* Chain Status — full width on mobile spanning both cols */}
         <div className="border border-border bg-card backdrop-blur-sm p-4 rounded-2xl hover:border-success/20 transition-all">
           <div className="flex items-start justify-between mb-2">
-            <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
-              Chain Status
+              <div className="text-[10px] sm:text-[11px] text-muted-foreground font-medium uppercase tracking-[0.12em]">
+              {t("chainStatus")}
             </div>
             <Hash className="h-3.5 w-3.5 text-success shrink-0" />
           </div>
@@ -678,7 +679,7 @@ export function PortfolioView() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success" />
             </span>
-            Chain ID 88888
+            {t("chainId")}
           </div>
         </div>
       </div>
@@ -687,11 +688,11 @@ export function PortfolioView() {
       <div>
         <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">My NFT Positions</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">{t("myNFTPositions")}</h2>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               {isLoadingOnChain
-                ? "Reading from Chiliz Mainnet..."
-                : `${holdings.length} position${holdings.length !== 1 ? "s" : ""} on-chain`}
+                ? t("readingChain")
+                : `${holdings.length} ${holdings.length !== 1 ? t("positionsOnChain_other", { count: holdings.length }) : t("positionsOnChain_one", { count: holdings.length })}`}
             </p>
           </div>
           <Button
@@ -700,7 +701,7 @@ export function PortfolioView() {
             onClick={refetch}
             className="border-border bg-card text-muted-foreground hover:text-foreground shrink-0"
           >
-            Refresh
+            {t("refresh")}
           </Button>
         </div>
 
@@ -734,9 +735,9 @@ export function PortfolioView() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted border border-border mb-4">
               <Layers className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">No positions yet</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">{t("noPositionsTitle")}</h3>
             <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-              Buy your first FanIndex NFT below to start tracking your on-chain portfolio.
+              {t("noPositionsDescription")}
             </p>
           </div>
         )}
@@ -746,11 +747,11 @@ export function PortfolioView() {
       <div>
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <div>
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Fan Tokens</h2>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">{t("fanTokens")}</h2>
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               {isLoadingFanTokens
-                ? "Reading balances from Chiliz..."
-                : `${userFanTokens.length} token${userFanTokens.length !== 1 ? "s" : ""} in wallet`}
+                ? t("readingBalances")
+                : `${userFanTokens.length !== 1 ? t("tokensInWallet_other", { count: userFanTokens.length }) : t("tokensInWallet_one", { count: userFanTokens.length })}`}
             </p>
           </div>
         </div>
@@ -813,9 +814,9 @@ export function PortfolioView() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted border border-border mb-4">
               <Coins className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">No fan tokens yet</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">{t("noFanTokensTitle")}</h3>
             <p className="text-muted-foreground text-sm max-w-sm mx-auto">
-              You don&apos;t have any fan tokens in your wallet. Visit the Fan Tokens page to explore available tokens.
+              {t("noFanTokensDescription")}
             </p>
           </div>
         )}
@@ -835,9 +836,9 @@ export function PortfolioView() {
       {/* Available Indices */}
       <div>
         <div className="mb-5 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">Available Indices</h2>
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">{t("availableIndices")}</h2>
           <p className="text-xs sm:text-sm text-muted-foreground">
-            Invest in live on-chain indices on the Chiliz network
+            {t("availableIndicesDescription")}
           </p>
         </div>
 

@@ -272,6 +272,32 @@
       "refresh": "Recargar Página"
     }
   },
+  "transactionHistory": {
+    "title": "Historial de Transacciones",
+    "liveLabel": "En vivo",
+    "txCount_one": "{{count}} transacción",
+    "txCount_other": "{{count}} transacciones",
+    "emptyDescription": "Las transacciones aparecerán aquí después de comprar o vender",
+    "noTransactions": "Sin transacciones aún",
+    "noTransactionsHint": "Comprá o vendé una posición para ver tu historial de transacciones",
+    "justNow": "Ahora mismo",
+    "block": "Bloque",
+    "confirming": "Confirmando...",
+    "view": "Ver"
+  },
+  "portfolioAllocationComponent": {
+    "title": "Asignación de Portfolio",
+    "assets_one": "{{count}} activo",
+    "assets_other": "{{count}} activos",
+    "categories_one": "{{count}} categoría",
+    "categories_other": "{{count}} categorías",
+    "nftPositions": "Posiciones NFT",
+    "chzBalance": "Balance CHZ",
+    "fanTokens": "Fan Tokens",
+    "asset": "activo",
+    "assets": "activos",
+    "totalValue": "Valor Total"
+  },
   "whitepaperContent": {
     "executiveSummary": {
       "p1": "FanIndex es una plataforma descentralizada de infraestructura SportFi construida en Chiliz Chain que transforma Fan Tokens en productos financieros estructurados basados en índices.",
@@ -429,7 +455,82 @@
   },
   "termsPage": {
     "back": "Volver al inicio",
-    "title": "Términos de Servicio"
+    "title": "Términos de Servicio",
+    "lastUpdated": "Última actualización",
+    "contents": "Contenido",
+    "sections": {
+      "agreement": {
+        "title": "1. Aceptación de los Términos",
+        "p1": "Al acceder y utilizar el sitio web, la plataforma y los servicios de FanIndex (colectivamente, la \"Plataforma\"), aceptás y acordás estar sujeto a estos Términos de Servicio y todas las leyes y regulaciones aplicables. Si no estás de acuerdo con alguno de estos términos, tenés prohibido usar o acceder a esta Plataforma.",
+        "p2": "Estos términos se aplican a todos los usuarios de la Plataforma, incluyendo inversores, visitantes y cualquier otra persona que acceda o use el servicio."
+      },
+      "platform": {
+        "title": "2. Descripción de la Plataforma",
+        "p1": "FanIndex es una plataforma de infraestructura SportFi descentralizada construida en Chiliz Chain. La Plataforma permite a los usuarios obtener exposición diversificada a los ecosistemas de Fan Tokens a través de productos de índice tokenizados estructurados profesionalmente.",
+        "p2": "FanIndex provee los siguientes servicios principales:",
+        "ul1": ["Índices deportivos tokenizados compuestos de Fan Tokens", "Infraestructura de portfolio on-chain y seguimiento de posiciones", "Análisis del mercado de Fan Tokens y datos de precios en tiempo real", "Certificados de posición de inversión basados en NFT", "Metodologías de índice transparentes on-chain"],
+        "p3": "Todas las operaciones de índices, incluidas compras y rescates, se ejecutan de forma transparente en Chiliz Chain a través de contratos inteligentes. La Plataforma no custodia activos en el sentido financiero tradicional — todas las posiciones se mantienen on-chain y se representan mediante NFT."
+      },
+      "investmentProcess": {
+        "title": "3. Proceso de Inversión",
+        "p1": "Cuando un usuario invierte en un producto FanIndex, el siguiente proceso ocurre automáticamente a través del contrato inteligente:",
+        "ul1": ["El usuario deposita CHZ en el protocolo", "Los contratos inteligentes ejecutan compras proporcionales de los Fan Tokens subyacentes", "Los Fan Tokens son mantenidos por el tesoro del protocolo on-chain", "Se mintea un NFT único representando la posición en la wallet del inversor"],
+        "p2": "Los rescates se procesan quemando el NFT de posición, tras lo cual el portfolio subyacente se liquida y el CHZ se devuelve al inversor. No hay tarifa de salida en los rescates.",
+        "p3": "Se aplica una tarifa de entrada al protocolo del 1% en todas las compras. Los productos de índice gestionados activamente pueden tener una tarifa de gestión anualizada adicional de 1–2% según se detalla en la página del producto correspondiente."
+      },
+      "indexMethodology": {
+        "title": "4. Metodología de Índices",
+        "p1": "Los índices de FanIndex se construyen utilizando una metodología transparente y basada en reglas. El valor de cada índice se calcula usando un modelo de precios ponderados aplicado a precios de mercado en tiempo real obtenidos de CoinGecko y otros proveedores de datos de mercado.",
+        "p2": "Los índices pueden estructurarse como productos ponderados por capitalización de mercado, de igual peso o gestionados activamente. La metodología aplicable se divulga en la página individual de cada producto.",
+        "p3": "Los índices se rebalancean periódicamente para mantener las asignaciones objetivo. El rebalanceo actualmente es ejecutado manualmente por el equipo de FanIndex. Versiones futuras del protocolo pueden introducir rebalanceo automatizado mediante contratos inteligentes y mecanismos de gobernanza DAO.",
+        "p4": "FanIndex se reserva el derecho de actualizar las metodologías de índices, agregar o eliminar constituyentes y ajustar los calendarios de rebalanceo de acuerdo con las condiciones del mercado y las mejoras del protocolo. Los cambios materiales serán divulgados a los usuarios."
+      },
+      "risks": {
+        "title": "5. Divulgaciones de Riesgo",
+        "p1": "Invertir en índices de Fan Tokens implica riesgos significativos. Deberías considerar cuidadosamente los siguientes factores de riesgo antes de usar la Plataforma:",
+        "ul1": ["Volatilidad del mercado: Los Fan Tokens son activos digitales altamente volátiles. El valor de las posiciones en índices puede fluctuar sustancialmente y puede caer a cero.", "Riesgo de liquidez: Algunos Fan Tokens dentro de un índice pueden experimentar períodos de baja liquidez, lo que puede afectar la capacidad de rebalancear o rescatar posiciones a los precios esperados.", "Riesgo de contrato inteligente: A pesar de las auditorías de seguridad y la gestión de tesorería multisig, los contratos inteligentes pueden contener vulnerabilidades.", "Riesgo regulatorio: Las regulaciones de activos digitales continúan evolucionando a nivel global. Los cambios en las leyes aplicables pueden afectar la disponibilidad de los servicios de FanIndex en ciertas jurisdicciones.", "Riesgo de concentración: Los productos de índice individuales están concentrados en el ecosistema de Fan Tokens y no están diversificados en clases de activos más amplias."],
+        "p2": "Solo deberías invertir montos que puedas permitirte perder por completo. FanIndex no provee asesoramiento de inversión."
+      },
+      "eligibility": {
+        "title": "6. Elegibilidad de Usuarios",
+        "p1": "Al usar la Plataforma, representás y garantizás que tenés la edad legal en tu jurisdicción para celebrar contratos vinculantes, y que tu uso de la Plataforma no viola ninguna ley o regulación aplicable en tu jurisdicción.",
+        "p2": "La Plataforma no está disponible para personas ubicadas en jurisdicciones donde los productos de finanzas descentralizadas, activos digitales o instrumentos financieros basados en blockchain estén restringidos o prohibidos. Sos el único responsable de garantizar el cumplimiento de las leyes locales.",
+        "p3": "FanIndex se reserva el derecho de restringir el acceso a la Plataforma en cualquier jurisdicción en cualquier momento sin previo aviso."
+      },
+      "nftPositions": {
+        "title": "7. Certificados de Posición NFT",
+        "p1": "Cada posición de inversión en un producto FanIndex está representada por un NFT único minteado en tu wallet. El NFT contiene los siguientes datos on-chain:",
+        "ul1": ["Tipo e identificador del índice", "Valor de CHZ depositado", "Datos de asignación proporcional al momento de la compra", "Marca de tiempo del minteo e información de propiedad"],
+        "p2": "El NFT actúa como prueba de propiedad, certificado de portfolio y un reclamo redimible sobre los activos subyacentes. La transferencia del NFT constituye la transferencia de la posición subyacente."
+      },
+      "intellectualProperty": {
+        "title": "8. Propiedad Intelectual",
+        "p1": "Todo el contenido en la Plataforma FanIndex, incluyendo pero no limitado a metodologías de índices, activos de marca, diseños de interfaz, documentación y software, es propiedad intelectual de FanIndex y sus licenciantes.",
+        "p2": "Se otorga permiso para acceder y usar la Plataforma solo para fines personales y no comerciales."
+      },
+      "disclaimers": {
+        "title": "9. Descargos de Responsabilidad",
+        "p1": "La Plataforma y sus servicios se proveen \"tal como están\" y \"según disponibilidad\" sin garantías de ningún tipo, ya sean expresas o implícitas. FanIndex renuncia expresamente a todas las garantías.",
+        "p2": "Nada en la Plataforma constituye asesoramiento financiero, de inversión, legal o fiscal. Deberías consultar asesores profesionales independientes antes de tomar cualquier decisión de inversión."
+      },
+      "limitation": {
+        "title": "10. Limitación de Responsabilidad",
+        "p1": "En la máxima medida permitida por la ley aplicable, FanIndex, sus fundadores, colaboradores, socios y afiliados no serán responsables de ningún daño indirecto, incidental, especial, consecuente o punitivo que surja de tu uso o incapacidad de usar la Plataforma."
+      },
+      "governance": {
+        "title": "11. Gobernanza del Protocolo",
+        "p1": "FanIndex planea introducir mecanismos de gobernanza descentralizada en versiones futuras del protocolo, permitiendo a la comunidad participar en propuestas de índices, ajustes de metodología, decisiones de tesorería y expansión del ecosistema."
+      },
+      "modifications": {
+        "title": "12. Modificaciones a los Términos",
+        "p1": "FanIndex se reserva el derecho de modificar estos Términos de Servicio en cualquier momento. Los términos actualizados se publicarán en esta página con una fecha efectiva revisada. El uso continuo de la Plataforma tras cualquier modificación constituye la aceptación de los términos actualizados."
+      },
+      "contact": {
+        "title": "13. Contacto",
+        "p1": "Si tenés alguna pregunta, inquietud o consulta legal sobre estos Términos de Servicio o la Plataforma FanIndex, por favor contactanos en:",
+        "email": "legal@fanindex.pro"
+      }
+    }
   },
   "resources": {
     "sections": {
@@ -596,7 +697,32 @@
     "position": "Posición",
     "buy": "Comprar Indice",
     "live": "En vivo",
-    "notConnected": "Conectá tu wallet para ver tu portfolio"
+    "notConnected": "Conectá tu wallet para ver tu portfolio",
+    "connectTitle": "Conectá tu Wallet",
+    "connectDescription": "Conectá tu wallet para ver tu portfolio, seguir tus posiciones y gestionar tus inversiones en fan tokens.",
+    "totalValue": "Valor Total del Portfolio",
+    "share": "Compartir",
+    "chzBalance": "Balance CHZ",
+    "nativeLabel": "Nativo",
+    "activeNFTs": "NFTs Activos",
+    "positionsLabel": "Posiciones",
+    "chainStatus": "Estado de la Cadena",
+    "chainId": "Chain ID 88888",
+    "myNFTPositions": "Mis Posiciones NFT",
+    "readingChain": "Leyendo desde Chiliz Mainnet...",
+    "positionsOnChain_one": "{{count}} posición en cadena",
+    "positionsOnChain_other": "{{count}} posiciones en cadena",
+    "refresh": "Actualizar",
+    "noPositionsTitle": "Sin posiciones aún",
+    "noPositionsDescription": "Comprá tu primer NFT de FanIndex abajo para empezar a rastrear tu portfolio en cadena.",
+    "fanTokens": "Fan Tokens",
+    "readingBalances": "Leyendo balances desde Chiliz...",
+    "tokensInWallet_one": "{{count}} token en la wallet",
+    "tokensInWallet_other": "{{count}} tokens en la wallet",
+    "noFanTokensTitle": "Sin fan tokens aún",
+    "noFanTokensDescription": "No tenés fan tokens en tu wallet. Visitá la página de Fan Tokens para explorar los disponibles.",
+    "availableIndices": "Índices Disponibles",
+    "availableIndicesDescription": "Invertí en índices on-chain en vivo en la red Chiliz"
   },
   "gettingStarted": {
     "title": "Primeros Pasos",
