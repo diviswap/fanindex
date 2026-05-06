@@ -70,13 +70,13 @@ function TermsSection({ sectionId, t }: { sectionId: SectionId; t: any }) {
           }
           return <p key={key}>{value as string}</p>
         })}
-        {sectionId === "contact" && section.email && (
+        {sectionId === "contact" && section.email ? (
           <p>
             <a href={`mailto:${section.email as string}`} className="text-success hover:underline">
               {section.email as string}
             </a>
           </p>
-        )}
+        ) : null}
       </div>
     </article>
   )
