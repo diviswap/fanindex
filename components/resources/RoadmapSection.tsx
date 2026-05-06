@@ -1,45 +1,38 @@
 "use client"
 
 import { Zap, GitBranch, Target, Rocket } from "lucide-react"
-
-const roadmapPhases = [
-  {
-    phase: "Phase 1: Foundation",
-    status: "Complete",
-    items: ["Core index creation", "NFT position system", "Smart contract deployment", "Portfolio tracking"],
-    icon: Target,
-  },
-  {
-    phase: "Phase 2: Growth",
-    status: "In Progress",
-    items: ["Advanced analytics dashboard", "Mobile app launch", "DAO governance setup", "API for developers"],
-    icon: Rocket,
-  },
-  {
-    phase: "Phase 3: Scale",
-    status: "Planned",
-    items: [
-      "Margin trading for indices",
-      "Cross-chain index support",
-      "Institutional partnerships",
-      "Treasury expansion",
-    ],
-    icon: Zap,
-  },
-  {
-    phase: "Phase 4: Evolution",
-    status: "Planned",
-    items: [
-      "AI-powered index recommendations",
-      "Derivatives market",
-      "Global expansion",
-      "Enterprise solutions",
-    ],
-    icon: GitBranch,
-  },
-]
+import { useTranslations } from "next-intl"
 
 export function RoadmapSection() {
+  const t = useTranslations("roadmap")
+
+  const roadmapPhases = [
+    {
+      phaseKey: "phase1",
+      statusKey: "complete",
+      itemsKey: "items.phase1",
+      icon: Target,
+    },
+    {
+      phaseKey: "phase2",
+      statusKey: "inProgress",
+      itemsKey: "items.phase2",
+      icon: Rocket,
+    },
+    {
+      phaseKey: "phase3",
+      statusKey: "planned",
+      itemsKey: "items.phase3",
+      icon: Zap,
+    },
+    {
+      phaseKey: "phase4",
+      statusKey: "planned",
+      itemsKey: "items.phase4",
+      icon: GitBranch,
+    },
+  ]
+
   return (
     <section id="roadmap" className="space-y-8">
       <div className="space-y-3">
@@ -47,10 +40,10 @@ export function RoadmapSection() {
           <div className="p-2.5 rounded-lg bg-success/10">
             <Rocket className="h-6 w-6 text-success" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Roadmap</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">{t("title")}</h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Our vision for the future of FanIndex. Delivering innovation quarterly.
+          {t("description")}
         </p>
       </div>
 
@@ -58,11 +51,12 @@ export function RoadmapSection() {
       <div className="space-y-4">
         {roadmapPhases.map((phase, idx) => {
           const Icon = phase.icon
-          const isCompleted = phase.status === "Complete"
-          const isActive = phase.status === "In Progress"
+          const isCompleted = phase.statusKey === "complete"
+          const isActive = phase.statusKey === "inProgress"
+          const items = t(phase.itemsKey) as string[]
 
           return (
-            <div key={phase.phase} className="relative">
+            <div key={phase.phaseKey} className="relative">
               {/* Timeline connector */}
               {idx < roadmapPhases.length - 1 && (
                 <div className="absolute left-[19px] top-20 h-8 w-0.5 bg-gradient-to-b from-success/50 to-border" />
@@ -97,7 +91,7 @@ export function RoadmapSection() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <h3 className="text-lg font-semibold text-foreground">{phase.phase}</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t(phase.phaseKey)}</h3>
                       <span
                         className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                           isCompleted
@@ -107,12 +101,12 @@ export function RoadmapSection() {
                               : "bg-muted/50 text-muted-foreground"
                         }`}
                       >
-                        {phase.status}
+                        {t(phase.statusKey)}
                       </span>
                     </div>
 
                     <div className="grid gap-2 md:grid-cols-2">
-                      {phase.items.map((item) => (
+                      {items && Array.isArray(items) ? items.map((item) => (
                         <div
                           key={item}
                           className="flex items-center gap-2 text-sm text-muted-foreground"
@@ -120,7 +114,7 @@ export function RoadmapSection() {
                           <div className="h-1.5 w-1.5 rounded-full bg-success/50" />
                           {item}
                         </div>
-                      ))}
+                      )) : null}
                     </div>
                   </div>
                 </div>

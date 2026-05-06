@@ -2,31 +2,34 @@
 
 import { Gem, Sparkles, Shield, TrendingUp } from "lucide-react"
 import Image from "next/image"
-
-const nftFeatures = [
-  {
-    icon: Gem,
-    title: "Ownership Certificate",
-    description: "Each position is backed by an NFT that represents verifiable on-chain ownership.",
-  },
-  {
-    icon: Shield,
-    title: "On-Chain Transparency",
-    description: "All metadata, rebalancing events, and holdings are permanently recorded on blockchain.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Redeemability",
-    description: "Positions can be redeemed directly for underlying assets, ensuring real value backing.",
-  },
-  {
-    icon: Sparkles,
-    title: "Premium Features",
-    description: "NFT holders unlock exclusive analytics, governance rights, and market insights.",
-  },
-]
+import { useTranslations } from "next-intl"
 
 export function NFTPositionsSection() {
+  const t = useTranslations("nftPositions")
+
+  const nftFeatures = [
+    {
+      icon: Gem,
+      titleKey: "ownershipCertificate.title",
+      descriptionKey: "ownershipCertificate.description",
+    },
+    {
+      icon: Shield,
+      titleKey: "onChainTransparency.title",
+      descriptionKey: "onChainTransparency.description",
+    },
+    {
+      icon: TrendingUp,
+      titleKey: "redeemability.title",
+      descriptionKey: "redeemability.description",
+    },
+    {
+      icon: Sparkles,
+      titleKey: "premiumFeatures.title",
+      descriptionKey: "premiumFeatures.description",
+    },
+  ]
+
   return (
     <section id="nft-positions" className="space-y-8">
       <div className="space-y-3">
@@ -34,10 +37,10 @@ export function NFTPositionsSection() {
           <div className="p-2.5 rounded-lg bg-success/10">
             <Gem className="h-6 w-6 text-success" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">NFT Positions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">{t("title")}</h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Index positions are backed by NFTs representing verifiable, redeemable ownership of underlying assets.
+          {t("description")}
         </p>
       </div>
 
@@ -67,9 +70,9 @@ export function NFTPositionsSection() {
           {/* Features */}
           <div className="space-y-6 md:order-1">
             <div>
-              <h3 className="text-2xl font-bold text-foreground mb-2">Premium Index Ownership</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-2">{t("premiumOwnership")}</h3>
               <p className="text-muted-foreground">
-                Every FanIndex position is represented by an NFT that certifies your ownership and provides access to exclusive benefits.
+                {t("premiumDescription")}
               </p>
             </div>
 
@@ -77,15 +80,15 @@ export function NFTPositionsSection() {
               {nftFeatures.map((feature) => {
                 const Icon = feature.icon
                 return (
-                  <div key={feature.title} className="flex gap-4">
+                  <div key={feature.titleKey} className="flex gap-4">
                     <div className="flex-shrink-0">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-success/10">
                         <Icon className="h-5 w-5 text-success" />
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-foreground text-sm">{feature.title}</h4>
-                      <p className="text-xs text-muted-foreground">{feature.description}</p>
+                      <h4 className="font-semibold text-foreground text-sm">{t(feature.titleKey)}</h4>
+                      <p className="text-xs text-muted-foreground">{t(feature.descriptionKey)}</p>
                     </div>
                   </div>
                 )

@@ -2,10 +2,13 @@
 
 import { TrendingUp, BarChart3 } from "lucide-react"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
 import { useMemo } from "react"
 
 export function LiveIndicesSection() {
+  const t = useTranslations("liveIndices")
+
   // Get the first 5 indices to display
   const displayIndices = useMemo(() => {
     return INDICES.slice(0, 5)
@@ -30,10 +33,10 @@ export function LiveIndicesSection() {
           <div className="p-2.5 rounded-lg bg-success/10">
             <TrendingUp className="h-6 w-6 text-success" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Available Indices</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">{t("title")}</h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Pre-built indices available for investment. Select an index and start diversifying your portfolio today.
+          {t("description")}
         </p>
       </div>
 
@@ -43,11 +46,11 @@ export function LiveIndicesSection() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/50 bg-muted/30">
-                <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Index</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">Type</th>
-                <th className="px-6 py-4 text-right text-sm font-semibold text-muted-foreground">NAV</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">Assets</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">Action</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">{t("index")}</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-muted-foreground">{t("type")}</th>
+                <th className="px-6 py-4 text-right text-sm font-semibold text-muted-foreground">{t("nav")}</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">{t("assets")}</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">{t("action")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
@@ -76,7 +79,7 @@ export function LiveIndicesSection() {
                     <p className="font-mono text-lg font-semibold text-foreground">
                       {index.nav}
                     </p>
-                    <p className="text-xs text-muted-foreground">CHZ</p>
+                    <p className="text-xs text-muted-foreground">{t("chz")}</p>
                   </td>
                   <td className="px-6 py-4 text-center">
                     <span className="text-sm font-semibold text-foreground">
@@ -88,7 +91,7 @@ export function LiveIndicesSection() {
                       href={`/indices/${index.ticker.toLowerCase()}`}
                       className="inline-flex px-3 py-1.5 rounded-lg bg-success/10 text-success text-xs font-semibold hover:bg-success/20 transition-colors"
                     >
-                      Invest
+                      {t("invest")}
                     </Link>
                   </td>
                 </tr>
@@ -104,7 +107,7 @@ export function LiveIndicesSection() {
           href="/indices"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-success/10 text-success font-semibold hover:bg-success/20 transition-colors"
         >
-          Browse All Indices
+          {t("browseAll")}
           <TrendingUp className="h-4 w-4" />
         </Link>
       </div>

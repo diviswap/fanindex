@@ -1,35 +1,38 @@
 "use client"
 
 import { BarChart3, TrendingUp, PieChart, Zap } from "lucide-react"
-
-const analyticsFeatures = [
-  {
-    icon: TrendingUp,
-    title: "PnL Tracking",
-    description: "Real-time profit & loss calculations with detailed performance breakdown by asset and time period.",
-    metric: "Real-Time",
-  },
-  {
-    icon: PieChart,
-    title: "Portfolio Allocation",
-    description: "Visual breakdown of your holdings. Monitor weight drift and rebalancing opportunities.",
-    metric: "Live Updates",
-  },
-  {
-    icon: Zap,
-    title: "Market Exposure",
-    description: "Understand your exposure to different asset classes, sectors, and market dynamics.",
-    metric: "24/7 Monitoring",
-  },
-  {
-    icon: BarChart3,
-    title: "Fan Token Analytics",
-    description: "Advanced metrics on fan token holdings, voting power, and exclusive governance opportunities.",
-    metric: "Institutional-Grade",
-  },
-]
+import { useTranslations } from "next-intl"
 
 export function PortfolioAnalyticsSection() {
+  const t = useTranslations("portfolioAnalytics")
+
+  const analyticsFeatures = [
+    {
+      icon: TrendingUp,
+      titleKey: "pnlTracking.title",
+      descriptionKey: "pnlTracking.description",
+      metricKey: "pnlTracking.metric",
+    },
+    {
+      icon: PieChart,
+      titleKey: "portfolioAllocation.title",
+      descriptionKey: "portfolioAllocation.description",
+      metricKey: "portfolioAllocation.metric",
+    },
+    {
+      icon: Zap,
+      titleKey: "marketExposure.title",
+      descriptionKey: "marketExposure.description",
+      metricKey: "marketExposure.metric",
+    },
+    {
+      icon: BarChart3,
+      titleKey: "fanTokenAnalytics.title",
+      descriptionKey: "fanTokenAnalytics.description",
+      metricKey: "fanTokenAnalytics.metric",
+    },
+  ]
+
   return (
     <section id="portfolio-analytics" className="space-y-8">
       <div className="space-y-3">
@@ -37,10 +40,10 @@ export function PortfolioAnalyticsSection() {
           <div className="p-2.5 rounded-lg bg-success/10">
             <BarChart3 className="h-6 w-6 text-success" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Portfolio & Analytics</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">{t("title")}</h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Institutional-grade analytics dashboard for professional portfolio management.
+          {t("description")}
         </p>
       </div>
 
@@ -50,7 +53,7 @@ export function PortfolioAnalyticsSection() {
           const Icon = feature.icon
           return (
             <div
-              key={feature.title}
+              key={feature.titleKey}
               className="group relative border border-border bg-card/50 backdrop-blur-sm p-6 rounded-2xl hover:border-success/30 hover:bg-card transition-all duration-300 overflow-hidden"
             >
               {/* Subtle glow on hover */}
@@ -62,11 +65,11 @@ export function PortfolioAnalyticsSection() {
                     <Icon className="h-5 w-5 text-success" />
                   </div>
                   <span className="text-xs font-semibold text-success bg-success/10 px-2.5 py-1 rounded-full">
-                    {feature.metric}
+                    {t(feature.metricKey)}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{t(feature.titleKey)}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t(feature.descriptionKey)}</p>
               </div>
             </div>
           )
@@ -82,7 +85,7 @@ export function PortfolioAnalyticsSection() {
               <BarChart3 className="h-8 w-8 text-success" />
             </div>
             <p className="text-muted-foreground">
-              Full dashboard coming soon with real-time market data, PnL tracking, and advanced portfolio insights.
+              {t("dashboardComing")}
             </p>
           </div>
         </div>

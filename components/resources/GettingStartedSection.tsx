@@ -2,35 +2,38 @@
 
 import { BookOpen, ArrowRight, Zap, TrendingUp, Lock, BarChart3 } from "lucide-react"
 import Link from "next/link"
-
-const gettingStartedItems = [
-  {
-    icon: Zap,
-    title: "What Are Indices?",
-    description: "Understand FanIndex's approach to diversified crypto investing. Learn how weighted indices work and why they're essential for portfolio management.",
-    href: "#methodology",
-  },
-  {
-    icon: Lock,
-    title: "Understanding Composition",
-    description: "Learn how index composition affects returns. Deep dive into rebalancing, weighting schemes, and liquidity constraints.",
-    href: "#live-indices",
-  },
-  {
-    icon: BarChart3,
-    title: "Portfolio Best Practices",
-    description: "Tips for managing a successful portfolio. Risk management, diversification strategies, and performance optimization.",
-    href: "#portfolio-analytics",
-  },
-  {
-    icon: TrendingUp,
-    title: "Start Investing",
-    description: "Invest in pre-built indices or browse available options. Begin your journey with FanIndex in just a few clicks.",
-    href: "/indices",
-  },
-]
+import { useTranslations } from "next-intl"
 
 export function GettingStartedSection() {
+  const t = useTranslations("gettingStarted")
+
+  const gettingStartedItems = [
+    {
+      icon: Zap,
+      titleKey: "items.whatAreIndices.title",
+      descriptionKey: "items.whatAreIndices.description",
+      href: "#methodology",
+    },
+    {
+      icon: Lock,
+      titleKey: "items.understanding.title",
+      descriptionKey: "items.understanding.description",
+      href: "#live-indices",
+    },
+    {
+      icon: BarChart3,
+      titleKey: "items.bestPractices.title",
+      descriptionKey: "items.bestPractices.description",
+      href: "#portfolio-analytics",
+    },
+    {
+      icon: TrendingUp,
+      titleKey: "items.startInvesting.title",
+      descriptionKey: "items.startInvesting.description",
+      href: "/indices",
+    },
+  ]
+
   return (
     <section id="getting-started" className="space-y-6 md:space-y-8">
       <div className="space-y-3">
@@ -38,10 +41,10 @@ export function GettingStartedSection() {
           <div className="p-2.5 rounded-lg bg-success/10">
             <BookOpen className="h-6 w-6 text-success" />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground">Getting Started</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground">{t("title")}</h2>
         </div>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Everything you need to know to begin your journey with FanIndex.
+          {t("description")}
         </p>
       </div>
 
@@ -50,7 +53,7 @@ export function GettingStartedSection() {
           const Icon = item.icon
           return (
             <Link
-              key={item.title}
+              key={item.titleKey}
               href={item.href}
               className="group relative border border-border bg-card/50 backdrop-blur-sm p-6 rounded-2xl hover:border-success/30 hover:bg-card transition-all duration-300"
             >
@@ -60,9 +63,9 @@ export function GettingStartedSection() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-semibold text-foreground group-hover:text-success transition-colors mb-2">
-                    {item.title}
+                    {t(item.titleKey)}
                   </h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{t(item.descriptionKey)}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-success opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
               </div>

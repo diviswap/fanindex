@@ -381,5 +381,250 @@
     "buy": "Comprar Indice",
     "live": "En vivo",
     "notConnected": "Conectá tu wallet para ver tu portfolio"
+  },
+  "gettingStarted": {
+    "title": "Primeros Pasos",
+    "description": "Todo lo que necesitás saber para comenzar tu viaje con FanIndex.",
+    "items": {
+      "whatAreIndices": {
+        "title": "¿Qué son los Indices?",
+        "description": "Entendé el enfoque de FanIndex para inversión cripto diversificada. Aprendé cómo funcionan los índices ponderados y por qué son esenciales para la gestión de portfolio."
+      },
+      "understanding": {
+        "title": "Entendiendo la Composición",
+        "description": "Aprendé cómo la composición del índice afecta los retornos. Profundizá en rebalanceo, esquemas de ponderación y restricciones de liquidez."
+      },
+      "bestPractices": {
+        "title": "Mejores Prácticas de Portfolio",
+        "description": "Consejos para gestionar un portfolio exitoso. Gestión de riesgo, estrategias de diversificación y optimización de rendimiento."
+      },
+      "startInvesting": {
+        "title": "Comenzá a Invertir",
+        "description": "Invertí en índices preestablecidos o explorá opciones disponibles. Comenzá tu viaje con FanIndex en solo unos pocos clics."
+      }
+    }
+  },
+  "methodology": {
+    "title": "Metodología de Indices",
+    "description": "Construcción de índices de nivel profesional inspirada en la gestión de activos tradicional.",
+    "pricingFormula": "Fórmula de Precios",
+    "pricingDescription": "El Valor Activo Neto (NAV) de cada índice se calcula como la suma de precios de activos ponderados:",
+    "formula": "NAV = Σ(wᵢ × Pᵢ)",
+    "formulaExplain": "Donde wᵢ es el peso del activo i y Pᵢ es su precio en CHZ",
+    "example": "Ejemplo: Un índice con 60% CHZ (precio 0.50 CHZ) y 40% FAN (precio 0.75 CHZ) tendría NAV = (0.6 × 0.50) + (0.4 × 0.75) = 0.60 CHZ",
+    "items": {
+      "weightAllocation": {
+        "title": "Asignación de Peso",
+        "description": "Esquemas de ponderación flexibles que soportan estrategias de capitalización de mercado, peso igual y personalizadas."
+      },
+      "monthlyRebalance": {
+        "title": "Rebalanceo Mensual",
+        "description": "El rebalanceo automatizado asegura que los índices se mantengan fieles a sus asignaciones objetivo."
+      },
+      "liquidityMethodology": {
+        "title": "Metodología de Liquidez",
+        "description": "Los criterios de inclusión priorizan activos líquidos y negociables con contrapartes de nivel institucional."
+      }
+    }
+  },
+  "liveIndices": {
+    "title": "Indices Disponibles",
+    "description": "Índices preestablecidos disponibles para inversión. Seleccioná un índice y comenzá a diversificar tu portfolio hoy.",
+    "index": "Indice",
+    "type": "Tipo",
+    "nav": "NAV",
+    "assets": "Activos",
+    "action": "Acción",
+    "invest": "Invertir",
+    "chz": "CHZ",
+    "browseAll": "Ver Todos los Indices"
+  },
+  "fees": {
+    "title": "Comisiones y Precios",
+    "description": "Estructura de comisiones transparente y competitiva diseñada para maximizar tus retornos.",
+    "entryFee": {
+      "title": "Comisión de Entrada",
+      "amount": "1%",
+      "description": "Comisión única al comprar una posición de índice.",
+      "details": "Cubre interacciones de contratos inteligentes y provisión de liquidez."
+    },
+    "exitFee": {
+      "title": "Comisión de Salida",
+      "amount": "0%",
+      "description": "Sin comisión al salir o vender tu posición.",
+      "details": "Queremos que tus rescates sean fluidos y rentables."
+    },
+    "managementFee": {
+      "title": "Comisión de Gestión",
+      "amount": "1-2%",
+      "description": "Comisión de gestión anual solo para índices gestionados.",
+      "details": "Índices Ponderados y Peso Igual: Sin comisión de gestión · Índices Gestionados: 1-2% anualmente"
+    },
+    "performanceFee": {
+      "title": "Comisión de Rendimiento",
+      "amount": "Varía",
+      "description": "Comisiones opcionales basadas en rendimiento para índices gestionados.",
+      "details": "20% de ganancias por encima del benchmark (cuando corresponde)."
+    },
+    "feeCalculation": "Ejemplo de Cálculo de Comisiones",
+    "step1": "Invertí 1000 CHZ en un índice ponderado",
+    "step2": "Comisión de entrada aplicada: 1% = 10 CHZ",
+    "step3": "Recibís 990 CHZ en tokens de índice",
+    "step4": "Sin comisión de gestión anual (los índices ponderados y peso igual son sin comisión)",
+    "step5": "Rescatá en cualquier momento sin comisión de salida",
+    "note": "Nota: Los índices gestionados solo aplican una comisión de gestión adicional del 1-2% anualmente. Los índices ponderados y peso igual no tienen comisiones de gestión."
+  },
+  "nftPositions": {
+    "title": "Infraestructura de Posiciones NFT",
+    "description": "Tus posiciones están representadas por NFTs on-chain."
+  },
+  "portfolioAnalytics": {
+    "title": "Analítica de Portfolio",
+    "description": "Analítica avanzada para tus posiciones de portfolio."
+  },
+  "smartContracts": {
+    "title": "Contratos Inteligentes",
+    "description": "Infraestructura auditada y transparente que asegura tus inversiones on-chain.",
+    "etfVault": {
+      "title": "Contratos de Bóveda ETF",
+      "description": "Contratos inteligentes principales que gestionan posiciones de índice y custodia de activos para cada índice.",
+      "chain": "Chiliz Chain"
+    },
+    "nftPosition": {
+      "title": "Contratos de Posición NFT",
+      "description": "Contratos inteligentes ERC-721 que representan la propiedad y metadatos de la posición."
+    },
+    "batchBuyer": {
+      "title": "Comprador en Lote",
+      "description": "Contrato para compra eficiente en lote de posiciones de índice."
+    },
+    "secureInfrastructure": {
+      "title": "Infraestructura Segura",
+      "description": "Arquitectura multi-contrato que asegura seguridad y composabilidad."
+    },
+    "securityAudits": "Seguridad y Auditorías",
+    "securityDescription": "Todos los contratos inteligentes han sido auditados independientemente por firmas de seguridad líderes para asegurar la seguridad de los fondos del usuario.",
+    "auditReport": "Informe de Auditoría de Seguridad",
+    "auditReportDesc": "Hallazgos completos de auditoría y seguimiento de remediación de vulnerabilidades.",
+    "viewReport": "Ver Informe",
+    "contractVerification": "Verificación de Contrato",
+    "contractVerDesc": "Todos los contratos verificados on-chain con código fuente y artefactos de compilación.",
+    "verify": "Verificar",
+    "indexContracts": "Direcciones de Contrato de Índices",
+    "indexName": "Indice",
+    "vaultContract": "Contrato de Bóveda",
+    "nftContract": "Contrato NFT"
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "description": "¿No encontrás la respuesta que buscás? Contactá a nuestro equipo de soporte.",
+    "q1": "¿Cómo funcionan los índices en FanIndex?",
+    "a1": "Los índices de FanIndex son colecciones de activos cripto cuidadosamente seleccionados con asignaciones ponderadas. Cada índice rastrea el valor combinado de sus constituyentes y se rebalancea mensualmente para mantener los pesos objetivo. Las posiciones están respaldadas por NFTs que representan propiedad verificable.",
+    "q2": "¿Cuáles son las comisiones?",
+    "a2": "Comisión de Entrada: 1% al comprar. Comisión de Salida: 0%. Comisión de Gestión: Solo para índices gestionados (1-2% anualmente). Los índices ponderados y peso igual no tienen comisiones de gestión. Comisión de Rendimiento: 20% de ganancias por encima del benchmark (solo para índices gestionados). Todas las comisiones son transparentes y se deducen automáticamente.",
+    "q3": "¿Con qué frecuencia se rebalancean los índices?",
+    "a3": "Los índices se rebalancean mensualmente en un cronograma establecido. El rebalanceo asegura que las asignaciones se mantengan fieles a los objetivos y elimina activos con bajo rendimiento. Se te notifica antes de cada rebalanceo, y todas las transacciones se registran on-chain.",
+    "q4": "¿Es FanIndex seguro?",
+    "a4": "Sí. Todos los contratos inteligentes son auditados independientemente. Utilizamos billeteras multi-firma para la gestión de tesorería y oráculos de Chainlink para feeds de precios. Tus posiciones NFT representan propiedad real on-chain respaldada por activos subyacentes.",
+    "q5": "¿Puedo retirar en cualquier momento?",
+    "a5": "Sí, podés retirar instantáneamente en cualquier momento sin comisiones de salida. Rescatá tu posición y recibí CHZ o tokens Fan según tu preferencia. Los retiros se procesan inmediatamente on-chain. Sin período de bloqueo ni restricciones.",
+    "q6": "¿Cuál es la inversión mínima?",
+    "a6": "La inversión mínima es 100 CHZ. No hay límite máximo. Podés comprar posiciones fraccionarias de cualquier índice.",
+    "q7": "¿Puedo crear mi propio índice personalizado?",
+    "a7": "Aún no. La creación de índices personalizados está planeada para una versión futura. Actualmente, podés invertir en índices preestablecidos creados por FanIndex. Estamos trabajando en permitir índices creados por la comunidad, lo que te permitirá diseñar y compartir asignaciones personalizadas.",
+    "q8": "¿Cómo se determinan los precios de los índices?",
+    "a8": "Los precios de los índices (NAV) se calculan usando la fórmula: NAV = Σ(wᵢ × Pᵢ), donde wᵢ es el peso del activo i y Pᵢ es su precio actual en CHZ. Los precios se actualizan en tiempo real con datos de mercado."
+  },
+  "riskDisclosure": {
+    "title": "Divulgación de Riesgos",
+    "description": "Información importante sobre los riesgos asociados con FanIndex."
+  },
+  "riskDisclosure": {
+    "title": "Divulgación de Riesgos",
+    "description": "Información importante sobre riesgos de inversión. Por favor, leé cuidadosamente antes de invertir.",
+    "marketRisk": {
+      "title": "Riesgo de Mercado",
+      "description": "Los valores de los índices fluctúan con los precios de los activos subyacentes. El rendimiento pasado no garantiza resultados futuros. Los mercados cripto son volátiles y pueden moverse significativamente en cortos períodos."
+    },
+    "liquidityRisk": {
+      "title": "Riesgo de Liquidez",
+      "description": "Aunque priorizamos activos líquidos, la liquidez puede variar. Durante estrés de mercado, los rescates pueden procesarse con retrasos o a precios subóptimos."
+    },
+    "operationalRisk": {
+      "title": "Riesgo Operacional",
+      "description": "Las vulnerabilidades de contratos inteligentes, fallos de oráculos o interrupciones de intercambios podrían impactar tus posiciones. Mantenemos seguros y auditorías de seguridad."
+    },
+    "regulatoryRisk": {
+      "title": "Riesgo Regulatorio",
+      "description": "Las regulaciones de criptomonedas están evolucionando. Los cambios regulatorios podrían afectar operaciones de índices, comisiones o elegibilidad de activos."
+    },
+    "disclaimer": "Descargo de Responsabilidad",
+    "disclaimerText": "FanIndex es una plataforma descentralizada para crear y gestionar índices de activos cripto. Los activos cripto son altamente volátiles y especulativos. La inversión en índices cripto conlleva riesgo sustancial de pérdida. Solo invertí montos que podés permitirte perder completamente.",
+    "pastPerformance": "El rendimiento pasado no es indicativo de resultados futuros. No somos asesores de inversión. Esto no es asesoramiento de inversión. Por favor, realizá tu propia investigación y consultá con un asesor financiero antes de invertir.",
+    "acknowledgement": "Al usar FanIndex, reconocés que has leído y entendido estos riesgos y aceptás los términos de servicio."
+  },
+  "roadmap": {
+    "title": "Hoja de Ruta",
+    "description": "Nuestra visión para el futuro de FanIndex. Entregando innovación trimestralmente.",
+    "phase1": "Fase 1: Fundación",
+    "phase2": "Fase 2: Crecimiento",
+    "phase3": "Fase 3: Escala",
+    "phase4": "Fase 4: Evolución",
+    "complete": "Completado",
+    "inProgress": "En Progreso",
+    "planned": "Planeado",
+    "items": {
+      "phase1": ["Creación de índice central", "Sistema de posiciones NFT", "Despliegue de contratos inteligentes", "Seguimiento de portfolio"],
+      "phase2": ["Panel de analítica avanzada", "Lanzamiento de aplicación móvil", "Configuración de gobernanza DAO", "API para desarrolladores"],
+      "phase3": ["Trading de margen para índices", "Soporte de índices entre cadenas", "Asociaciones institucionales", "Expansión de tesorería"],
+      "phase4": ["Recomendaciones de índices impulsadas por IA", "Mercado de derivados", "Expansión global", "Soluciones empresariales"]
+    }
+  },
+  "nftPositions": {
+    "title": "Posiciones NFT",
+    "description": "Las posiciones de índice están respaldadas por NFTs que representan la propiedad verificable y redimible de activos subyacentes.",
+    "ownershipCertificate": {
+      "title": "Certificado de Propiedad",
+      "description": "Cada posición está respaldada por un NFT que representa propiedad verificable on-chain."
+    },
+    "onChainTransparency": {
+      "title": "Transparencia On-Chain",
+      "description": "Todos los metadatos, eventos de rebalanceo y participaciones se registran permanentemente en blockchain."
+    },
+    "redeemability": {
+      "title": "Capacidad de Rescate",
+      "description": "Las posiciones pueden rescatarse directamente por activos subyacentes, asegurando respaldo de valor real."
+    },
+    "premiumFeatures": {
+      "title": "Características Premium",
+      "description": "Los titulares de NFT desbloquean analítica exclusiva, derechos de gobernanza e información de mercado."
+    },
+    "premiumOwnership": "Propiedad de Índice Premium",
+    "premiumDescription": "Cada posición de FanIndex está representada por un NFT que certifica tu propiedad y proporciona acceso a beneficios exclusivos."
+  },
+  "portfolioAnalytics": {
+    "title": "Portfolio y Analítica",
+    "description": "Panel de analítica de nivel institucional para gestión profesional de portfolio.",
+    "pnlTracking": {
+      "title": "Seguimiento de PnL",
+      "description": "Cálculos de ganancia y pérdida en tiempo real con desglose de rendimiento detallado por activo y período.",
+      "metric": "Tiempo Real"
+    },
+    "portfolioAllocation": {
+      "title": "Asignación de Portfolio",
+      "description": "Desglose visual de tus participaciones. Monitoreá la desviación de peso y oportunidades de rebalanceo.",
+      "metric": "Actualizaciones En Vivo"
+    },
+    "marketExposure": {
+      "title": "Exposición de Mercado",
+      "description": "Entendé tu exposición a diferentes clases de activos, sectores y dinámicas de mercado.",
+      "metric": "Monitoreo 24/7"
+    },
+    "fanTokenAnalytics": {
+      "title": "Analítica de Fan Tokens",
+      "description": "Métricas avanzadas sobre participaciones de fan tokens, poder de voto y oportunidades de gobernanza exclusivas.",
+      "metric": "Nivel Institucional"
+    },
+    "dashboardComing": "El panel completo vendrá pronto con datos de mercado en tiempo real, seguimiento de PnL e información avanzada de portfolio."
   }
 }

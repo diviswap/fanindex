@@ -381,5 +381,250 @@
     "buy": "Buy Index",
     "live": "Live",
     "notConnected": "Connect your wallet to view your portfolio"
+  },
+  "gettingStarted": {
+    "title": "Getting Started",
+    "description": "Everything you need to know to begin your journey with FanIndex.",
+    "items": {
+      "whatAreIndices": {
+        "title": "What Are Indices?",
+        "description": "Understand FanIndex's approach to diversified crypto investing. Learn how weighted indices work and why they're essential for portfolio management."
+      },
+      "understanding": {
+        "title": "Understanding Composition",
+        "description": "Learn how index composition affects returns. Deep dive into rebalancing, weighting schemes, and liquidity constraints."
+      },
+      "bestPractices": {
+        "title": "Portfolio Best Practices",
+        "description": "Tips for managing a successful portfolio. Risk management, diversification strategies, and performance optimization."
+      },
+      "startInvesting": {
+        "title": "Start Investing",
+        "description": "Invest in pre-built indices or browse available options. Begin your journey with FanIndex in just a few clicks."
+      }
+    }
+  },
+  "methodology": {
+    "title": "Index Methodology",
+    "description": "Professional-grade index construction inspired by traditional asset management.",
+    "pricingFormula": "Pricing Formula",
+    "pricingDescription": "The Net Asset Value (NAV) of each index is calculated as the sum of weighted asset prices:",
+    "formula": "NAV = Σ(wᵢ × Pᵢ)",
+    "formulaExplain": "Where wᵢ is the weight of asset i and Pᵢ is its price in CHZ",
+    "example": "Example: An index with 60% CHZ (price 0.50 CHZ) and 40% FAN (price 0.75 CHZ) would have NAV = (0.6 × 0.50) + (0.4 × 0.75) = 0.60 CHZ",
+    "items": {
+      "weightAllocation": {
+        "title": "Weight Allocation",
+        "description": "Flexible weighting schemes supporting market-cap, equal-weight, and custom strategies."
+      },
+      "monthlyRebalance": {
+        "title": "Monthly Rebalance",
+        "description": "Automated rebalancing ensures indices stay true to their target allocations."
+      },
+      "liquidityMethodology": {
+        "title": "Liquidity Methodology",
+        "description": "Inclusion criteria prioritize liquid, tradeable assets with institutional-grade counterparties."
+      }
+    }
+  },
+  "liveIndices": {
+    "title": "Available Indices",
+    "description": "Pre-built indices available for investment. Select an index and start diversifying your portfolio today.",
+    "index": "Index",
+    "type": "Type",
+    "nav": "NAV",
+    "assets": "Assets",
+    "action": "Action",
+    "invest": "Invest",
+    "chz": "CHZ",
+    "browseAll": "Browse All Indices"
+  },
+  "fees": {
+    "title": "Fees & Pricing",
+    "description": "Transparent, competitive fee structure designed to maximize your returns.",
+    "entryFee": {
+      "title": "Entry Fee",
+      "amount": "1%",
+      "description": "One-time fee when buying into an index position.",
+      "details": "Covers smart contract interactions and liquidity provision."
+    },
+    "exitFee": {
+      "title": "Exit Fee",
+      "amount": "0%",
+      "description": "No fee when exiting or selling your position.",
+      "details": "We want your redemptions to be seamless and cost-effective."
+    },
+    "managementFee": {
+      "title": "Management Fee",
+      "amount": "1-2%",
+      "description": "Annual management fee for managed indices only.",
+      "details": "Weighted & Equal-weight indices: No management fee · Managed indices: 1-2% annually"
+    },
+    "performanceFee": {
+      "title": "Performance Fee",
+      "amount": "Varies",
+      "description": "Optional performance-based fees for managed indices.",
+      "details": "20% of gains above benchmark (when applicable)."
+    },
+    "feeCalculation": "Fee Calculation Example",
+    "step1": "Invest 1000 CHZ into a weighted index",
+    "step2": "Entry fee applied: 1% = 10 CHZ",
+    "step3": "You receive 990 CHZ in index tokens",
+    "step4": "No annual management fee (weighted & equal-weight indices are fee-free)",
+    "step5": "Exit anytime with zero exit fee",
+    "note": "Note: Managed indices only apply an additional 1-2% annual management fee. Weighted and equal-weight indices have no management fees."
+  },
+  "nftPositions": {
+    "title": "NFT Position Infrastructure",
+    "description": "Your positions are represented by NFTs on-chain."
+  },
+  "portfolioAnalytics": {
+    "title": "Portfolio Analytics",
+    "description": "Advanced analytics for your portfolio positions."
+  },
+  "smartContracts": {
+    "title": "Smart Contracts",
+    "description": "Audited, transparent infrastructure securing your investments on-chain.",
+    "etfVault": {
+      "title": "ETF Vault Contracts",
+      "description": "Core smart contracts managing index positions and asset custody for each index.",
+      "chain": "Chiliz Chain"
+    },
+    "nftPosition": {
+      "title": "NFT Position Contracts",
+      "description": "ERC-721 smart contracts representing position ownership and metadata."
+    },
+    "batchBuyer": {
+      "title": "Batch Buyer",
+      "description": "Contract for efficient batch purchasing of index positions."
+    },
+    "secureInfrastructure": {
+      "title": "Secure Infrastructure",
+      "description": "Multi-contract architecture ensuring security and composability."
+    },
+    "securityAudits": "Security & Audits",
+    "securityDescription": "All smart contracts have been independently audited by leading security firms to ensure the safety of user funds.",
+    "auditReport": "Security Audit Report",
+    "auditReportDesc": "Complete audit findings and vulnerability remediation tracking.",
+    "viewReport": "View Report",
+    "contractVerification": "Contract Verification",
+    "contractVerDesc": "All contracts verified on-chain with source code and build artifacts.",
+    "verify": "Verify",
+    "indexContracts": "Index Contract Addresses",
+    "indexName": "Index",
+    "vaultContract": "Vault Contract",
+    "nftContract": "NFT Contract"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Can't find the answer you're looking for? Contact our support team.",
+    "q1": "How do indices work on FanIndex?",
+    "a1": "FanIndex indices are collections of carefully selected crypto assets with weighted allocations. Each index tracks the combined value of its constituents and rebalances monthly to maintain target weights. Positions are backed by NFTs representing verifiable ownership.",
+    "q2": "What are the fees?",
+    "a2": "Entry Fee: 1% when buying in. Exit Fee: 0%. Management Fee: Only for managed indices (1-2% annually). Weighted and equal-weight indices have no management fees. Performance Fee: 20% of gains above benchmark (for managed indices only). All fees are transparent and deducted automatically.",
+    "q3": "How often are indices rebalanced?",
+    "a3": "Indices rebalance monthly on a set schedule. Rebalancing ensures allocations stay true to targets and removes underperforming assets. You're notified before each rebalancing, and all transactions are recorded on-chain.",
+    "q4": "Is FanIndex secure?",
+    "a4": "Yes. All smart contracts are independently audited. We use multi-signature wallets for treasury management and Chainlink oracles for price feeds. Your NFT positions represent real on-chain ownership backed by underlying assets.",
+    "q5": "Can I withdraw anytime?",
+    "a5": "Yes, you can withdraw instantly anytime with zero exit fees. Redeem your position and receive CHZ or Fan tokens according to your preference. Withdrawals are processed immediately on-chain. No lockup period or restrictions.",
+    "q6": "What is the minimum investment?",
+    "a6": "The minimum investment is 100 CHZ. There's no maximum limit. You can buy fractional positions of any index.",
+    "q7": "Can I create my own custom index?",
+    "a7": "Not yet. Custom index creation is planned for a future release. Currently, you can invest in pre-built indices created by FanIndex. We're working on enabling community-created indices, which will allow you to design and share custom allocations.",
+    "q8": "How are index prices determined?",
+    "a8": "Index prices (NAV) are calculated using the formula: NAV = Σ(wᵢ × Pᵢ), where wᵢ is the weight of asset i and Pᵢ is its current price in CHZ. Prices update in real-time with market data."
+  },
+  "riskDisclosure": {
+    "title": "Risk Disclosure",
+    "description": "Important information about risks associated with FanIndex."
+  },
+  "riskDisclosure": {
+    "title": "Risk Disclosure",
+    "description": "Important information about investment risks. Please read carefully before investing.",
+    "marketRisk": {
+      "title": "Market Risk",
+      "description": "Index values fluctuate with underlying asset prices. Past performance does not guarantee future results. Crypto markets are volatile and can move significantly in short periods."
+    },
+    "liquidityRisk": {
+      "title": "Liquidity Risk",
+      "description": "While we prioritize liquid assets, liquidity can vary. During market stress, redemptions may be processed with delays or at suboptimal prices."
+    },
+    "operationalRisk": {
+      "title": "Operational Risk",
+      "description": "Smart contract vulnerabilities, oracle failures, or exchange outages could impact your positions. We maintain insurance and security audits."
+    },
+    "regulatoryRisk": {
+      "title": "Regulatory Risk",
+      "description": "Cryptocurrency regulations are evolving. Changes in regulation could affect index operations, fees, or asset eligibility."
+    },
+    "disclaimer": "Disclaimer",
+    "disclaimerText": "FanIndex is a decentralized platform for creating and managing crypto asset indices. Crypto assets are highly volatile and speculative. Investment in crypto indices carries substantial risk of loss. Only invest amounts you can afford to lose completely.",
+    "pastPerformance": "Past performance is not indicative of future results. We are not investment advisors. This is not investment advice. Please conduct your own research and consult with a financial advisor before investing.",
+    "acknowledgement": "By using FanIndex, you acknowledge that you have read and understood these risks and agree to the terms of service."
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "description": "Our vision for the future of FanIndex. Delivering innovation quarterly.",
+    "phase1": "Phase 1: Foundation",
+    "phase2": "Phase 2: Growth",
+    "phase3": "Phase 3: Scale",
+    "phase4": "Phase 4: Evolution",
+    "complete": "Complete",
+    "inProgress": "In Progress",
+    "planned": "Planned",
+    "items": {
+      "phase1": ["Core index creation", "NFT position system", "Smart contract deployment", "Portfolio tracking"],
+      "phase2": ["Advanced analytics dashboard", "Mobile app launch", "DAO governance setup", "API for developers"],
+      "phase3": ["Margin trading for indices", "Cross-chain index support", "Institutional partnerships", "Treasury expansion"],
+      "phase4": ["AI-powered index recommendations", "Derivatives market", "Global expansion", "Enterprise solutions"]
+    }
+  },
+  "nftPositions": {
+    "title": "NFT Positions",
+    "description": "Index positions are backed by NFTs representing verifiable, redeemable ownership of underlying assets.",
+    "ownershipCertificate": {
+      "title": "Ownership Certificate",
+      "description": "Each position is backed by an NFT that represents verifiable on-chain ownership."
+    },
+    "onChainTransparency": {
+      "title": "On-Chain Transparency",
+      "description": "All metadata, rebalancing events, and holdings are permanently recorded on blockchain."
+    },
+    "redeemability": {
+      "title": "Redeemability",
+      "description": "Positions can be redeemed directly for underlying assets, ensuring real value backing."
+    },
+    "premiumFeatures": {
+      "title": "Premium Features",
+      "description": "NFT holders unlock exclusive analytics, governance rights, and market insights."
+    },
+    "premiumOwnership": "Premium Index Ownership",
+    "premiumDescription": "Every FanIndex position is represented by an NFT that certifies your ownership and provides access to exclusive benefits."
+  },
+  "portfolioAnalytics": {
+    "title": "Portfolio & Analytics",
+    "description": "Institutional-grade analytics dashboard for professional portfolio management.",
+    "pnlTracking": {
+      "title": "PnL Tracking",
+      "description": "Real-time profit & loss calculations with detailed performance breakdown by asset and time period.",
+      "metric": "Real-Time"
+    },
+    "portfolioAllocation": {
+      "title": "Portfolio Allocation",
+      "description": "Visual breakdown of your holdings. Monitor weight drift and rebalancing opportunities.",
+      "metric": "Live Updates"
+    },
+    "marketExposure": {
+      "title": "Market Exposure",
+      "description": "Understand your exposure to different asset classes, sectors, and market dynamics.",
+      "metric": "24/7 Monitoring"
+    },
+    "fanTokenAnalytics": {
+      "title": "Fan Token Analytics",
+      "description": "Advanced metrics on fan token holdings, voting power, and exclusive governance opportunities.",
+      "metric": "Institutional-Grade"
+    },
+    "dashboardComing": "Full dashboard coming soon with real-time market data, PnL tracking, and advanced portfolio insights."
   }
 }
