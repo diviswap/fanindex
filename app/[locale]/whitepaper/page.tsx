@@ -535,6 +535,7 @@ const SECTIONS = [
 
 export default function WhitepaperPage() {
   const t = useTranslations("whitepaperPage")
+  const tc = useTranslations("whitepaperContent")
   
   // Map section IDs to translation keys
   const sectionKeyMap: Record<string, string> = {
@@ -547,7 +548,7 @@ export default function WhitepaperPage() {
     "future-expansion": "futureExpansion",
     "pricing-methodology": "pricingMethodology",
     "nft-infrastructure": "nftInfrastructure",
-    "buy-redeem": "buyRedeem",
+    "buy-redeem": "buyRedeemFlow",
     "rebalancing": "rebalancing",
     "technical-architecture": "technicalArchitecture",
     "fee-structure": "feeStructure",
@@ -556,6 +557,54 @@ export default function WhitepaperPage() {
     "roadmap": "roadmap",
     "risks": "risks",
     "conclusion": "conclusion",
+  }
+  
+  // Function to render content based on section
+  const renderContent = (sectionId: string) => {
+    const contentKey = sectionKeyMap[sectionId]
+    if (!contentKey) return null
+    
+    const content = tc(contentKey)
+    
+    return (
+      <div className="space-y-4 text-foreground/90 leading-relaxed">
+        {/* Render paragraphs */}
+        {Object.entries(content).map(([key, value]) => {
+          if (key === "p1" || key === "p2" || key === "p3" || key === "p4" || key === "p5" || key === "p6" || key === "p7") {
+            return <p key={key} className="text-foreground/90">{String(value)}</p>
+          }
+          if (key === "h1") return <h3 key={key} className="mt-6 mb-3 text-lg font-semibold text-foreground">{String(value)}</h3>
+          if (key === "h2") return <h3 key={key} className="mt-6 mb-3 text-lg font-semibold text-foreground">{String(value)}</h3>
+          if (key === "h3") return <h3 key={key} className="mt-6 mb-3 text-lg font-semibold text-foreground">{String(value)}</h3>
+          if (key === "formula") return <div key={key} className="my-4 rounded-xl border border-border/60 bg-card/40 px-5 py-4 font-mono text-sm text-foreground">{String(value)}</div>
+          if (key.startsWith("ul") || key.startsWith("ol")) return null
+          return null
+        })}
+        
+        {/* Render lists */}
+        {Object.entries(content).map(([key, value]) => {
+          if (key.startsWith("ul") && Array.isArray(value)) {
+            return (
+              <ul key={key} className="list-inside space-y-2 ml-2">
+                {(value as string[]).map((item, i) => (
+                  <li key={i} className="text-foreground/90">• {item}</li>
+                ))}
+              </ul>
+            )
+          }
+          if (key.startsWith("ol") && Array.isArray(value)) {
+            return (
+              <ol key={key} className="list-inside space-y-2 ml-2">
+                {(value as string[]).map((item, i) => (
+                  <li key={i} className="text-foreground/90">{i + 1}. {item}</li>
+                ))}
+              </ol>
+            )
+          }
+          return null
+        })}
+      </div>
+    )
   }
   
   return (
@@ -634,8 +683,7 @@ export default function WhitepaperPage() {
                   <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground mb-6">
                     {t(`sections.${sectionKeyMap[s.id] || s.id}`)}
                   </h2>
-                  <div className="space-y-4 text-sm leading-relaxed text-muted-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-3 [&_ol]:mt-3 [&_ol]:space-y-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_ul]:mt-3 [&_ul]:space-y-2.5 [&_ul]:pl-5 [&_ul]:list-disc [&_strong]:text-foreground [&_strong]:font-semibold [&_a]:text-success [&_a:hover]:underline">
-                    {s.content}
+                  {renderContent(s.id)}
                   </div>
                 </article>
               ))}
