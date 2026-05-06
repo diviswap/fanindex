@@ -574,10 +574,30 @@
     "inProgress": "En Progreso",
     "planned": "Planeado",
     "items": {
-      "phase1": ["Creación de índice central", "Sistema de posiciones NFT", "Despliegue de contratos inteligentes", "Seguimiento de portfolio"],
-      "phase2": ["Panel de analítica avanzada", "Lanzamiento de aplicación móvil", "Configuración de gobernanza DAO", "API para desarrolladores"],
-      "phase3": ["Trading de margen para índices", "Soporte de índices entre cadenas", "Asociaciones institucionales", "Expansión de tesorería"],
-      "phase4": ["Recomendaciones de índices impulsadas por IA", "Mercado de derivados", "Expansión global", "Soluciones empresariales"]
+      "phase1": {
+        "0": "Creación de índice central",
+        "1": "Sistema de posiciones NFT",
+        "2": "Despliegue de contratos inteligentes",
+        "3": "Seguimiento de portfolio"
+      },
+      "phase2": {
+        "0": "Panel de analítica avanzada",
+        "1": "Lanzamiento de aplicación móvil",
+        "2": "Configuración de gobernanza DAO",
+        "3": "API para desarrolladores"
+      },
+      "phase3": {
+        "0": "Trading de margen para índices",
+        "1": "Soporte de índices entre cadenas",
+        "2": "Asociaciones institucionales",
+        "3": "Expansión de tesorería"
+      },
+      "phase4": {
+        "0": "Recomendaciones de índices impulsadas por IA",
+        "1": "Mercado de derivados",
+        "2": "Expansión global",
+        "3": "Soluciones empresariales"
+      }
     }
   },
   "nftPositions": {

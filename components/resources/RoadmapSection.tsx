@@ -10,25 +10,45 @@ export function RoadmapSection() {
     {
       phaseKey: "phase1",
       statusKey: "complete",
-      itemsKey: "items.phase1",
+      items: [
+        t("items.phase1.0"),
+        t("items.phase1.1"),
+        t("items.phase1.2"),
+        t("items.phase1.3"),
+      ],
       icon: Target,
     },
     {
       phaseKey: "phase2",
       statusKey: "inProgress",
-      itemsKey: "items.phase2",
+      items: [
+        t("items.phase2.0"),
+        t("items.phase2.1"),
+        t("items.phase2.2"),
+        t("items.phase2.3"),
+      ],
       icon: Rocket,
     },
     {
       phaseKey: "phase3",
       statusKey: "planned",
-      itemsKey: "items.phase3",
+      items: [
+        t("items.phase3.0"),
+        t("items.phase3.1"),
+        t("items.phase3.2"),
+        t("items.phase3.3"),
+      ],
       icon: Zap,
     },
     {
       phaseKey: "phase4",
       statusKey: "planned",
-      itemsKey: "items.phase4",
+      items: [
+        t("items.phase4.0"),
+        t("items.phase4.1"),
+        t("items.phase4.2"),
+        t("items.phase4.3"),
+      ],
       icon: GitBranch,
     },
   ]
@@ -53,7 +73,6 @@ export function RoadmapSection() {
           const Icon = phase.icon
           const isCompleted = phase.statusKey === "complete"
           const isActive = phase.statusKey === "inProgress"
-          const items = t(phase.itemsKey) as string[]
 
           return (
             <div key={phase.phaseKey} className="relative">
@@ -106,7 +125,7 @@ export function RoadmapSection() {
                     </div>
 
                     <div className="grid gap-2 md:grid-cols-2">
-                      {items && Array.isArray(items) ? items.map((item) => (
+                      {phase.items && Array.isArray(phase.items) ? phase.items.map((item) => (
                         <div
                           key={item}
                           className="flex items-center gap-2 text-sm text-muted-foreground"

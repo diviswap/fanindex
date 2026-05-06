@@ -574,10 +574,30 @@
     "inProgress": "In Progress",
     "planned": "Planned",
     "items": {
-      "phase1": ["Core index creation", "NFT position system", "Smart contract deployment", "Portfolio tracking"],
-      "phase2": ["Advanced analytics dashboard", "Mobile app launch", "DAO governance setup", "API for developers"],
-      "phase3": ["Margin trading for indices", "Cross-chain index support", "Institutional partnerships", "Treasury expansion"],
-      "phase4": ["AI-powered index recommendations", "Derivatives market", "Global expansion", "Enterprise solutions"]
+      "phase1": {
+        "0": "Core index creation",
+        "1": "NFT position system",
+        "2": "Smart contract deployment",
+        "3": "Portfolio tracking"
+      },
+      "phase2": {
+        "0": "Advanced analytics dashboard",
+        "1": "Mobile app launch",
+        "2": "DAO governance setup",
+        "3": "API for developers"
+      },
+      "phase3": {
+        "0": "Margin trading for indices",
+        "1": "Cross-chain index support",
+        "2": "Institutional partnerships",
+        "3": "Treasury expansion"
+      },
+      "phase4": {
+        "0": "AI-powered index recommendations",
+        "1": "Derivatives market",
+        "2": "Global expansion",
+        "3": "Enterprise solutions"
+      }
     }
   },
   "nftPositions": {
