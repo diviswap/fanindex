@@ -627,7 +627,8 @@
     "premiumFeatures": {
       "title": "Premium Features",
       "description": "NFT holders unlock exclusive analytics, governance rights, and market insights."
-    },
+    }
+  },
   "portfolioAnalytics": {
     "title": "Portfolio & Analytics",
     "description": "Institutional-grade analytics dashboard for professional portfolio management.",
