@@ -684,7 +684,6 @@ export default function WhitepaperPage() {
                     {t(`sections.${sectionKeyMap[s.id] || s.id}`)}
                   </h2>
                   {renderContent(s.id)}
-                  </div>
                 </article>
               ))}
             </div>
