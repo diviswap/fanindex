@@ -2,6 +2,7 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { useTranslations } from "next-intl"
 import {
   useAccount,
   useWriteContract,
@@ -52,6 +53,7 @@ export function RedeemDialog({
   onOpenChange,
   onSuccess,
 }: RedeemDialogProps) {
+  const t = useTranslations("redeemDialog")
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const { switchChain, isPending: isSwitching } = useSwitchChain()
@@ -166,12 +168,12 @@ export function RedeemDialog({
                 </div>
                 <div>
                   <h3 className="text-xl sm:text-2xl font-bold text-success">
-                    {redemptionDetails.percentage === 100 ? "Redemption Successful!" : "Partial Redemption Successful!"}
+                    {redemptionDetails.percentage === 100 ? t("successTitle") : t("successTitlePartial")}
                   </h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                     {redemptionDetails.type === "chz"
-                      ? `${redemptionDetails.percentage}% of your position has been closed and CHZ transferred`
-                      : `${redemptionDetails.percentage}% of your position has been closed and fan tokens transferred`}
+                      ? `${redemptionDetails.percentage}% ${t("successDescription")}`
+                      : `${redemptionDetails.percentage}% ${t("successDescriptionTokens")}`}
                   </p>
                 </div>
               </div>
@@ -179,49 +181,49 @@ export function RedeemDialog({
               <div className="rounded-xl border-2 border-success/30 bg-card/95 backdrop-blur-sm p-3 sm:p-5 space-y-3 sm:space-y-4">
                 <div className="space-y-2 sm:space-y-3">
                   <div className="flex justify-between items-center pb-2 sm:pb-3 border-b border-border">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Index</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("index")}</span>
                     <span className="text-sm sm:text-base font-bold text-foreground">{indexName || "Position"}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Position ID</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("positionID")}</span>
                     <span className="text-sm sm:text-base font-semibold text-foreground">#{nftId}</span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Percentage Redeemed</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("percentageRedeemed")}</span>
                     <span className="text-sm sm:text-base font-semibold text-success">
                       {redemptionDetails.percentage}%
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Redemption Type</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("redemptionType")}</span>
                     <span className="text-sm sm:text-base font-semibold text-foreground">
-                      {redemptionDetails.type === "chz" ? "Convert to CHZ" : "Receive Fan Tokens"}
+                      {redemptionDetails.type === "chz" ? t("chzType") : t("tokensType")}
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Position Value</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("positionComposition")}</span>
                     <span className="text-sm sm:text-base font-semibold text-foreground">
                       {redemptionDetails.value.toFixed(4)} CHZ
                     </span>
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-xs sm:text-sm text-muted-foreground">Exit Fee (0%)</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{t("exitFee")}</span>
                     <span className="text-sm sm:text-base font-semibold text-foreground">{exitFee.toFixed(4)} CHZ</span>
                   </div>
 
                   <div className="pt-2 sm:pt-3 border-t border-border flex justify-between items-center">
                     <span className="text-sm sm:text-base font-bold">
-                      {redemptionDetails.type === "chz" ? "CHZ Received" : "Fan Tokens Received"}
+                      {redemptionDetails.type === "chz" ? t("chzReceived") : t("tokensReceived")}
                     </span>
                     <span className="text-base sm:text-lg font-bold text-success">
                       {redemptionDetails.type === "chz"
                         ? `${redemptionDetails.received.toFixed(4)} CHZ`
-                        : "Underlying Tokens"}
+                        : t("tokensReceiveType")}
                     </span>
                   </div>
                 </div>
@@ -257,9 +259,9 @@ export function RedeemDialog({
                   <ArrowDownToLine className="h-4 w-4 sm:h-5 sm:w-5 text-destructive" />
                 </div>
                 <div>
-                  <DialogTitle className="text-lg sm:text-xl md:text-2xl">Redeem Position</DialogTitle>
+                  <DialogTitle className="text-lg sm:text-xl md:text-2xl">{t("title")}</DialogTitle>
                   <DialogDescription className="text-muted-foreground text-xs sm:text-sm mt-0.5 sm:mt-1">
-                    {indexName ? `Redeem your ${indexName} position` : "Redeem your position"}
+                    {indexName ? `${t("description")} ${indexName}` : t("description")}
                   </DialogDescription>
                 </div>
               </div>
@@ -271,7 +273,7 @@ export function RedeemDialog({
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
                     <p className="text-xs font-medium text-yellow-500">
-                      Your wallet is on the wrong network. Redemptions require Chiliz Mainnet (chain 88888).
+                      {t("wrongNetwork")}
                     </p>
                   </div>
                   <Button
@@ -281,9 +283,9 @@ export function RedeemDialog({
                     disabled={isSwitching}
                   >
                     {isSwitching ? (
-                      <><Loader2 className="h-3 w-3 animate-spin mr-1" />Switching...</>
+                      <><Loader2 className="h-3 w-3 animate-spin mr-1" />{t("switching")}</>
                     ) : (
-                      "Switch to Chiliz Mainnet"
+                      t("switchToChiliz")
                     )}
                   </Button>
                 </div>
@@ -293,7 +295,7 @@ export function RedeemDialog({
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 flex-shrink-0" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This index is not yet deployed on Chiliz Mainnet.
+                    {t("notDeployed")}
                   </p>
                 </div>
               )}
@@ -305,7 +307,7 @@ export function RedeemDialog({
                     <div className="flex items-center gap-2">
                       <Coins className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                        Position Composition
+                        {t("positionComposition")}
                       </span>
                     </div>
                     {totalValueCHZ > 0 && (
@@ -315,9 +317,9 @@ export function RedeemDialog({
                     )}
                   </div>
                   <div className="grid grid-cols-3 px-3 py-1.5 border-b border-border/40">
-                    <span className="text-xs font-medium text-muted-foreground">Token</span>
-                    <span className="text-xs font-medium text-muted-foreground text-right">Amount</span>
-                    <span className="text-xs font-medium text-muted-foreground text-right">Value (CHZ)</span>
+                    <span className="text-xs font-medium text-muted-foreground">{t("token")}</span>
+                    <span className="text-xs font-medium text-muted-foreground text-right">{t("amount")}</span>
+                    <span className="text-xs font-medium text-muted-foreground text-right">{t("value")}</span>
                   </div>
                   {tokenRows.map((row) => (
                     <div
@@ -359,7 +361,7 @@ export function RedeemDialog({
                   {redemptionPercentage < 100 && totalValueCHZ > 0 && (
                     <div className="px-3 py-2 border-t border-border/40 flex justify-between items-center bg-muted/20">
                       <span className="text-xs text-muted-foreground">
-                        Redeeming {redemptionPercentage}% →
+                        {t("redeeming")} {redemptionPercentage}% →
                       </span>
                       <span className="text-xs font-bold text-success tabular-nums">
                         {((totalValueCHZ * redemptionPercentage) / 100).toFixed(2)} CHZ
@@ -372,7 +374,7 @@ export function RedeemDialog({
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-3 sm:space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-xs sm:text-sm font-semibold">Redemption Amount</Label>
+                    <Label className="text-xs sm:text-sm font-semibold">{t("redemptionAmount")}</Label>
                     <div className="flex items-center gap-2">
                       <Input
                         type="number"
@@ -410,15 +412,15 @@ export function RedeemDialog({
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     {redemptionPercentage === 100
-                      ? "Redeeming your entire position will burn the NFT"
-                      : `Redeeming ${redemptionPercentage}% — the remaining ${100 - redemptionPercentage}% stays in your portfolio`}
+                      ? `${t("warning")}CHZ${t("warningEnd")}`
+                      : `${t("warning")}${redemptionPercentage}%${t("warningPartialEnd")}${redemptionDetails?.type === "chz" ? "CHZ" : t("tokensReceiveType")}${t("warningEnd")}`}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-3 sm:space-y-4">
                 <Label className="text-xs sm:text-sm font-semibold mb-2 sm:mb-3 block">
-                  Choose Redemption Method
+                  {t("redemptionMethod")}
                 </Label>
                 <RadioGroup
                   value={redemptionType}
@@ -428,11 +430,10 @@ export function RedeemDialog({
                     <RadioGroupItem value="chz" id="chz" className="mt-0.5" />
                     <div className="flex-1">
                       <Label htmlFor="chz" className="text-xs sm:text-sm font-medium cursor-pointer">
-                        Convert to CHZ
+                        {t("convertToCHZ")}
                       </Label>
                       <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1">
-                        Sell {redemptionPercentage === 100 ? "all" : `${redemptionPercentage}%`} fan tokens and
-                        receive CHZ (native currency)
+                        {t("convertDescription")}
                       </p>
                     </div>
                   </div>
@@ -440,11 +441,10 @@ export function RedeemDialog({
                     <RadioGroupItem value="tokens" id="tokens" className="mt-0.5" />
                     <div className="flex-1">
                       <Label htmlFor="tokens" className="text-xs sm:text-sm font-medium cursor-pointer">
-                        Receive Fan Tokens
+                        {t("receiveTokens")}
                       </Label>
                       <p className="text-xs text-muted-foreground mt-0.5 sm:mt-1">
-                        Withdraw {redemptionPercentage === 100 ? "all" : `${redemptionPercentage}%`} underlying fan
-                        tokens directly to your wallet
+                        {t("tokensDescription")}
                       </p>
                     </div>
                   </div>
@@ -453,27 +453,27 @@ export function RedeemDialog({
 
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-2 sm:space-y-3">
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Position ID</span>
+                  <span className="text-muted-foreground">{t("positionID")}</span>
                   <span className="font-semibold">#{nftId}</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Redemption Value</span>
+                  <span className="text-muted-foreground">{t("redemptionValue")}</span>
                   <span className="font-semibold">
                     {currentValue > 0 ? `${currentValue.toFixed(4)} CHZ` : "-- CHZ"}
                   </span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Exit fee (0%)</span>
+                  <span className="text-muted-foreground">{t("exitFee")}</span>
                   <span className="font-semibold">0 CHZ</span>
                 </div>
                 <div className="border-t pt-2 sm:pt-2.5 flex justify-between items-center">
-                  <span className="text-sm sm:text-base font-bold">You will receive</span>
+                  <span className="text-sm sm:text-base font-bold">{t("youWillReceive")}</span>
                   <span className="text-success font-bold text-base sm:text-lg">
                     {redemptionType === "chz"
                       ? youWillReceive > 0
                         ? `${youWillReceive.toFixed(4)} CHZ`
                         : "-- CHZ"
-                      : `${redemptionPercentage}% Fan Tokens`}
+                      : `${redemptionPercentage}% ${t("tokensReceiveType")}`}
                   </span>
                 </div>
               </div>
@@ -482,24 +482,23 @@ export function RedeemDialog({
                 <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {redemptionPercentage === 100
-                    ? "This action is irreversible. Your NFT will be burned and you will receive "
+                    ? `${t("warning")}CHZ${t("warningEnd")}`
                     : `This will redeem ${redemptionPercentage}% of your position. You will receive `}
-                  {redemptionType === "chz" ? "CHZ" : "the underlying fan tokens"} directly to your wallet.
+                  {redemptionType === "chz" ? "CHZ" : t("tokensReceiveType")} directly to your wallet.
                 </p>
               </div>
 
               <div className="flex items-start gap-2 p-2 sm:p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <Info className="h-3 w-3 sm:h-4 sm:w-4 text-blue-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  The redemption value is calculated based on the current market prices of the underlying Fan Tokens in
-                  this index.
+                  {t("info")}
                 </p>
               </div>
 
               {error && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
                   <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive flex-shrink-0" />
-                  <p className="text-xs sm:text-sm text-destructive">Transaction failed. Please try again.</p>
+                  <p className="text-xs sm:text-sm text-destructive">{t("transactionFailed")}</p>
                 </div>
               )}
             </div>
@@ -511,7 +510,7 @@ export function RedeemDialog({
                 disabled={isPending || isConfirming}
                 className="flex-1 h-9 sm:h-11 text-sm sm:text-base bg-transparent"
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button
                 onClick={handleRedeem}
@@ -527,17 +526,17 @@ export function RedeemDialog({
                 {isPending ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                    Waiting for wallet...
+                    {t("waitingForWallet")}
                   </span>
                 ) : isConfirming ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
-                    Confirming on-chain...
+                    {t("confirmingOnChain")}
                   </span>
                 ) : (
                   <span className="flex items-center gap-2">
                     <ArrowDownToLine className="h-3 w-3 sm:h-4 sm:w-4" />
-                    {redemptionPercentage === 100 ? "Confirm Redemption" : `Redeem ${redemptionPercentage}%`}
+                    {redemptionPercentage === 100 ? t("confirmRedemption") : `${t("redeem")} ${redemptionPercentage}%`}
                   </span>
                 )}
               </Button>

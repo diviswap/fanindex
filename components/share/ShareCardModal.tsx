@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback, useEffect, useRef } from "react"
+import { useTranslations } from "next-intl"
 import {
   Dialog,
   DialogContent,
@@ -67,7 +68,7 @@ interface ShareCardModalProps {
   walletAddress?: string
 }
 
-// ── Toggle pill ────────────────────────────────────────────────────────────────
+  // ── Toggle pill ────────────────────────────────────────────────────────────────
 
 function Toggle({
   label,
@@ -97,7 +98,7 @@ function Toggle({
 
 // ── Tweet text ─────────────────────────────────────────────────────────────────
 
-function buildTweetText(data: ShareData): string {
+function buildTweetText(data: ShareData, t: ReturnType<typeof useTranslations>): string {
   if (data.type === "index") {
     return `Just discovered the ${data.index.name} on @FanIndexes — backed by ${data.index.tokens.join(", ")} fan tokens on Chiliz Chain.\n\nfanindex.pro\n\n#Chiliz #CHZ #FanTokens`
   }
@@ -112,6 +113,7 @@ function buildTweetText(data: ShareData): string {
 // ── Main modal ─────────────────────────────────────────────────────────────────
 
 export function ShareCardModal({ open, onOpenChange, data, walletAddress }: ShareCardModalProps) {
+  const t = useTranslations("shareCardModal")
   const [showPrice, setShowPrice] = useState(true)
   const [showTokens, setShowTokens] = useState(true)
   const [showComposition, setShowComposition] = useState(true)
@@ -177,8 +179,8 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   }, [copyToClipboard])
 
   const handleShareX = useCallback(() => {
-    shareToX(buildTweetText(data))
-  }, [shareToX, data])
+    shareToX(buildTweetText(data, t))
+  }, [shareToX, data, t])
 
   const handleOpenChange = (v: boolean) => {
     if (!v) reset()
@@ -228,18 +230,18 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
   const toggleRow =
     data.type === "index" ? (
       <div className="flex flex-wrap gap-2">
-        <Toggle label="Price" icon={Tag} checked={showPrice} onChange={setShowPrice} />
-        <Toggle label="Tokens" icon={Layers} checked={showTokens} onChange={setShowTokens} />
+        <Toggle label={t("price")} icon={Tag} checked={showPrice} onChange={setShowPrice} />
+        <Toggle label={t("tokens")} icon={Layers} checked={showTokens} onChange={setShowTokens} />
       </div>
     ) : data.type === "position" ? (
       <div className="flex flex-wrap gap-2">
-        <Toggle label="Composition" icon={BarChart3} checked={showComposition} onChange={setShowComposition} />
-        <Toggle label="Wallet" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
+        <Toggle label={t("composition")} icon={BarChart3} checked={showComposition} onChange={setShowComposition} />
+        <Toggle label={t("wallet")} icon={Wallet} checked={showWallet} onChange={setShowWallet} />
       </div>
     ) : (
       <div className="flex flex-wrap gap-2">
-        <Toggle label="Breakdown" icon={BarChart3} checked={showBreakdown} onChange={setShowBreakdown} />
-        <Toggle label="Wallet" icon={Wallet} checked={showWallet} onChange={setShowWallet} />
+        <Toggle label={t("breakdown")} icon={BarChart3} checked={showBreakdown} onChange={setShowBreakdown} />
+        <Toggle label={t("wallet")} icon={Wallet} checked={showWallet} onChange={setShowWallet} />
       </div>
     )
 
@@ -271,7 +273,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
 
         {/* Header */}
         <DialogHeader className="flex-row items-center justify-between px-4 sm:px-5 pt-4 sm:pt-5 pb-3 sm:pb-4 border-b border-border">
-          <DialogTitle className="text-base font-bold text-foreground">Share Card</DialogTitle>
+          <DialogTitle className="text-base font-bold text-foreground">{t("title")}</DialogTitle>
         </DialogHeader>
 
         <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
@@ -353,14 +355,14 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
             {isCapturing && (
               <div className="absolute inset-0 bg-background/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3 rounded-xl">
                 <Loader2 className="h-6 w-6 animate-spin text-success" />
-                <span className="text-sm font-semibold text-foreground">Generating image...</span>
+                <span className="text-sm font-semibold text-foreground">{t("generating")}</span>
               </div>
             )}
           </div>
 
           {/* Customization toggles */}
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Customize</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("customize")}</p>
             {toggleRow}
           </div>
 
@@ -379,7 +381,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               ) : (
                 <Copy className="h-3.5 w-3.5 mr-1.5" />
               )}
-              {copyDone ? "Copied!" : "Copy"}
+              {copyDone ? t("copied") : t("copy")}
             </Button>
 
             <Button
@@ -393,7 +395,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               ) : (
                 <Download className="h-3.5 w-3.5 mr-1.5" />
               )}
-              {downloadDone ? "Saved!" : "Download"}
+              {downloadDone ? t("saved") : t("download")}
             </Button>
 
             <Button
@@ -404,7 +406,7 @@ export function ShareCardModal({ open, onOpenChange, data, walletAddress }: Shar
               <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 mr-1.5 fill-current shrink-0" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z" />
               </svg>
-              Post on X
+              {t("postOnX")}
             </Button>
           </div>
         </div>
