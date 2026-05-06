@@ -347,7 +347,7 @@
       "marketContext": "3. Contexto de Mercado",
       "platform": "4. La Plataforma FanIndex",
       "indexArchitecture": "5. Arquitectura de Índices",
-      "indexSuite": "6. Suite de Índices Actual",
+      "currentSuite": "6. Suite de Índices Actual",
       "futureExpansion": "7. Expansión Futura",
       "pricingMethodology": "8. Metodología de Precios",
       "nftInfrastructure": "9. Infraestructura de Posiciones NFT",
@@ -355,7 +355,7 @@
       "rebalancing": "11. Rebalanceo",
       "technicalArchitecture": "12. Arquitectura Técnica",
       "feeStructure": "13. Estructura de Comisiones",
-      "revenue": "14. Asignación de Ingresos",
+      "revenueAllocation": "14. Asignación de Ingresos",
       "governance": "15. Gobernanza",
       "roadmap": "16. Hoja de Ruta",
       "risks": "17. Riesgos",
@@ -366,6 +366,15 @@
     "backToHome": "Volver al inicio",
     "title": "Recursos y Documentación",
     "description": "Todo lo que necesitás saber sobre FanIndex. Desde primeros pasos hasta analítica avanzada, contratos inteligentes y gestión de portfolio institucional."
+  },
+  "nftPositionCard": {
+    "positionValue": "Valor de Posición",
+    "composition": "Composición",
+    "priceChart": "Precio 30d",
+    "buyMore": "Comprar Más",
+    "sell": "Vender",
+    "share": "Compartir posición",
+    "view": "Ver"
   },
   "indexCard": {
     "nav": "NAV",

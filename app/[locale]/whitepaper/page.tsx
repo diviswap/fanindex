@@ -535,6 +535,29 @@ const SECTIONS = [
 
 export default function WhitepaperPage() {
   const t = useTranslations("whitepaperPage")
+  
+  // Map section IDs to translation keys
+  const sectionKeyMap: Record<string, string> = {
+    "executive-summary": "executiveSummary",
+    "vision": "vision",
+    "market-context": "marketContext",
+    "platform": "platform",
+    "index-architecture": "indexArchitecture",
+    "index-suite": "currentSuite",
+    "future-expansion": "futureExpansion",
+    "pricing-methodology": "pricingMethodology",
+    "nft-infrastructure": "nftInfrastructure",
+    "buy-redeem": "buyRedeem",
+    "rebalancing": "rebalancing",
+    "technical-architecture": "technicalArchitecture",
+    "fee-structure": "feeStructure",
+    "revenue": "revenueAllocation",
+    "governance": "governance",
+    "roadmap": "roadmap",
+    "risks": "risks",
+    "conclusion": "conclusion",
+  }
+  
   return (
     <div className="relative flex w-full flex-col min-h-screen bg-background">
       <NavBar />
@@ -593,7 +616,7 @@ export default function WhitepaperPage() {
                       href={`#${s.id}`}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {s.title}
+                      {t(`sections.${sectionKeyMap[s.id] || s.id}`)}
                     </a>
                   </li>
                 ))}
@@ -609,7 +632,7 @@ export default function WhitepaperPage() {
                   className="scroll-mt-28 border-b border-border/40 pb-16 last:border-0 last:pb-0"
                 >
                   <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground mb-6">
-                    {s.title}
+                    {t(`sections.${sectionKeyMap[s.id] || s.id}`)}
                   </h2>
                   <div className="space-y-4 text-sm leading-relaxed text-muted-foreground [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_h3]:mt-6 [&_h3]:mb-3 [&_ol]:mt-3 [&_ol]:space-y-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_ul]:mt-3 [&_ul]:space-y-2.5 [&_ul]:pl-5 [&_ul]:list-disc [&_strong]:text-foreground [&_strong]:font-semibold [&_a]:text-success [&_a:hover]:underline">
                     {s.content}

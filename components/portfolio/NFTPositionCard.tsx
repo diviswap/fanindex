@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { useTranslations } from "next-intl"
 import { formatUnits } from "viem"
 import useSWR from "swr"
 import { Button } from "@/components/ui/button"
@@ -24,6 +25,7 @@ const VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
 
 export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAddress }: NFTPositionCardProps) {
+  const t = useTranslations("nftPositionCard")
   const { tokenId, indexName, tokenAddresses, tokenAmounts } = holding
   const [showShareModal, setShowShareModal] = useState(false)
 
@@ -124,7 +126,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             </h3>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            <div className="text-xs text-muted-foreground font-medium">Position Value</div>
+            <div className="text-xs text-muted-foreground font-medium">{t("positionValue")}</div>
             <div className="text-xl font-bold text-foreground tabular-nums">
               {chartPrice !== null ? chartPrice.toFixed(4) : hasLivePrices ? totalValueCHZ.toFixed(2) : "--"} CHZ
             </div>
@@ -142,7 +144,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
           <div className="rounded-xl border border-border/60 bg-muted/30 p-2">
             <div className="flex items-center justify-between mb-1 px-1">
               <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                30d Price
+                {t("priceChart")}
               </span>
               {return90d !== null && (
                 <span className={`text-[10px] font-bold tabular-nums ${return90d >= 0 ? "text-success" : "text-destructive"}`}>
@@ -165,7 +167,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
         {/* Token breakdown - Composition */}
         <div className="rounded-xl bg-muted/40 border border-border/60 overflow-hidden">
           <div className="px-3 py-2 border-b border-border/60 bg-muted/30">
-            <span className="text-xs font-semibold text-muted-foreground">Composition</span>
+            <span className="text-xs font-semibold text-muted-foreground">{t("composition")}</span>
           </div>
           <div className="divide-y divide-border/30">
             {tokenRows.map((row) => (
@@ -228,7 +230,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
               className="flex-1 border-success/40 bg-card text-success hover:bg-success/10 hover:text-success hover:border-success font-semibold transition-colors h-9"
             >
               <TrendingUp className="h-3.5 w-3.5 mr-1.5" />
-              Buy More
+              {t("buyMore")}
             </Button>
           )}
           <Button
@@ -238,14 +240,14 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             className="flex-1 border-destructive/40 bg-card text-destructive hover:bg-destructive/10 hover:text-destructive hover:border-destructive font-semibold transition-colors h-9"
           >
             <TrendingDown className="h-3.5 w-3.5 mr-1.5" />
-            Sell
+            {t("sell")}
           </Button>
           <Button
             onClick={() => setShowShareModal(true)}
             variant="outline"
             size="sm"
             className="border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted font-semibold transition-colors h-9 w-9 p-0"
-            title="Share position"
+            title={t("share")}
           >
             <Share2 className="h-3.5 w-3.5" />
           </Button>
@@ -256,7 +258,7 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
             className="inline-flex items-center justify-center gap-1.5 h-9 px-3 rounded-md border border-border bg-card text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted hover:border-border/80 transition-all"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline">View</span>
+            <span className="hidden sm:inline">{t("view")}</span>
           </a>
         </div>
       </div>

@@ -367,6 +367,15 @@
     "title": "Resources & Documentation",
     "description": "Everything you need to understand FanIndex. From getting started to advanced analytics, smart contracts, and institutional-grade portfolio management."
   },
+  "nftPositionCard": {
+    "positionValue": "Position Value",
+    "composition": "Composition",
+    "priceChart": "30d Price",
+    "buyMore": "Buy More",
+    "sell": "Sell",
+    "share": "Share position",
+    "view": "View"
+  },
   "indexCard": {
     "nav": "NAV",
     "constituents": "Constituents",
@@ -619,9 +628,6 @@
       "title": "Premium Features",
       "description": "NFT holders unlock exclusive analytics, governance rights, and market insights."
     },
-    "premiumOwnership": "Premium Index Ownership",
-    "premiumDescription": "Every FanIndex position is represented by an NFT that certifies your ownership and provides access to exclusive benefits."
-  },
   "portfolioAnalytics": {
     "title": "Portfolio & Analytics",
     "description": "Institutional-grade analytics dashboard for professional portfolio management.",
@@ -646,5 +652,47 @@
       "metric": "Institutional-Grade"
     },
     "dashboardComing": "Full dashboard coming soon with real-time market data, PnL tracking, and advanced portfolio insights."
+  },
+  "portfolioPage": {
+    "badge": "Live On-Chain",
+    "title": "Manage Your",
+    "titleHighlight": "Portfolio",
+    "description": "Track your FanIndex positions, holdings, and real-time portfolio allocation.",
+    "trust": {
+      "prices": "Real-Time Prices",
+      "positions": "Active Positions",
+      "updated": "Live Updates"
+    },
+    "howItWorks": {
+      "label": "How It Works",
+      "title": "Getting Started with FanIndex",
+      "steps": {
+        "deposit": {
+          "step": "Step 1",
+          "title": "Deposit CHZ",
+          "description": "Connect your wallet and deposit CHZ to invest in your chosen index."
+        },
+        "receive": {
+          "step": "Step 2",
+          "title": "Receive NFT",
+          "description": "Your position is minted as an NFT, representing your index holdings."
+        },
+        "track": {
+          "step": "Step 3",
+          "title": "Track Performance",
+          "description": "Monitor your portfolio in real-time with live price updates and analytics."
+        },
+        "redeem": {
+          "step": "Step 4",
+          "title": "Redeem Anytime",
+          "description": "Burn your NFT to redeem your position and receive CHZ or underlying assets."
+        }
+      }
+    },
+    "error": {
+      "title": "Something Went Wrong",
+      "description": "We encountered an error loading your portfolio. Please try again.",
+      "refresh": "Refresh Page"
+    }
   }
 }
