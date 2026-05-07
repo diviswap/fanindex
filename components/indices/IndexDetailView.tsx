@@ -13,6 +13,7 @@ import { useIndexNav } from "@/lib/hooks/use-index-nav"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { useReadContract } from "wagmi"
 import useSWR from "swr"
+import { useTranslations } from "next-intl"
 
 interface IndexDetailViewProps {
   index: IndexData
@@ -52,6 +53,7 @@ function returnFromSlice(slice: HistoricalDataPoint[]): number | null {
 }
 
 export function IndexDetailView({ index }: IndexDetailViewProps) {
+  const t = useTranslations("indexDetail")
   const [showBuyDialog, setShowBuyDialog] = useState(false)
   const [timePeriod, setTimePeriod] = useState<"24h" | "7d" | "30d" | "90d">("30d")
 
@@ -279,7 +281,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             className="text-muted-foreground hover:text-foreground hover:bg-accent mb-3 sm:mb-4 text-xs sm:text-sm"
           >
             <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-2" />
-            Back to Indices
+            {t("backToIndices")}
           </Button>
         </Link>
 
@@ -313,7 +315,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             size="lg"
             className="w-full lg:w-auto bg-success hover:bg-success/90 text-black font-semibold px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg"
           >
-            Invest in Index
+            {t("investInIndex")}
           </Button>
         </div>
       </div>
@@ -321,7 +323,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
       <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-6 mb-6 sm:mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
           <div className="flex items-center justify-between sm:justify-start gap-2">
-            <h2 className="text-base sm:text-xl font-bold text-foreground">Price Performance</h2>
+            <h2 className="text-base sm:text-xl font-bold text-foreground">{t("pricePerformance")}</h2>
             {historyLoading && (
               <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             )}
@@ -350,14 +352,14 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="text-sm">Loading chart data...</span>
+                <span className="text-sm">{t("loadingChart")}</span>
               </div>
             </div>
           ) : filteredData.length === 0 ? (
             <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
               <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <Activity className="h-8 w-8" />
-                <span className="text-sm">No data available</span>
+                <span className="text-sm">{t("noDataAvailable")}</span>
               </div>
             </div>
           ) : (
@@ -419,23 +421,23 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
         
         <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-          <span>Data from CoinGecko</span>
-          <span>Updated every 5 min</span>
+          <span>{t("dataFrom")}</span>
+          <span>{t("updatedEvery")}</span>
         </div>
       </Card>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12">
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Market Cap</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("marketCap")}</div>
           <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
             {liveStats ? fmtUSD(liveStats.totalMarketCap) : index.totalValue}
           </div>
           {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">Combined tokens</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("combinedTokens")}</div>
           )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">90d Return</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("return90d")}</div>
           {returns["90d"] === null ? (
             <div className="text-lg sm:text-xl md:text-2xl font-bold text-muted-foreground">--</div>
           ) : (
@@ -447,31 +449,31 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
               {returns["90d"] >= 0 ? "+" : ""}{returns["90d"].toFixed(1)}%
             </div>
           )}
-          <div className="text-xs text-muted-foreground mt-1">Last 90 days</div>
+          <div className="text-xs text-muted-foreground mt-1">{t("last90days")}</div>
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">24h Volume</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("volume24h")}</div>
           <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
             {liveStats ? fmtUSD(liveStats.totalVolume) : "--"}
           </div>
           {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">Combined tokens</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("combinedTokens")}</div>
           )}
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Investors</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("investors")}</div>
           <div className="flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
             <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             {index.holders}
           </div>
         </Card>
         <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">Volatility</div>
+          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("volatility")}</div>
           <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
             {liveStats ? `${liveStats.annualisedVol.toFixed(1)}%` : "--"}
           </div>
           {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">Annualised (7d σ)</div>
+            <div className="text-xs text-muted-foreground mt-1">{t("annualized")}</div>
           )}
         </Card>
       </div>
@@ -480,9 +482,9 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         <Card className="lg:col-span-2 border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4 sm:mb-6">
             <PieChart className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
-            <h2 className="text-xl sm:text-2xl font-bold text-foreground">Asset Allocation</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground">{t("assetAllocation")}</h2>
             <span className="ml-auto text-xs text-muted-foreground">
-              Live from CoinGecko
+              {t("liveFromCoinGecko")}
             </span>
           </div>
 
@@ -521,7 +523,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
                           {price.toFixed(2)} CHZ
                         </div>
                       ) : (
-                        <div className="text-xs text-muted-foreground">Loading...</div>
+                        <div className="text-xs text-muted-foreground">{t("loading")}</div>
                       )}
                     </div>
                   </div>
@@ -538,8 +540,8 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           <Card className="border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
-              <h2 className="text-lg sm:text-xl font-bold text-foreground">Returns</h2>
-              <span className="ml-auto text-xs text-muted-foreground">Live</span>
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">{t("returns")}</h2>
+              <span className="ml-auto text-xs text-muted-foreground">{t("live")}</span>
             </div>
 
             <div className="space-y-3 sm:space-y-4">
@@ -553,35 +555,35 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           <Card className="border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
-              <h2 className="text-lg sm:text-xl font-bold text-foreground">Index Details</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">{t("indexDetails")}</h2>
             </div>
 
             <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
               <div className="flex justify-between py-2 border-b border-border">
-                <span className="text-muted-foreground font-medium">Strategy</span>
+                <span className="text-muted-foreground font-medium">{t("strategy")}</span>
                 <span className="text-foreground font-semibold">{typeLabels[index.type]}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-border">
-                <span className="text-muted-foreground font-medium">Assets</span>
-                <span className="text-foreground font-semibold">{index.tokens.length} Tokens</span>
+                <span className="text-muted-foreground font-medium">{t("assets")}</span>
+                <span className="text-foreground font-semibold">{index.tokens.length} {t("tokensLabel")}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-border">
-                <span className="text-muted-foreground font-medium">Entry Fee</span>
+                <span className="text-muted-foreground font-medium">{t("entryFee")}</span>
                 <span className="text-foreground font-semibold">{feePctLabel}</span>
               </div>
               <div className="flex justify-between py-2 border-b border-border">
-                <span className="text-muted-foreground font-medium">Exit Fee</span>
+                <span className="text-muted-foreground font-medium">{t("exitFee")}</span>
                 <span className="text-foreground font-semibold">0%</span>
               </div>
               {index.type === "managed" && (
                 <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground font-medium">Management Fee</span>
-                  <span className="text-foreground font-semibold">2% annually</span>
+                  <span className="text-muted-foreground font-medium">{t("managementFee")}</span>
+                  <span className="text-foreground font-semibold">2% {t("annually")}</span>
                 </div>
               )}
               <div className="flex justify-between py-2">
-                <span className="text-muted-foreground font-medium">Rebalancing</span>
-                <span className="text-foreground font-semibold">Monthly</span>
+                <span className="text-muted-foreground font-medium">{t("rebalancing")}</span>
+                <span className="text-foreground font-semibold">{t("monthly")}</span>
               </div>
             </div>
           </Card>

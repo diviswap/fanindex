@@ -1,21 +1,21 @@
 {
   "nav": {
     "home": "Inicio",
-    "indices": "Indices",
+    "indices": "Índices",
     "fanTokens": "Fan Tokens",
-    "portfolio": "Portfolio",
+    "portfolio": "Portafolio",
     "whitepaper": "Whitepaper"
   },
   "hero": {
     "badge": "En vivo en Chiliz",
-    "title": "La Capa de Indices para",
+    "title": "La Capa de Índices para",
     "titleHighlight": "Fan Tokens",
-    "description": "Indices deportivos tokenizados, analítica y infraestructura de portfolio para el inversor SportFi moderno.",
-    "exploreIndices": "Explorar Indices",
+    "description": "Índices deportivos tokenizados, analítica y herramientas de portafolio para el inversor SportFi moderno.",
+    "exploreIndices": "Explorar Índices",
     "viewMarket": "Ver Mercado",
     "trust": {
       "onChain": "Infraestructura On-Chain",
-      "nftPositions": "Posiciones en NFT",
+      "nftPositions": "Posiciones NFT",
       "analytics": "Analítica en Tiempo Real"
     }
   },
@@ -25,48 +25,48 @@
     "items": {
       "diversified": {
         "title": "Exposición Diversificada",
-        "description": "Reduce el riesgo de concentración entre equipos y ligas."
+        "description": "Reducí el riesgo de concentración entre equipos y ligas."
       },
       "transparent": {
         "title": "Transparencia On-Chain",
-        "description": "Todas las posiciones de índice son verificables on-chain."
+        "description": "Todas las posiciones del índice son verificables on-chain."
       },
       "professional": {
         "title": "Infraestructura Profesional",
-        "description": "Construido para la participación SportFi a largo plazo."
+        "description": "Diseñado para la participación SportFi a largo plazo."
       }
     }
   },
   "indexFamily": {
-    "label": "Familia de Indices",
+    "label": "Familia de Índices",
     "title": "El Ecosistema FanIndex",
-    "description": "Una familia de índices estructurados profesionalmente que brinda exposición transparente y diversificada al mercado SportFi.",
+    "description": "Una familia de índices estructurados profesionalmente que ofrece exposición transparente y diversificada al mercado SportFi.",
     "constituents": "activos",
     "nav": "NAV",
     "view": "Ver",
     "items": {
       "FTLX": {
-        "title": "Indice de Líderes Fan Token",
+        "title": "Índice de Líderes Fan Token",
         "tagline": "Benchmark",
         "description": "El benchmark insignia que rastrea los fan tokens más grandes y líquidos."
       },
       "FGMX": {
-        "title": "Indice Fan Gaming",
+        "title": "Índice Fan Gaming",
         "tagline": "Esports",
         "description": "Exposición diversificada a las principales organizaciones de esports en Chiliz."
       },
       "FFLX": {
-        "title": "Indice Fan Fight",
+        "title": "Índice Fan Fight",
         "tagline": "Deportes de Combate",
         "description": "Exposición estructurada a las principales organizaciones de deportes de combate."
       },
       "FELX": {
-        "title": "Indice Liga Inglesa",
+        "title": "Índice Liga Inglesa",
         "tagline": "Premier League",
         "description": "Exposición ponderada a los principales clubes de fútbol ingleses."
       },
       "FSLX": {
-        "title": "Indice Liga Española",
+        "title": "Índice Liga Española",
         "tagline": "La Liga",
         "description": "Exposición ponderada a los principales clubes de fútbol españoles."
       }
@@ -75,8 +75,8 @@
   "analytics": {
     "label": "Plataforma de Analítica",
     "title": "Inteligencia de Mercado Fan Token en Tiempo Real",
-    "description": "Datos de mercado institucionales para la economía SportFi. Precios en vivo, capitalización, volumen y métricas de supply en todo el universo de fan tokens.",
-    "openMarket": "Abrir Datos de Mercado",
+    "description": "Datos de mercado de nivel institucional para la economía SportFi. Precios en vivo, capitalización, volumen y métricas de suministro en todo el universo de fan tokens.",
+    "openMarket": "Ver Datos de Mercado",
     "live": "En vivo · Chiliz Mainnet",
     "feed": "Feed CoinGecko · 60s",
     "terminal": "FANINDEX · TERMINAL",
@@ -97,15 +97,15 @@
     }
   },
   "portfolio": {
-    "label": "Infraestructura de Portfolio",
-    "title": "Rastreá tus Posiciones Indexadas",
-    "description": "Cada posición de índice se acuña como un token no fungible, custodiado on-chain. Visualizá, transferí o rescatá tu exposición indexada con transparencia institucional.",
+    "label": "Infraestructura de Portafolio",
+    "title": "Seguí tus Posiciones Indexadas",
+    "description": "Cada posición del índice se acuña como un token no fungible, custodiado on-chain. Visualizá, transferí o rescatá tu exposición indexada con transparencia de nivel institucional.",
     "features": {
       "nft": "Recibos NFT para cada posición indexada",
       "nav": "NAV y P&L en tiempo real desde precios on-chain",
       "redeem": "Rescate atómico hacia activos subyacentes"
     },
-    "openPortfolio": "Abrir Portfolio",
+    "openPortfolio": "Abrir Portafolio",
     "metrics": {
       "value": "Valor del Portfolio",
       "performance": "Rendimiento",
@@ -158,8 +158,8 @@
     "sections": {
       "product": {
         "label": "Producto",
-        "indices": "Indices",
-        "portfolio": "Portfolio",
+        "indices": "Índices",
+        "portfolio": "Portafolio",
         "fanTokens": "Fan Tokens"
       },
       "resources": {
@@ -247,10 +247,10 @@
     }
   },
   "portfolioPage": {
-    "badge": "Seguimiento de Portfolio En Vivo",
+    "badge": "Seguimiento de Portafolio En Vivo",
     "title": "Mi",
-    "titleHighlight": "Portfolio",
-    "description": "Rastreá y gestioná tus posiciones de índice de Fan Tokens con analítica on-chain en tiempo real.",
+    "titleHighlight": "Portafolio",
+    "description": "Seguí y gestioná tus posiciones de índice de Fan Tokens con analítica on-chain en tiempo real.",
     "trust": {
       "prices": "Precios en Tiempo Real",
       "positions": "Posiciones NFT",
@@ -285,18 +285,102 @@
     "confirming": "Confirmando...",
     "view": "Ver"
   },
-  "portfolioAllocationComponent": {
-    "title": "Asignación de Portfolio",
-    "assets_one": "{{count}} activo",
-    "assets_other": "{{count}} activos",
-    "categories_one": "{{count}} categoría",
-    "categories_other": "{{count}} categorías",
+"portfolioAllocationComponent": {
+  "title": "Asignación de Portfolio",
+  "assets_one": "1 activo",
+  "assets_other": "{count} activos",
+  "categories_one": "1 categoría",
+  "categories_other": "{count} categorías",
     "nftPositions": "Posiciones NFT",
     "chzBalance": "Balance CHZ",
     "fanTokens": "Fan Tokens",
     "asset": "activo",
     "assets": "activos",
     "totalValue": "Valor Total"
+  },
+  "buyDialog": {
+    "buyTitle": "Comprar {indexName}",
+    "wrongNetworkWarning": "Tu wallet está conectada a la red incorrecta. Las transacciones requieren Chiliz Mainnet (cadena 88888).",
+    "switchToChiliz": "Cambiar a Chiliz Mainnet",
+    "switching": "Cambiando...",
+    "notDeployed": "Este índice aún no se ha desplegado en Chiliz Mainnet.",
+    "indexComposition": "Composición del Índice",
+    "token": "Token",
+    "weight": "Peso",
+    "estCHZ": "Est. CHZ",
+    "investmentAmount": "Cantidad a Invertir",
+    "minimum": "Mínimo",
+    "tokens": "tokens",
+    "units": "unidades",
+    "pricePerUnit": "Precio por unidad",
+    "protocolFee": "Comisión del protocolo",
+    "netInvestment": "Inversión neta",
+    "youSend": "Enviás",
+    "nftInfo": "Vas a recibir un NFT que representa tu posición. Este NFT se puede canjear en cualquier momento para recibir los Fan Tokens subyacentes.",
+    "belowMinimum": "La cantidad está por debajo del mínimo recomendado. La transacción puede revertir si la liquidez por token es muy baja.",
+    "transactionFailed": "La transacción falló. Por favor, intentá de nuevo.",
+    "waitingWallet": "Esperando a la wallet...",
+    "confirmingOnChain": "Confirmando on-chain...",
+    "completed": "Completado",
+    "confirmPurchase": "Confirmar Compra",
+    "cancel": "Cancelar",
+    "purchaseSuccessful": "¡Compra Exitosa!",
+    "nftMintedToWallet": "Tu NFT de posición se ha acuñado en tu wallet",
+    "index": "Índice",
+    "amountInvested": "Cantidad Invertida",
+    "unitsReceived": "Unidades Recibidas",
+    "totalSent": "Total Enviado",
+    "viewTransaction": "Ver Transacción en Chiliscan",
+    "viewPortfolio": "Ver Portfolio"
+  },
+  "indexDetail": {
+    "backToIndices": "Volver a Índices",
+    "investInIndex": "Invertir en Índice",
+    "pricePerformance": "Rendimiento de Precio",
+    "loadingChart": "Cargando datos del gráfico...",
+    "noDataAvailable": "Sin datos disponibles",
+    "dataFrom": "Datos de CoinGecko",
+    "updatedEvery": "Actualizado cada 5 min",
+    "marketCap": "Cap. de Mercado",
+    "combinedTokens": "Tokens combinados",
+    "return90d": "Retorno 90d",
+    "last90days": "Últimos 90 días",
+    "volume24h": "Volumen 24h",
+    "investors": "Inversores",
+    "volatility": "Volatilidad",
+    "annualized": "Anualizada (7d σ)",
+    "assetAllocation": "Asignación de Activos",
+    "liveFromCoinGecko": "En vivo desde CoinGecko",
+    "loading": "Cargando...",
+    "returns": "Retornos",
+    "live": "En vivo",
+    "indexDetails": "Detalles del Índice",
+    "strategy": "Estrategia",
+    "assets": "Activos",
+    "tokensLabel": "Tokens",
+    "entryFee": "Comisión de Entrada",
+    "exitFee": "Comisión de Salida",
+    "managementFee": "Comisión de Gestión",
+    "annually": "anual",
+    "rebalancing": "Rebalanceo",
+    "monthly": "Mensual"
+  },
+  "fanTokenDetail": {
+    "tokenNotFound": "Token No Encontrado",
+    "tokenNotFoundDesc": "El fan token \"{symbol}\" no pudo encontrarse.",
+    "backToFanTokens": "Volver a Fan Tokens",
+    "currentPrice": "Precio Actual",
+    "marketCap": "Cap. de Mercado",
+    "volume24h": "Volumen 24h",
+    "circulatingSupply": "Suministro Circulante",
+    "totalSupply": "Suministro Total",
+    "supplyDistribution": "Distribución de Suministro",
+    "circulatingTotal": "Circulante / Suministro Total",
+    "ofCHZMarketCap": "% del Cap. de Mercado CHZ",
+    "contractAddresses": "Direcciones de Contratos",
+    "unwrappedToken": "Token Sin Envolver",
+    "wrappedToken": "Token Envuelto",
+    "externalLinks": "Enlaces Externos"
   },
   "whitepaperContent": {
     "executiveSummary": {
@@ -695,7 +779,7 @@
   "portfolioView": {
     "native": "Balance nativo",
     "position": "Posición",
-    "buy": "Comprar Indice",
+    "buy": "Comprar Índice",
     "live": "En vivo",
     "notConnected": "Conectá tu wallet para ver tu portfolio",
     "connectTitle": "Conectá tu Wallet",
@@ -717,8 +801,8 @@
     "noPositionsDescription": "Comprá tu primer NFT de FanIndex abajo para empezar a rastrear tu portfolio en cadena.",
     "fanTokens": "Fan Tokens",
     "readingBalances": "Leyendo balances desde Chiliz...",
-    "tokensInWallet_one": "{{count}} token en la wallet",
-    "tokensInWallet_other": "{{count}} tokens en la wallet",
+    "tokensInWallet_one": "1 token en la wallet",
+    "tokensInWallet_other": "{count} tokens en la wallet",
     "noFanTokensTitle": "Sin fan tokens aún",
     "noFanTokensDescription": "No tenés fan tokens en tu wallet. Visitá la página de Fan Tokens para explorar los disponibles.",
     "availableIndices": "Índices Disponibles",
@@ -770,9 +854,9 @@
     }
   },
   "liveIndices": {
-    "title": "Indices Disponibles",
-    "description": "Índices preestablecidos disponibles para inversión. Seleccioná un índice y comenzá a diversificar tu portfolio hoy.",
-    "index": "Indice",
+    "title": "Índices Disponibles",
+    "description": "Índices preestablecidos disponibles para inversión. Seleccioná un índice y comenzá a diversificar tu portafolio hoy.",
+    "index": "Índice",
     "type": "Tipo",
     "nav": "NAV",
     "assets": "Activos",
@@ -853,7 +937,7 @@
     "contractVerDesc": "Todos los contratos verificados on-chain con código fuente y artefactos de compilación.",
     "verify": "Verificar",
     "indexContracts": "Direcciones de Contrato de Índices",
-    "indexName": "Indice",
+    "indexName": "Índice",
     "vaultContract": "Contrato de Bóveda",
     "nftContract": "Contrato NFT"
   },

@@ -20,12 +20,14 @@ import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 
 const CHZ_MARKET_CAP = 301580000
 const CHZ_CIRCULATING_SUPPLY = 10106836844
 const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY
 
 export default function FanTokenDetailPage() {
+  const t = useTranslations("fanTokenDetail")
   const params = useParams()
   const router = useRouter()
   const symbol = (params.symbol as string)?.toUpperCase()
@@ -97,11 +99,11 @@ export default function FanTokenDetailPage() {
         <WebGLShader />
         <NavBar />
         <main className="relative z-10 w-full mx-auto max-w-7xl px-4 py-32 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Token Not Found</h1>
-          <p className="text-muted-foreground mb-8">The fan token "{symbol}" could not be found.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">{t("tokenNotFound")}</h1>
+          <p className="text-muted-foreground mb-8">{t("tokenNotFoundDesc", { symbol })}</p>
           <Button onClick={() => router.push("/fan-tokens")} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Fan Tokens
+            {t("backToFanTokens")}
           </Button>
         </main>
         <Footer />
@@ -126,7 +128,7 @@ export default function FanTokenDetailPage() {
           className="mb-6 -ml-2 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Fan Tokens
+          {t("backToFanTokens")}
         </Button>
 
         {/* Header */}
@@ -170,7 +172,7 @@ export default function FanTokenDetailPage() {
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
               <div>
-                <div className="text-sm text-muted-foreground mb-1">Current Price</div>
+                <div className="text-sm text-muted-foreground mb-1">{t("currentPrice")}</div>
                 <div className="text-3xl sm:text-4xl font-bold text-foreground">
                   {priceInCHZ.toFixed(4)} <span className="text-lg text-muted-foreground">CHZ</span>
                 </div>
@@ -216,7 +218,7 @@ export default function FanTokenDetailPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <Card className="bg-card/50 backdrop-blur border-border">
             <CardContent className="p-4">
-              <div className="text-xs text-muted-foreground mb-1">Market Cap</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("marketCap")}</div>
               <div className="text-lg font-bold text-foreground">
                 {formatNumberInCHZ(token.marketCap)} CHZ
               </div>
@@ -227,7 +229,7 @@ export default function FanTokenDetailPage() {
           </Card>
           <Card className="bg-card/50 backdrop-blur border-border">
             <CardContent className="p-4">
-              <div className="text-xs text-muted-foreground mb-1">24h Volume</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("volume24h")}</div>
               <div className="text-lg font-bold text-foreground">
                 {formatNumberInCHZ(token.volume)} CHZ
               </div>
@@ -238,7 +240,7 @@ export default function FanTokenDetailPage() {
           </Card>
           <Card className="bg-card/50 backdrop-blur border-border">
             <CardContent className="p-4">
-              <div className="text-xs text-muted-foreground mb-1">Circulating Supply</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("circulatingSupply")}</div>
               <div className="text-lg font-bold text-foreground">
                 {formatNumber(token.circulatingSupply)}
               </div>
@@ -249,7 +251,7 @@ export default function FanTokenDetailPage() {
           </Card>
           <Card className="bg-card/50 backdrop-blur border-border">
             <CardContent className="p-4">
-              <div className="text-xs text-muted-foreground mb-1">Total Supply</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("totalSupply")}</div>
               <div className="text-lg font-bold text-foreground">
                 {formatNumber(token.totalSupply)}
               </div>
@@ -263,12 +265,12 @@ export default function FanTokenDetailPage() {
         {/* Supply Info */}
         <Card className="mb-6 bg-card/50 backdrop-blur border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Supply Distribution</CardTitle>
+            <CardTitle className="text-lg">{t("supplyDistribution")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-muted-foreground">Circulating / Total Supply</span>
+                <span className="text-muted-foreground">{t("circulatingTotal")}</span>
                 <span className="font-medium text-foreground">{token.percentOfSupply}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -279,7 +281,7 @@ export default function FanTokenDetailPage() {
               </div>
             </div>
             <div className="flex justify-between text-sm pt-2 border-t border-border">
-              <span className="text-muted-foreground">% of CHZ Market Cap</span>
+              <span className="text-muted-foreground">{t("ofCHZMarketCap")}</span>
               <span className="font-medium text-success">
                 {((Number.parseFloat(token.marketCap.replace(/,/g, "")) / CHZ_MARKET_CAP) * 100).toFixed(4)}%
               </span>
@@ -291,13 +293,13 @@ export default function FanTokenDetailPage() {
         {(token.unwrapped || token.wrapped) && (
           <Card className="mb-6 bg-card/50 backdrop-blur border-border">
             <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Contract Addresses</CardTitle>
+              <CardTitle className="text-lg">{t("contractAddresses")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {token.unwrapped && (
                 <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
                   <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground mb-1">Unwrapped Token</div>
+                    <div className="text-xs text-muted-foreground mb-1">{t("unwrappedToken")}</div>
                     <div className="text-sm font-mono text-foreground truncate">
                       {token.unwrapped}
                     </div>
@@ -335,7 +337,7 @@ export default function FanTokenDetailPage() {
               {token.wrapped && (
                 <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
                   <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground mb-1">Wrapped Token</div>
+                    <div className="text-xs text-muted-foreground mb-1">{t("wrappedToken")}</div>
                     <div className="text-sm font-mono text-foreground truncate">
                       {token.wrapped}
                     </div>
@@ -377,7 +379,7 @@ export default function FanTokenDetailPage() {
         {/* External Links */}
         <Card className="bg-card/50 backdrop-blur border-border">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg">External Links</CardTitle>
+            <CardTitle className="text-lg">{t("externalLinks")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-3">

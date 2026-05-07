@@ -57,7 +57,7 @@ export function NFTPositionsSection() {
           <div className="flex items-center justify-center md:order-2">
             <div className="relative w-full">
               <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/NFT-Docs-G66a0Ti7CsGjpvtj8A1XACOUOohPin.png"
+                src="/images/NFT-Resources.png"
                 alt="FanIndex NFT Position"
                 width={600}
                 height={750}

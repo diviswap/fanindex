@@ -20,6 +20,7 @@ import type { IndexData } from "./IndexCard"
 import { Loader2, CheckCircle2, XCircle, TrendingUp, Wallet, Info, ExternalLink, Trophy, Coins, AlertTriangle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
+import { useTranslations } from "next-intl"
 
 const CHILIZ_MAINNET_ID = chiliz.id // 88888
 
@@ -33,6 +34,7 @@ interface BuyIndexDialogProps {
 }
 
 export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice }: BuyIndexDialogProps) {
+  const t = useTranslations("buyDialog")
   // Use live price when available; fall back to static index.price.
   // Either way, ensure we never show "0" — use a sensible placeholder.
   const effectivePrice = (() => {
@@ -309,40 +311,40 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-success">Purchase Successful!</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-success">{t("purchaseSuccessful")}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                    Your position NFT has been minted to your wallet
+                    {t("nftMintedToWallet")}
                   </p>
                 </div>
               </div>
 
               <div className="rounded-xl border-2 border-success/30 bg-card/95 backdrop-blur-sm p-3 sm:p-5 space-y-3">
                 <div className="flex justify-between items-center pb-2 border-b border-border">
-                  <span className="text-xs sm:text-sm text-muted-foreground">Index</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{t("index")}</span>
                   <span className="text-sm sm:text-base font-bold text-foreground">{index.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-muted-foreground">Amount Invested</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{t("amountInvested")}</span>
                   <span className="text-sm font-semibold">{purchaseDetails.amount} CHZ</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-muted-foreground">Units Received</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{t("unitsReceived")}</span>
                   <span className="text-sm font-semibold text-success">{purchaseDetails.units.toFixed(4)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-xs sm:text-sm text-muted-foreground">
-                    Protocol Fee ({purchaseDetails.feePctLabel}%)
+                    {t("protocolFee")} ({purchaseDetails.feePctLabel}%)
                   </span>
                   <span className="text-sm font-semibold">- {purchaseDetails.fee.toFixed(4)} CHZ</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-xs sm:text-sm text-muted-foreground">Net Investment</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{t("netInvestment")}</span>
                   <span className="text-sm font-semibold text-success">
                     {(Number.parseFloat(purchaseDetails.amount) - purchaseDetails.fee).toFixed(4)} CHZ
                   </span>
                 </div>
                 <div className="pt-2 border-t border-border flex justify-between items-center">
-                  <span className="text-sm font-bold">Total Sent</span>
+                  <span className="text-sm font-bold">{t("totalSent")}</span>
                   <span className="text-base font-bold text-success">
                     {Number.parseFloat(purchaseDetails.amount).toFixed(4)} CHZ
                   </span>
@@ -357,7 +359,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                       className="flex items-center justify-center gap-2 text-xs sm:text-sm text-success hover:text-success/80 transition-colors font-medium"
                     >
                       <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
-                      View Transaction on Chiliscan
+                      {t("viewTransaction")}
                     </a>
                   </div>
                 )}
@@ -367,7 +369,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                 onClick={handleViewPortfolio}
                 className="w-full bg-success hover:bg-success/90 text-black font-bold h-10"
               >
-                View Portfolio
+                {t("viewPortfolio")}
               </Button>
             </div>
           </div>
@@ -380,7 +382,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
                 </div>
                 <div>
-                  <DialogTitle className="text-lg sm:text-xl md:text-2xl">Buy {index.name}</DialogTitle>
+                  <DialogTitle className="text-lg sm:text-xl md:text-2xl">{t("buyTitle", { indexName: index.name })}</DialogTitle>
                   <DialogDescription className="text-muted-foreground text-xs sm:text-sm mt-0.5">
                     {index.description}
                   </DialogDescription>
@@ -396,7 +398,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-yellow-500 shrink-0" />
                     <p className="text-xs font-medium text-yellow-500">
-                      Your wallet is connected to the wrong network. Transactions require Chiliz Mainnet (chain 88888).
+                      {t("wrongNetworkWarning")}
                     </p>
                   </div>
                   <Button
@@ -406,9 +408,9 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                     disabled={isSwitching}
                   >
                     {isSwitching ? (
-                      <><Loader2 className="h-3 w-3 animate-spin mr-1" />Switching...</>
+                      <><Loader2 className="h-3 w-3 animate-spin mr-1" />{t("switching")}</>
                     ) : (
-                      "Switch to Chiliz Mainnet"
+                      t("switchToChiliz")
                     )}
                   </Button>
                 </div>
@@ -419,7 +421,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <Info className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-500 shrink-0" />
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    This index is not yet deployed on Chiliz Mainnet.
+                    {t("notDeployed")}
                   </p>
                 </div>
               )}
@@ -429,12 +431,12 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                 <div className="rounded-xl border border-border/60 bg-muted/40 overflow-hidden">
                   <div className="px-3 py-2 border-b border-border/60 flex items-center gap-2">
                     <Coins className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Index Composition</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("indexComposition")}</span>
                   </div>
                   <div className="grid grid-cols-3 px-3 py-1.5 border-b border-border/40">
-                    <span className="text-xs font-medium text-muted-foreground">Token</span>
-                    <span className="text-xs font-medium text-muted-foreground text-center">Weight</span>
-                    <span className="text-xs font-medium text-muted-foreground text-right">Est. CHZ</span>
+                    <span className="text-xs font-medium text-muted-foreground">{t("token")}</span>
+                    <span className="text-xs font-medium text-muted-foreground text-center">{t("weight")}</span>
+                    <span className="text-xs font-medium text-muted-foreground text-right">{t("estCHZ")}</span>
                   </div>
                   {compositionRows.map((row) => (
                     <div
@@ -474,7 +476,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
               <div className="space-y-2">
                 <Label htmlFor="amount" className="text-xs sm:text-sm font-medium flex items-center gap-2">
                   <Wallet className="h-3 w-3 sm:h-4 sm:w-4" />
-                  Investment Amount
+                  {t("investmentAmount")}
                 </Label>
                 <div className="relative">
                   <Input
@@ -492,19 +494,19 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <p className="text-muted-foreground">
-                    Minimum: {effectiveMinCHZ.toFixed(effectiveMinCHZ >= 100 ? 0 : 2)} CHZ
+                    {t("minimum")}: {effectiveMinCHZ.toFixed(effectiveMinCHZ >= 100 ? 0 : 2)} CHZ
                     {tokenCount >= 5 && (
                       <span className="ml-1 text-muted-foreground/70">
-                        ({tokenCount} tokens)
+                        ({tokenCount} {t("tokens")})
                       </span>
                     )}
                   </p>
-                  {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} units</p>}
+                  {estimatedUnits > 0 && <p className="text-success">≈ {estimatedUnits.toFixed(4)} {t("units")}</p>}
                 </div>
                 {belowMinimum && (
                   <p className="text-xs text-yellow-500 flex items-center gap-1">
                     <AlertTriangle className="h-3 w-3" />
-                    Amount is below the recommended minimum. The transaction may revert if liquidity per token is too thin.
+                    {t("belowMinimum")}
                   </p>
                 )}
               </div>
@@ -512,19 +514,19 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
               {/* Summary */}
               <div className="rounded-xl border bg-muted/50 p-3 sm:p-5 space-y-2">
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Price per unit</span>
+                  <span className="text-muted-foreground">{t("pricePerUnit")}</span>
                   <span className="font-semibold">{effectivePrice} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Protocol fee ({feePctLabel}%)</span>
+                  <span className="text-muted-foreground">{t("protocolFee")} ({feePctLabel}%)</span>
                   <span className="font-semibold">- {entryFee.toFixed(4)} CHZ</span>
                 </div>
                 <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Net investment</span>
+                  <span className="text-muted-foreground">{t("netInvestment")}</span>
                   <span className="font-semibold text-success">{netInvestment.toFixed(4)} CHZ</span>
                 </div>
                 <div className="border-t pt-2 flex justify-between items-center">
-                  <span className="text-sm font-bold">You send</span>
+                  <span className="text-sm font-bold">{t("youSend")}</span>
                   <span className="text-success font-bold text-base sm:text-lg">
                     {amount ? Number.parseFloat(amount).toFixed(4) : "0.0000"} CHZ
                   </span>
@@ -534,8 +536,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
               <div className="flex items-start gap-2 p-2 sm:p-3 rounded-lg bg-success/10 border border-success/20">
                 <Info className="h-3 w-3 sm:h-4 sm:w-4 text-success mt-0.5 shrink-0" />
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  You will receive an NFT representing your position. This NFT can be redeemed at any time to receive
-                  the underlying Fan Tokens.
+                  {t("nftInfo")}
                 </p>
               </div>
 
@@ -543,7 +544,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
               {error && (
                 <div className="flex items-center gap-2 p-2 sm:p-3 rounded-lg bg-destructive/10 border border-destructive/30 animate-in fade-in slide-in-from-top-2">
                   <XCircle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0" />
-                  <p className="text-xs sm:text-sm text-destructive">Transaction failed. Please try again.</p>
+                  <p className="text-xs sm:text-sm text-destructive">{t("transactionFailed")}</p>
                 </div>
               )}
 
@@ -566,20 +567,20 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   {isPending ? (
                     <>
                       <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
-                      Waiting for wallet...
+                      {t("waitingWallet")}
                     </>
                   ) : isConfirming ? (
                     <>
                       <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-2" />
-                      Confirming on-chain...
+                      {t("confirmingOnChain")}
                     </>
                   ) : isSuccess ? (
                     <>
                       <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
-                      Completed
+                      {t("completed")}
                     </>
                   ) : (
-                    "Confirm Purchase"
+                    t("confirmPurchase")
                   )}
                 </Button>
                 <Button
@@ -588,7 +589,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
                   disabled={isPending || isConfirming}
                   className="text-sm sm:text-base h-9 sm:h-11 bg-transparent"
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               </div>
             </div>
