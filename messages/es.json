@@ -101,13 +101,13 @@
     "title": "Seguí tus Posiciones Indexadas",
     "description": "Cada posición del índice se acuña como un token no fungible, custodiado on-chain. Visualizá, transferí o rescatá tu exposición indexada con transparencia de nivel institucional.",
     "features": {
-      "nft": "Recibos NFT para cada posición indexada",
-      "nav": "NAV y P&L en tiempo real desde precios on-chain",
-      "redeem": "Rescate atómico hacia activos subyacentes"
+      "nft": "Recibos NFT por cada posición indexada",
+      "nav": "NAV y P&L en tiempo real con precios on-chain",
+      "redeem": "Rescate atómico hacia los activos subyacentes"
     },
     "openPortfolio": "Abrir Portafolio",
     "metrics": {
-      "value": "Valor del Portfolio",
+      "value": "Valor del Portafolio",
       "performance": "Rendimiento",
       "positions": "Posiciones Activas",
       "chain": "Estado de Red",
@@ -153,7 +153,7 @@
     "readWhitepaper": "Leer Whitepaper"
   },
   "footer": {
-    "description": "La primera plataforma similar a ETF para Fan Tokens. Diversificá tu portfolio entre ligas y equipos en la Chiliz Chain.",
+    "description": "La primera plataforma tipo ETF para Fan Tokens. Diversificá tu portafolio entre ligas y equipos en Chiliz Chain.",
     "copyright": "Todos los derechos reservados.",
     "sections": {
       "product": {
@@ -190,21 +190,29 @@
     "connected": {
       "chain": "Chiliz Chain",
       "address": "Dirección",
-      "balance": "Balance",
-      "myPortfolio": "Mi Portfolio",
-      "viewExplorer": "Ver en Explorer",
+      "balance": "Saldo",
+      "myPortfolio": "Mi Portafolio",
+      "viewExplorer": "Ver en el Explorador",
       "disconnect": "Desconectar",
       "disconnected": "Wallet desconectada",
-      "copied": "Dirección copiada al portapapeles"
+      "copied": "Dirección copiada"
     }
   },
+  "marketOverview": {
+    "indicesLive": "Índices En Vivo",
+    "indicesLiveSub": "{up} al alza · {down} a la baja",
+    "avg24h": "Promedio 24h",
+    "avg24hSub": "Entre todos los índices",
+    "top24h": "Mejor 24h",
+    "worst24h": "Peor 24h"
+  },
   "indicesPage": {
-    "badge": "Indices de Tokens Deportivos En Vivo",
-    "title": "Indices de",
+    "badge": "Índices de Tokens Deportivos En Vivo",
+    "title": "Índices de",
     "titleHighlight": "Fan Tokens",
     "description": "Exposición diversificada a la economía de tokens deportivos. En vivo, on-chain y rebalanceada.",
     "strategies": {
-      "label": "Estrategias de Indices",
+      "label": "Estrategias de Inversión",
       "title": "Tres Enfoques para Exposición SportFi",
       "weighted": {
         "title": "Ponderado",
@@ -221,8 +229,8 @@
     },
     "methodology": {
       "label": "Metodología",
-      "title": "Cómo Se Calculan los Precios de los Indices",
-      "description": "Todos los productos FanIndex usan una fórmula de precios ponderada, transparente y on-chain. Los precios de mercado se obtienen en tiempo real de CoinGecko y se actualizan continuamente.",
+      "title": "Cómo se Calculan los Precios de los Índices",
+      "description": "Todos los productos FanIndex usan una fórmula de precios ponderada, transparente y on-chain. Los precios de mercado se obtienen en tiempo real de CoinGecko y se actualizan de forma continua.",
       "rebalance": { "label": "Frecuencia de Rebalanceo", "value": "Periódico", "sub": "Ejecutado manualmente por el equipo FanIndex con automatización futura planificada" },
       "price": { "label": "Fuente de Precio", "value": "CoinGecko", "sub": "Precios de mercado en vivo obtenidos de la API de CoinGecko en tiempo real" },
       "fee": { "label": "Comisión de Entrada", "value": "1%", "sub": "Tarifa de protocolo aplicada en cada compra — sin comisión de salida" },
@@ -230,8 +238,8 @@
     },
     "roadmap": {
       "label": "Hoja de Ruta",
-      "title": "Expansión Futura de Indices",
-      "description": "La suite FanIndex crecerá para cubrir cada segmento importante de la economía global de tokens deportivos.",
+      "title": "Expansión Futura de Índices",
+      "description": "La suite de FanIndex crecerá para cubrir cada segmento relevante de la economía global de tokens deportivos.",
       "items": [
         "Liga Italiana",
         "Liga Turca",
@@ -250,7 +258,7 @@
     "badge": "Seguimiento de Portafolio En Vivo",
     "title": "Mi",
     "titleHighlight": "Portafolio",
-    "description": "Seguí y gestioná tus posiciones de índice de Fan Tokens con analítica on-chain en tiempo real.",
+    "description": "Seguí y gestioná tus posiciones de índices de Fan Tokens con analítica on-chain en tiempo real.",
     "trust": {
       "prices": "Precios en Tiempo Real",
       "positions": "Posiciones NFT",
@@ -258,41 +266,41 @@
     },
     "howItWorks": {
       "label": "Cómo Funciona",
-      "title": "Infraestructura de Posiciones Basada en NFT",
+      "title": "Posiciones Respaldadas por NFT",
       "steps": {
-        "deposit": { "step": "01", "title": "Depositá CHZ", "description": "Seleccioná un índice y depositá CHZ. Los contratos inteligentes ejecutan compras proporcionales de todos los Fan Tokens subyacentes automáticamente." },
-        "receive": { "step": "02", "title": "Recibí un NFT", "description": "Un NFT único se acuña en tu wallet. Certifica tu posición: tipo de índice, valor depositado, datos de asignación y marca de tiempo." },
-        "track": { "step": "03", "title": "Seguí el Rendimiento", "description": "Monitoreá tus posiciones, asignaciones y exposición en tiempo real directamente on-chain con total transparencia." },
-        "redeem": { "step": "04", "title": "Rescatá en Cualquier Momento", "description": "Quemá tu NFT para rescatar. El protocolo vende el portfolio subyacente y devuelve CHZ a tu wallet — sin comisión de salida." }
+        "deposit": { "step": "01", "title": "Depositá CHZ", "description": "Elegí un índice y depositá CHZ. Los contratos inteligentes ejecutan automáticamente las compras proporcionales de todos los Fan Tokens subyacentes." },
+        "receive": { "step": "02", "title": "Recibí un NFT", "description": "Se acuña un NFT único en tu wallet. Certifica tu posición: tipo de índice, valor depositado, asignación y marca de tiempo." },
+        "track": { "step": "03", "title": "Seguí el Rendimiento", "description": "Monitoreá tus posiciones, asignaciones y exposición en tiempo real directamente on-chain, con total transparencia." },
+        "redeem": { "step": "04", "title": "Rescatá Cuando Quieras", "description": "Quemá tu NFT para rescatar. El protocolo liquida el portafolio subyacente y te devuelve CHZ — sin comisión de salida." }
       }
     },
     "error": {
       "title": "Algo Salió Mal",
-      "description": "Encontramos un error al cargar tu portfolio. Por favor, intentá de nuevo.",
+      "description": "Hubo un error al cargar tu portafolio. Por favor, intentá de nuevo.",
       "refresh": "Recargar Página"
     }
   },
   "transactionHistory": {
     "title": "Historial de Transacciones",
     "liveLabel": "En vivo",
-    "txCount_one": "{{count}} transacción",
-    "txCount_other": "{{count}} transacciones",
+    "txCount_one": "1 transacción",
+    "txCount_other": "{count} transacciones",
     "emptyDescription": "Las transacciones aparecerán aquí después de comprar o vender",
-    "noTransactions": "Sin transacciones aún",
-    "noTransactionsHint": "Comprá o vendé una posición para ver tu historial de transacciones",
-    "justNow": "Ahora mismo",
+    "noTransactions": "Aún no hay transacciones",
+    "noTransactionsHint": "Comprá o vendé una posición para ver tu historial",
+    "justNow": "Ahora",
     "block": "Bloque",
     "confirming": "Confirmando...",
     "view": "Ver"
   },
-"portfolioAllocationComponent": {
-  "title": "Asignación de Portfolio",
-  "assets_one": "1 activo",
-  "assets_other": "{count} activos",
-  "categories_one": "1 categoría",
-  "categories_other": "{count} categorías",
+  "portfolioAllocationComponent": {
+    "title": "Asignación del Portafolio",
+    "assets_one": "1 activo",
+    "assets_other": "{count} activos",
+    "categories_one": "1 categoría",
+    "categories_other": "{count} categorías",
     "nftPositions": "Posiciones NFT",
-    "chzBalance": "Balance CHZ",
+    "chzBalance": "Saldo CHZ",
     "fanTokens": "Fan Tokens",
     "asset": "activo",
     "assets": "activos",
@@ -363,7 +371,15 @@
     "managementFee": "Comisión de Gestión",
     "annually": "anual",
     "rebalancing": "Rebalanceo",
-    "monthly": "Mensual"
+    "monthly": "Mensual",
+    "period24h": "24h",
+    "period7d": "7d",
+    "period30d": "30d",
+    "period90d": "90d",
+    "return24h": "Retorno 24h",
+    "return7d": "Retorno 7d",
+    "return30d": "Retorno 30d",
+    "noReturn": "Sin datos"
   },
   "fanTokenDetail": {
     "tokenNotFound": "Token No Encontrado",
@@ -692,7 +708,7 @@
   "resourcesHero": {
     "backToHome": "Volver al inicio",
     "title": "Recursos y Documentación",
-    "description": "Todo lo que necesitás saber sobre FanIndex. Desde primeros pasos hasta analítica avanzada, contratos inteligentes y gestión de portfolio institucional."
+    "description": "Todo lo que necesitás saber sobre FanIndex: desde los primeros pasos hasta analítica avanzada, contratos inteligentes y gestión institucional de portafolio."
   },
   "nftPositionCard": {
     "positionValue": "Valor de Posición",
@@ -781,12 +797,12 @@
     "position": "Posición",
     "buy": "Comprar Índice",
     "live": "En vivo",
-    "notConnected": "Conectá tu wallet para ver tu portfolio",
+    "notConnected": "Conectá tu wallet para ver tu portafolio",
     "connectTitle": "Conectá tu Wallet",
-    "connectDescription": "Conectá tu wallet para ver tu portfolio, seguir tus posiciones y gestionar tus inversiones en fan tokens.",
-    "totalValue": "Valor Total del Portfolio",
+    "connectDescription": "Conectá tu wallet para ver tu portafolio, seguir tus posiciones y gestionar tus inversiones en fan tokens.",
+    "totalValue": "Valor Total del Portafolio",
     "share": "Compartir",
-    "chzBalance": "Balance CHZ",
+    "chzBalance": "Saldo CHZ",
     "nativeLabel": "Nativo",
     "activeNFTs": "NFTs Activos",
     "positionsLabel": "Posiciones",
@@ -794,44 +810,44 @@
     "chainId": "Chain ID 88888",
     "myNFTPositions": "Mis Posiciones NFT",
     "readingChain": "Leyendo desde Chiliz Mainnet...",
-    "positionsOnChain_one": "{{count}} posición en cadena",
-    "positionsOnChain_other": "{{count}} posiciones en cadena",
+    "positionsOnChain_one": "1 posición on-chain",
+    "positionsOnChain_other": "{count} posiciones on-chain",
     "refresh": "Actualizar",
-    "noPositionsTitle": "Sin posiciones aún",
-    "noPositionsDescription": "Comprá tu primer NFT de FanIndex abajo para empezar a rastrear tu portfolio en cadena.",
+    "noPositionsTitle": "Todavía no tenés posiciones",
+    "noPositionsDescription": "Comprá tu primer NFT de FanIndex más abajo para empezar a seguir tu portafolio on-chain.",
     "fanTokens": "Fan Tokens",
-    "readingBalances": "Leyendo balances desde Chiliz...",
+    "readingBalances": "Leyendo saldos desde Chiliz...",
     "tokensInWallet_one": "1 token en la wallet",
     "tokensInWallet_other": "{count} tokens en la wallet",
-    "noFanTokensTitle": "Sin fan tokens aún",
+    "noFanTokensTitle": "Todavía no tenés fan tokens",
     "noFanTokensDescription": "No tenés fan tokens en tu wallet. Visitá la página de Fan Tokens para explorar los disponibles.",
     "availableIndices": "Índices Disponibles",
     "availableIndicesDescription": "Invertí en índices on-chain en vivo en la red Chiliz"
   },
   "gettingStarted": {
     "title": "Primeros Pasos",
-    "description": "Todo lo que necesitás saber para comenzar tu viaje con FanIndex.",
+    "description": "Todo lo que necesitás saber para empezar tu recorrido con FanIndex.",
     "items": {
       "whatAreIndices": {
-        "title": "¿Qué son los Indices?",
-        "description": "Entendé el enfoque de FanIndex para inversión cripto diversificada. Aprendé cómo funcionan los índices ponderados y por qué son esenciales para la gestión de portfolio."
+        "title": "¿Qué son los Índices?",
+        "description": "Entendé el enfoque de FanIndex para la inversión cripto diversificada. Aprendé cómo funcionan los índices ponderados y por qué son clave para gestionar un portafolio."
       },
       "understanding": {
         "title": "Entendiendo la Composición",
-        "description": "Aprendé cómo la composición del índice afecta los retornos. Profundizá en rebalanceo, esquemas de ponderación y restricciones de liquidez."
+        "description": "Aprendé cómo la composición del índice impacta los retornos. Explorá el rebalanceo, los esquemas de ponderación y las restricciones de liquidez."
       },
       "bestPractices": {
-        "title": "Mejores Prácticas de Portfolio",
-        "description": "Consejos para gestionar un portfolio exitoso. Gestión de riesgo, estrategias de diversificación y optimización de rendimiento."
+        "title": "Buenas Prácticas de Portafolio",
+        "description": "Consejos para gestionar un portafolio exitoso: gestión de riesgo, estrategias de diversificación y optimización del rendimiento."
       },
       "startInvesting": {
-        "title": "Comenzá a Invertir",
-        "description": "Invertí en índices preestablecidos o explorá opciones disponibles. Comenzá tu viaje con FanIndex en solo unos pocos clics."
+        "title": "Empezá a Invertir",
+        "description": "Invertí en índices predefinidos o explorá las opciones disponibles. Empezá tu experiencia con FanIndex en pocos clics."
       }
     }
   },
   "methodology": {
-    "title": "Metodología de Indices",
+    "title": "Metodología de Índices",
     "description": "Construcción de índices de nivel profesional inspirada en la gestión de activos tradicional.",
     "pricingFormula": "Fórmula de Precios",
     "pricingDescription": "El Valor Activo Neto (NAV) de cada índice se calcula como la suma de precios de activos ponderados:",
@@ -863,7 +879,7 @@
     "action": "Acción",
     "invest": "Invertir",
     "chz": "CHZ",
-    "browseAll": "Ver Todos los Indices"
+    "browseAll": "Ver Todos los Índices"
   },
   "fees": {
     "title": "Comisiones y Precios",
@@ -1008,7 +1024,7 @@
       },
       "phase2": {
         "0": "Panel de analítica avanzada",
-        "1": "Lanzamiento de aplicación móvil",
+        "1": "Lanzamiento de aplicaci��n móvil",
         "2": "Configuración de gobernanza DAO",
         "3": "API para desarrolladores"
       },

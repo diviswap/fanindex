@@ -198,8 +198,16 @@
       "copied": "Address copied to clipboard"
     }
   },
+  "marketOverview": {
+    "indicesLive": "Indices Live",
+    "indicesLiveSub": "{up} up · {down} down",
+    "avg24h": "Avg 24h",
+    "avg24hSub": "Across all indices",
+    "top24h": "Top 24h",
+    "worst24h": "Worst 24h"
+  },
   "indicesPage": {
-    "badge": "Live Sports Token Indices",
+  "badge": "Live Sports Token Indices",
     "title": "Fan Token",
     "titleHighlight": "Indices",
     "description": "Diversified exposure to the sports token economy. Live, on-chain, and rebalanced.",
@@ -952,7 +960,15 @@
     "managementFee": "Management Fee",
     "annually": "annually",
     "rebalancing": "Rebalancing",
-    "monthly": "Monthly"
+    "monthly": "Monthly",
+    "period24h": "24h",
+    "period7d": "7d",
+    "period30d": "30d",
+    "period90d": "90d",
+    "return24h": "24h Return",
+    "return7d": "7d Return",
+    "return30d": "30d Return",
+    "noReturn": "No data"
   },
   "fanTokenDetail": {
     "tokenNotFound": "Token Not Found",

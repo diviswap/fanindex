@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import useSWR from "swr"
+import { useTranslations } from "next-intl"
 import { TrendingUp, TrendingDown, Layers, Activity } from "lucide-react"
 import type { IndexData } from "./IndexCard"
 
@@ -24,6 +25,7 @@ interface PerIndexStats {
  * exactly so totals are coherent with what the user sees below.
  */
 export function MarketOverview({ indices }: MarketOverviewProps) {
+  const t = useTranslations("marketOverview")
   // Build per-index stats by reading the same SWR cache the cards use.
   // Each index has its own SWR call here — when the cards mount they will
   // share the same cache key, so this is essentially free network-wise.
@@ -52,19 +54,19 @@ export function MarketOverview({ indices }: MarketOverviewProps) {
     icon: React.ComponentType<{ className?: string }>
   }[] = [
     {
-      label: "Indices Live",
+      label: t("indicesLive"),
       value: indices.length.toString(),
-      sub: `${aggregate.gainers ?? 0} up · ${aggregate.losers ?? 0} down`,
+      sub: t("indicesLiveSub", { up: aggregate.gainers ?? 0, down: aggregate.losers ?? 0 }),
       tone: "neutral",
       icon: Layers,
     },
     {
-      label: "Avg 24h",
+      label: t("avg24h"),
       value:
         aggregate.avg === null
           ? "—"
           : `${aggregate.avg >= 0 ? "+" : ""}${aggregate.avg.toFixed(2)}%`,
-      sub: "Across all indices",
+      sub: t("avg24hSub"),
       tone:
         aggregate.avg === null
           ? "neutral"
@@ -74,7 +76,7 @@ export function MarketOverview({ indices }: MarketOverviewProps) {
       icon: Activity,
     },
     {
-      label: "Top 24h",
+      label: t("top24h"),
       value: aggregate.top
         ? `+${aggregate.top.return24h.toFixed(2)}%`
         : "—",
@@ -83,7 +85,7 @@ export function MarketOverview({ indices }: MarketOverviewProps) {
       icon: TrendingUp,
     },
     {
-      label: "Worst 24h",
+      label: t("worst24h"),
       value: aggregate.bottom
         ? `${aggregate.bottom.return24h >= 0 ? "+" : ""}${aggregate.bottom.return24h.toFixed(2)}%`
         : "—",

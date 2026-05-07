@@ -186,10 +186,11 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
     managed: "text-success bg-success/10 border-success/30",
   }
 
+  const tIndex = useTranslations("indexCard")
   const typeLabels = {
-    weighted: "Weighted",
-    equal: "Equal-Weight",
-    managed: "Managed",
+    weighted: tIndex("weighted"),
+    equal: tIndex("equalWeight"),
+    managed: tIndex("managed"),
   }
 
   const tokensWithWeights = useMemo(() => {
@@ -329,21 +330,24 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             )}
           </div>
           <div className="flex gap-1 sm:gap-2">
-            {(["24h", "7d", "30d", "90d"] as const).map((period) => (
-              <Button
-                key={period}
-                variant={timePeriod === period ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setTimePeriod(period)}
-                className={
-                  timePeriod === period
-                    ? "bg-success text-black hover:bg-success/90 text-xs px-2 sm:px-4 h-8"
-                    : "text-muted-foreground hover:text-foreground text-xs px-2 sm:px-4 h-8"
-                }
-              >
-                {period}
-              </Button>
-            ))}
+            {(["24h", "7d", "30d", "90d"] as const).map((period) => {
+              const periodKey = `period${period}` as "period24h" | "period7d" | "period30d" | "period90d"
+              return (
+                <Button
+                  key={period}
+                  variant={timePeriod === period ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setTimePeriod(period)}
+                  className={
+                    timePeriod === period
+                      ? "bg-success text-black hover:bg-success/90 text-xs px-2 sm:px-4 h-8"
+                      : "text-muted-foreground hover:text-foreground text-xs px-2 sm:px-4 h-8"
+                  }
+                >
+                  {t(periodKey)}
+                </Button>
+              )
+            })}
           </div>
         </div>
 
@@ -545,10 +549,10 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-              {renderReturn(returns["24h"], "24h")}
-              {renderReturn(returns["7d"], "7d")}
-              {renderReturn(returns["30d"], "30d")}
-              {renderReturn(returns["90d"], "90d")}
+              {renderReturn(returns["24h"], t("return24h"))}
+              {renderReturn(returns["7d"], t("return7d"))}
+              {renderReturn(returns["30d"], t("return30d"))}
+              {renderReturn(returns["90d"], t("return90d"))}
             </div>
           </Card>
 

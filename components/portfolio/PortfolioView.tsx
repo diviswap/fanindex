@@ -692,7 +692,7 @@ export function PortfolioView() {
             <p className="text-muted-foreground text-xs sm:text-sm mt-1">
               {isLoadingOnChain
                 ? t("readingChain")
-                : `${holdings.length} ${holdings.length !== 1 ? t("positionsOnChain_other", { count: holdings.length }) : t("positionsOnChain_one", { count: holdings.length })}`}
+                : t(holdings.length !== 1 ? "positionsOnChain_other" : "positionsOnChain_one", { count: holdings.length })}
             </p>
           </div>
           <Button
