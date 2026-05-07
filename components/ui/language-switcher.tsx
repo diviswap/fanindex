@@ -9,6 +9,9 @@ import { Globe, Check, ChevronDown } from "lucide-react"
 const languages = [
   { code: "en", label: "English", flag: "🇺🇸" },
   { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "pt", label: "Português", flag: "🇵🇹" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
 ]
 
 export function LanguageSwitcher() {
