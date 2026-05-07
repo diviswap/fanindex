@@ -1,0 +1,1078 @@
+{
+  "nav": {
+    "home": "Início",
+    "indices": "Índices",
+    "fanTokens": "Fan Tokens",
+    "portfolio": "Portfólio",
+    "whitepaper": "Whitepaper"
+  },
+  "hero": {
+    "badge": "Ao vivo na Chiliz",
+    "title": "A Camada de Índices para",
+    "titleHighlight": "Fan Tokens",
+    "description": "Índices esportivos tokenizados, análises e infraestrutura de portfólio para o investidor moderno de SportFi.",
+    "exploreIndices": "Explorar Índices",
+    "viewMarket": "Ver Mercado",
+    "trust": {
+      "onChain": "Infraestrutura On-Chain",
+      "nftPositions": "Posições em NFT",
+      "analytics": "Análises em Tempo Real"
+    }
+  },
+  "why": {
+    "label": "Por que FanIndex",
+    "title": "Exposição Estruturada para SportFi",
+    "items": {
+      "diversified": {
+        "title": "Exposição Diversificada",
+        "description": "Reduza o risco de concentração entre times e ligas."
+      },
+      "transparent": {
+        "title": "Transparência On-Chain",
+        "description": "Todas as posições de índice são verificáveis na blockchain."
+      },
+      "professional": {
+        "title": "Infraestrutura Profissional",
+        "description": "Construído para participação sustentável no SportFi."
+      }
+    }
+  },
+  "indexFamily": {
+    "label": "Família de Índices",
+    "title": "O Ecossistema FanIndex",
+    "description": "Uma família de índices estruturados profissionalmente que oferece exposição transparente e diversificada ao mercado SportFi.",
+    "constituents": "ativos",
+    "nav": "NAV",
+    "view": "Ver",
+    "items": {
+      "FTLX": {
+        "title": "Índice de Líderes de Fan Token",
+        "tagline": "Benchmark",
+        "description": "O benchmark principal que rastreia os fan tokens maiores e mais líquidos."
+      },
+      "FGMX": {
+        "title": "Índice Fan Gaming",
+        "tagline": "Esports",
+        "description": "Exposição diversificada às principais organizações de esports na Chiliz."
+      },
+      "FFLX": {
+        "title": "Índice Fan Fight",
+        "tagline": "Esportes de Combate",
+        "description": "Exposição estruturada às principais organizações de esportes de combate."
+      },
+      "FELX": {
+        "title": "Índice Liga Inglesa",
+        "tagline": "Premier League",
+        "description": "Exposição ponderada aos principais clubes de futebol ingleses."
+      },
+      "FSLX": {
+        "title": "Índice Liga Espanhola",
+        "tagline": "La Liga",
+        "description": "Exposição ponderada aos principais clubes de futebol espanhóis."
+      }
+    }
+  },
+  "analytics": {
+    "label": "Plataforma de Análise",
+    "title": "Inteligência de Mercado de Fan Token em Tempo Real",
+    "description": "Dados de mercado de nível institucional para a economia SportFi. Preços ao vivo, capitalização, volume e métricas de oferta em todo o universo de fan tokens.",
+    "openMarket": "Abrir Dados de Mercado",
+    "live": "Ao vivo · Chiliz Mainnet",
+    "feed": "CoinGecko Feed · 60s",
+    "terminal": "FANINDEX · TERMINAL",
+    "kpi": {
+      "chzPrice": "Preço CHZ (USD)",
+      "marketCap": "Cap. de Mercado Top 8",
+      "volume": "Volume 24h",
+      "tracked": "Ativos Rastreados"
+    },
+    "table": {
+      "rank": "#",
+      "asset": "Ativo",
+      "price": "Preço (CHZ)",
+      "change": "24h",
+      "marketCap": "Cap. de Mercado",
+      "volume": "Volume 24h",
+      "share": "Participação"
+    }
+  },
+  "portfolio": {
+    "label": "Infraestrutura de Portfólio",
+    "title": "Acompanhe Suas Posições Indexadas",
+    "description": "Cada posição de índice é emitida como um token não fungível, custodiado on-chain. Visualize, transfira ou resgate sua exposição indexada com transparência de nível institucional.",
+    "features": {
+      "nft": "Recibos em NFT para cada posição indexada",
+      "nav": "NAV e P&L em tempo real com preços on-chain",
+      "redeem": "Resgate atômico de volta aos ativos subjacentes"
+    },
+    "openPortfolio": "Abrir Portfólio",
+    "metrics": {
+      "value": "Valor do Portfólio",
+      "performance": "Desempenho",
+      "positions": "Posições Ativas",
+      "chain": "Status da Rede",
+      "mainnet": "Mainnet"
+    }
+  },
+  "rebalance": {
+    "label": "Motor de Rebalanceamento",
+    "title": "Infraestrutura Rebalanceada Mensalmente",
+    "description": "O FanIndex mantém seus índices por meio de um processo de rebalanceamento transparente e baseado em regras — a mesma disciplina operacional esperada de infraestruturas tradicionais de ETF.",
+    "principles": {
+      "monthly": {
+        "title": "Cadência Mensal",
+        "description": "Os constituintes e pesos são revisados e rebalanceados em um cronograma mensal fixo."
+      },
+      "rules": {
+        "title": "Metodologia Baseada em Regras",
+        "description": "Seleção orientada por liquidez, capitalização de mercado e limiares de atividade on-chain."
+      },
+      "onchain": {
+        "title": "Execução On-Chain",
+        "description": "Os rebalanceamentos são executados atomicamente por contratos inteligentes auditados na Chiliz."
+      },
+      "public": {
+        "title": "Fichas Técnicas Públicas",
+        "description": "Metodologia, holdings e eventos de rebalanceamento são documentados e verificáveis."
+      }
+    },
+    "factsheet": "Ficha Técnica",
+    "weighted": "Ponderado",
+    "constituents": "constituintes",
+    "methodology": "Metodologia",
+    "methodologyValue": "Ponderado por Liquidez",
+    "rebalanceFreq": "Rebalanceamento",
+    "rebalanceValue": "Mensal",
+    "totalWeight": "Peso Total"
+  },
+  "cta": {
+    "label": "A Tese FanIndex",
+    "title": "Construído para o Futuro do SportFi",
+    "description": "Os Fan Tokens criaram uma nova classe de ativos. O FanIndex está construindo a infraestrutura ao redor dela.",
+    "launchApp": "Lançar App",
+    "readWhitepaper": "Ler Whitepaper"
+  },
+  "footer": {
+    "description": "A primeira plataforma do tipo ETF para Fan Tokens. Diversifique seu portfólio entre ligas e times na Chiliz Chain.",
+    "copyright": "Todos os direitos reservados.",
+    "sections": {
+      "product": {
+        "label": "Produto",
+        "indices": "Índices",
+        "portfolio": "Portfólio",
+        "fanTokens": "Fan Tokens"
+      },
+      "resources": {
+        "label": "Recursos",
+        "docs": "Documentação",
+        "whitepaper": "Whitepaper"
+      },
+      "legal": {
+        "label": "Legal e Suporte",
+        "privacy": "Política de Privacidade",
+        "terms": "Termos de Serviço",
+        "x": "X"
+      }
+    }
+  },
+  "wallet": {
+    "connect": "Conectar",
+    "connecting": "Conectando...",
+    "title": "Conectar Carteira",
+    "subtitle": "Escolha sua carteira para continuar",
+    "loading": "Carregando carteiras...",
+    "popular": "Popular",
+    "scanWith": "Escaneie com qualquer carteira móvel",
+    "connectSocios": "Conectar com a carteira Socios",
+    "browserWallet": "Carteira do Navegador",
+    "browserWalletDesc": "MetaMask, Coinbase ou qualquer carteira EIP-1193",
+    "terms": "Ao conectar, você concorda com nossos Termos de Serviço e Política de Privacidade.",
+    "connected": {
+      "chain": "Chiliz Chain",
+      "address": "Endereço",
+      "balance": "Saldo",
+      "myPortfolio": "Meu Portfólio",
+      "viewExplorer": "Ver no Explorer",
+      "disconnect": "Desconectar",
+      "disconnected": "Carteira desconectada",
+      "copied": "Endereço copiado"
+    }
+  },
+  "marketOverview": {
+    "indicesLive": "Índices ao Vivo",
+    "indicesLiveSub": "{up} em alta · {down} em baixa",
+    "avg24h": "Média 24h",
+    "avg24hSub": "Entre todos os índices",
+    "top24h": "Melhor 24h",
+    "worst24h": "Pior 24h"
+  },
+  "indicesPage": {
+    "badge": "Índices de Tokens Esportivos ao Vivo",
+    "title": "Índices de",
+    "titleHighlight": "Fan Tokens",
+    "description": "Exposição diversificada à economia de tokens esportivos. Ao vivo, on-chain e rebalanceada.",
+    "strategies": {
+      "label": "Estratégias de Investimento",
+      "title": "Três Abordagens para Exposição ao SportFi",
+      "weighted": {
+        "title": "Ponderado",
+        "description": "Tokens alocados proporcionalmente com base na capitalização de mercado e liquidez para exposição otimizada e de nível benchmark."
+      },
+      "equal": {
+        "title": "Peso Igual",
+        "description": "Alocação igual entre todos os constituintes para exposição democratizada, distribuição de risco equilibrada e máxima diversificação."
+      },
+      "managed": {
+        "title": "Gerenciado",
+        "description": "Gerenciado ativamente pela equipe FanIndex com ajustes dinâmicos, rotação tática e alocação estratégica baseada nas condições de mercado."
+      }
+    },
+    "methodology": {
+      "label": "Metodologia",
+      "title": "Como os Preços dos Índices São Calculados",
+      "description": "Cada produto FanIndex utiliza uma fórmula de precificação ponderada, transparente e on-chain. Os preços de mercado são obtidos em tempo real da CoinGecko e atualizados continuamente.",
+      "rebalance": { "label": "Frequência de Rebalanceamento", "value": "Periódico", "sub": "Executado manualmente pela equipe FanIndex com automação futura planejada" },
+      "price": { "label": "Fonte de Preço", "value": "CoinGecko", "sub": "Preços de mercado ao vivo obtidos da API CoinGecko em tempo real" },
+      "fee": { "label": "Taxa de Entrada", "value": "1%", "sub": "Taxa de protocolo aplicada a cada compra — sem taxa de saída" },
+      "position": { "label": "Tipo de Posição", "value": "NFT", "sub": "Cada posição é representada por um NFT único que certifica a propriedade" }
+    },
+    "roadmap": {
+      "label": "Roadmap",
+      "title": "Expansão Futura de Índices",
+      "description": "A suite FanIndex crescerá para cobrir todos os principais segmentos da economia global de tokens esportivos.",
+      "items": [
+        "Liga Italiana",
+        "Liga Turca",
+        "Seleções Nacionais",
+        "Liga Brasileira",
+        "Esportes Asiáticos",
+        "Automobilismo",
+        "Basquete",
+        "UFC / MMA",
+        "Torneios Globais",
+        "Criados por Usuários"
+      ]
+    }
+  },
+  "portfolioPage": {
+    "badge": "Acompanhamento de Portfólio ao Vivo",
+    "title": "Meu",
+    "titleHighlight": "Portfólio",
+    "description": "Acompanhe e gerencie suas posições de índice de Fan Tokens com análises on-chain em tempo real.",
+    "trust": {
+      "prices": "Preços em Tempo Real",
+      "positions": "Posições em NFT",
+      "updated": "Atualização Automática"
+    },
+    "howItWorks": {
+      "label": "Como Funciona",
+      "title": "Infraestrutura de Posições em NFT",
+      "steps": {
+        "deposit": { "step": "01", "title": "Deposite CHZ", "description": "Selecione um índice e deposite CHZ. Os contratos inteligentes executam compras proporcionais de todos os Fan Tokens subjacentes automaticamente." },
+        "receive": { "step": "02", "title": "Receba um NFT", "description": "Um NFT único é emitido para sua carteira. Ele certifica sua posição — tipo de índice, valor depositado, dados de alocação e timestamp." },
+        "track": { "step": "03", "title": "Acompanhe o Desempenho", "description": "Monitore suas posições, alocações e exposição em tempo real diretamente on-chain com total transparência." },
+        "redeem": { "step": "04", "title": "Resgate Quando Quiser", "description": "Queime seu NFT para resgatar. O protocolo vende o portfólio subjacente e devolve CHZ para sua carteira — sem taxa de saída." }
+      }
+    },
+    "error": {
+      "title": "Algo Deu Errado",
+      "description": "Ocorreu um erro ao carregar seu portfólio. Tente novamente.",
+      "refresh": "Recarregar Página"
+    }
+  },
+  "privacyPage": {
+    "back": "Voltar ao início",
+    "title": "Política de Privacidade",
+    "lastUpdated": "Última atualização:",
+    "sections": {
+      "intro": { "title": "Introdução", "content": "FanIndex (\"nós\", \"nosso\" ou \"nos\") opera o site fanindex.pro e serviços relacionados. Esta Política de Privacidade explica como coletamos, usamos, divulgamos e protegemos suas informações quando você visita nosso site e utiliza nossos serviços." },
+      "collect": { "title": "Informações que Coletamos", "intro": "Coletamos informações que você nos fornece diretamente, como:", "items": ["Endereço de carteira e dados de transações blockchain", "Endereço de e-mail (se você optar por comunicações)", "Dados de uso e análises", "Informações do dispositivo e do navegador"] },
+      "use": { "title": "Como Usamos Suas Informações", "intro": "Usamos as informações coletadas para:", "items": ["Fornecer e melhorar nossos serviços", "Processar transações e enviar informações relacionadas", "Responder às suas perguntas e solicitações", "Enviar comunicações promocionais (com seu consentimento)", "Cumprir obrigações legais", "Analisar padrões de uso para aprimorar a experiência do usuário"] },
+      "security": { "title": "Segurança dos Dados", "content": "Implementamos medidas técnicas e organizacionais apropriadas para proteger suas informações pessoais contra acesso não autorizado, alteração, divulgação ou destruição. No entanto, nenhum método de transmissão pela internet é 100% seguro." },
+      "blockchain": { "title": "Transparência da Blockchain", "content": "Esteja ciente de que as transações na Chiliz Chain e em outras redes blockchain são públicas e transparentes. Qualquer informação registrada na blockchain fica permanentemente visível para todos os participantes da rede." },
+      "contact": { "title": "Contato", "content": "Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato conosco em privacy@fanindex.pro" }
+    }
+  },
+  "termsPage": {
+    "back": "Voltar ao início",
+    "title": "Termos de Serviço",
+    "lastUpdated": "Última atualização",
+    "contents": "Conteúdo",
+    "sections": {
+      "agreement": {
+        "title": "1. Aceitação dos Termos",
+        "p1": "Ao acessar e usar o site, a plataforma e os serviços do FanIndex (coletivamente, a \"Plataforma\"), você aceita e concorda em estar vinculado a estes Termos de Serviço e a todas as leis e regulamentos aplicáveis. Se você não concordar com qualquer um destes termos, está proibido de usar ou acessar esta Plataforma.",
+        "p2": "Estes termos se aplicam a todos os usuários da Plataforma, incluindo investidores, visitantes e quaisquer outras pessoas que acessem ou utilizem o serviço."
+      },
+      "platform": {
+        "title": "2. Descrição da Plataforma",
+        "p1": "O FanIndex é uma plataforma descentralizada de infraestrutura SportFi construída na Chiliz Chain. A Plataforma permite que os usuários obtenham exposição diversificada aos ecossistemas de Fan Tokens por meio de produtos de índice tokenizados e estruturados profissionalmente.",
+        "p2": "O FanIndex oferece os seguintes serviços principais:",
+        "ul1": ["Índices esportivos tokenizados compostos de Fan Tokens", "Infraestrutura de portfólio on-chain e rastreamento de posições", "Análises de mercado de Fan Token e dados de preços em tempo real", "Certificados de posição de investimento baseados em NFT", "Metodologias de índice transparentes on-chain"],
+        "p3": "Todas as operações de índice, incluindo compras e resgates, são executadas de forma transparente na Chiliz Chain por meio de contratos inteligentes. A Plataforma não custodia ativos no sentido financeiro tradicional — todas as posições são mantidas on-chain e representadas por NFTs."
+      },
+      "investmentProcess": {
+        "title": "3. Processo de Investimento",
+        "p1": "Quando um usuário investe em um produto FanIndex, o seguinte processo ocorre automaticamente via contrato inteligente:",
+        "ul1": ["CHZ é depositado no protocolo pelo usuário", "Contratos inteligentes executam compras proporcionais dos Fan Tokens subjacentes", "Fan Tokens são mantidos pelo tesouro do protocolo on-chain", "Um NFT único representando a posição é emitido para a carteira do investidor"],
+        "p2": "Os resgates são processados queimando o NFT de posição, após o qual o portfólio subjacente é liquidado e o CHZ é devolvido ao investidor. Não há taxa de saída nos resgates.",
+        "p3": "Uma taxa de protocolo de 1% é aplicada a todas as compras. Produtos de índice gerenciados ativamente podem ter uma taxa de gestão anualizada adicional de 1 a 2%, conforme divulgado na página do produto relevante."
+      },
+      "indexMethodology": {
+        "title": "4. Metodologia de Índice",
+        "p1": "Os índices FanIndex são construídos usando uma metodologia transparente e baseada em regras. O valor de cada índice é calculado usando um modelo de precificação ponderada aplicado a preços de mercado em tempo real obtidos da CoinGecko e de outros provedores de dados de mercado.",
+        "p2": "Os índices podem ser estruturados como produtos ponderados por capitalização de mercado, de peso igual ou gerenciados ativamente. A metodologia aplicável é divulgada na página individual de cada produto.",
+        "p3": "Os índices são periodicamente rebalanceados para manter as alocações-alvo. O rebalanceamento é atualmente executado manualmente pela equipe FanIndex. Versões futuras do protocolo podem introduzir rebalanceamento automatizado por contrato inteligente e mecanismos de governança DAO.",
+        "p4": "O FanIndex reserva-se o direito de atualizar as metodologias de índice, adicionar ou remover constituintes e ajustar os cronogramas de rebalanceamento de acordo com as condições de mercado e melhorias do protocolo. Alterações materiais serão divulgadas aos usuários."
+      },
+      "risks": {
+        "title": "5. Divulgação de Riscos",
+        "p1": "Investir em índices de Fan Token envolve riscos significativos. Você deve considerar cuidadosamente os seguintes fatores de risco antes de usar a Plataforma:",
+        "ul1": ["Volatilidade de Mercado: Fan Tokens são ativos digitais altamente voláteis. O valor das posições de índice pode flutuar substancialmente e pode cair a zero.", "Risco de Liquidez: Alguns Fan Tokens dentro de um índice podem passar por períodos de baixa liquidez, o que pode afetar a capacidade de rebalancear ou resgatar posições nos preços esperados.", "Risco de Contrato Inteligente: Apesar de auditorias de segurança e gestão multisig do tesouro, os contratos inteligentes podem conter vulnerabilidades.", "Risco Regulatório: As regulamentações de ativos digitais continuam evoluindo globalmente. Mudanças nas leis aplicáveis podem impactar a disponibilidade dos serviços FanIndex em determinadas jurisdições.", "Risco de Concentração: Os produtos de índice individuais estão concentrados no ecossistema de Fan Token e não são diversificados em classes de ativos mais amplas."],
+        "p2": "Você deve investir apenas valores que possa perder completamente. O FanIndex não fornece aconselhamento de investimento."
+      },
+      "eligibility": {
+        "title": "6. Elegibilidade do Usuário",
+        "p1": "Ao usar a Plataforma, você declara e garante que tem idade legal em sua jurisdição para celebrar contratos vinculantes, e que seu uso da Plataforma não viola nenhuma lei ou regulamento aplicável em sua jurisdição.",
+        "p2": "A Plataforma não está disponível para pessoas localizadas em jurisdições onde produtos de finanças descentralizadas, ativos digitais ou instrumentos financeiros baseados em blockchain são restritos ou proibidos. Você é o único responsável por garantir a conformidade com as leis locais.",
+        "p3": "O FanIndex reserva-se o direito de restringir o acesso à Plataforma em qualquer jurisdição a qualquer momento sem aviso prévio."
+      },
+      "nftPositions": {
+        "title": "7. Certificados de Posição NFT",
+        "p1": "Cada posição de investimento em um produto FanIndex é representada por um NFT único emitido para sua carteira. O NFT contém os seguintes dados on-chain:",
+        "ul1": ["Tipo e identificador do índice", "Valor depositado em CHZ", "Dados de alocação proporcional no momento da compra", "Timestamp de emissão e informações de propriedade"],
+        "p2": "O NFT funciona como prova de propriedade, certificado de portfólio e um direito resgatável sobre os ativos subjacentes. A transferência do NFT constitui transferência da posição subjacente."
+      },
+      "intellectualProperty": {
+        "title": "8. Propriedade Intelectual",
+        "p1": "Todo o conteúdo na Plataforma FanIndex, incluindo, entre outros, metodologias de índice, ativos de marca, designs de interface, documentação e software, é propriedade intelectual do FanIndex e de seus licenciantes.",
+        "p2": "É concedida permissão para acessar e usar a Plataforma apenas para fins pessoais e não comerciais."
+      },
+      "disclaimers": {
+        "title": "9. Isenções de Responsabilidade",
+        "p1": "A Plataforma e seus serviços são fornecidos \"como estão\" e \"conforme disponíveis\", sem garantias de qualquer tipo, expressas ou implícitas. O FanIndex expressamente renuncia a todas as garantias.",
+        "p2": "Nada na Plataforma constitui aconselhamento financeiro, de investimento, jurídico ou fiscal. Você deve consultar consultores profissionais independentes antes de tomar qualquer decisão de investimento."
+      },
+      "limitation": {
+        "title": "10. Limitação de Responsabilidade",
+        "p1": "Na máxima extensão permitida pela lei aplicável, o FanIndex, seus fundadores, colaboradores, parceiros e afiliados não serão responsáveis por quaisquer danos indiretos, incidentais, especiais, consequenciais ou punitivos decorrentes do seu uso ou incapacidade de usar a Plataforma."
+      },
+      "governance": {
+        "title": "11. Governança do Protocolo",
+        "p1": "O FanIndex planeja introduzir mecanismos de governança descentralizada em versões futuras do protocolo, permitindo que a comunidade participe de propostas de índices, ajustes de metodologia, decisões de tesouraria e expansão do ecossistema."
+      },
+      "modifications": {
+        "title": "12. Modificações dos Termos",
+        "p1": "O FanIndex reserva-se o direito de modificar estes Termos de Serviço a qualquer momento. Os termos atualizados serão publicados nesta página com uma data efetiva revisada. O uso continuado da Plataforma após qualquer modificação constitui aceitação dos termos atualizados."
+      },
+      "contact": {
+        "title": "13. Contato",
+        "p1": "Se você tiver dúvidas, preocupações ou consultas legais sobre estes Termos de Serviço ou a Plataforma FanIndex, entre em contato conosco em:",
+        "email": "legal@fanindex.pro"
+      }
+    }
+  },
+  "resources": {
+    "sections": {
+      "gettingStarted": "Primeiros Passos",
+      "methodology": "Metodologia",
+      "liveIndices": "Índices ao Vivo",
+      "nftPositions": "Posições NFT",
+      "analytics": "Análises",
+      "fees": "Taxas",
+      "smartContracts": "Contratos Inteligentes",
+      "faq": "Perguntas Frequentes",
+      "riskDisclosure": "Divulgação de Riscos",
+      "roadmap": "Roadmap"
+    }
+  },
+  "fanTokensPage": {
+    "badge": "Estatísticas ao Vivo de Fan Tokens",
+    "title": "Mercado de",
+    "titleHighlight": "Fan Tokens",
+    "description": "Preços em tempo real, capitalizações de mercado e dados de negociação para mais de 80 fan tokens na Chiliz Chain.",
+    "searchPlaceholder": "Buscar fan tokens...",
+    "categories": {
+      "all": "Todos os Tokens",
+      "football": "Futebol",
+      "esports": "Esports",
+      "motorsport": "Automobilismo",
+      "combat": "Combate",
+      "rugby": "Rugby",
+      "other": "Outros"
+    },
+    "stats": {
+      "totalTokens": "Total de Tokens",
+      "totalMarketCap": "Cap. de Mercado Total",
+      "volume24h": "Volume 24h",
+      "percentSupply": "% do Supply CHZ"
+    },
+    "table": {
+      "rank": "#",
+      "name": "Nome",
+      "price": "Preço (CHZ)",
+      "change24h": "24h",
+      "change7d": "7d",
+      "marketCap": "Cap. de Mercado",
+      "volume": "Volume 24h",
+      "percentOfSupply": "% do Supply"
+    }
+  },
+  "whitepaperPage": {
+    "back": "Voltar ao início",
+    "title": "A Camada de Índices para",
+    "titleHighlight": "Fan Tokens",
+    "description": "O FanIndex é a plataforma descentralizada de infraestrutura SportFi que transforma Fan Tokens em produtos financeiros estruturados e baseados em índices na Chiliz Chain.",
+    "tableOfContents": "Conteúdo",
+    "sections": {
+      "executiveSummary": "1. Resumo Executivo",
+      "vision": "2. Visão",
+      "marketContext": "3. Contexto de Mercado",
+      "platform": "4. A Plataforma FanIndex",
+      "indexArchitecture": "5. Arquitetura dos Índices",
+      "indexSuite": "6. Suite de Índices Atual",
+      "futureExpansion": "7. Expansão Futura de Índices",
+      "pricingMethodology": "8. Metodologia de Precificação",
+      "nftInfrastructure": "9. Infraestrutura de Posições NFT",
+      "buyRedeem": "10. Fluxo de Compra e Resgate",
+      "rebalancing": "11. Rebalanceamento",
+      "technicalArchitecture": "12. Arquitetura Técnica",
+      "feeStructure": "13. Estrutura de Taxas",
+      "revenue": "14. Alocação de Receita",
+      "governance": "15. Governança",
+      "roadmap": "16. Roadmap",
+      "risks": "17. Riscos",
+      "conclusion": "18. Conclusão"
+    }
+  },
+  "resourcesHero": {
+    "backToHome": "Voltar ao início",
+    "title": "Recursos e Documentação",
+    "description": "Tudo o que você precisa saber sobre o FanIndex: dos primeiros passos à análise avançada, contratos inteligentes e gestão de portfólio de nível institucional."
+  },
+  "nftPositionCard": {
+    "positionValue": "Valor da Posição",
+    "composition": "Composição",
+    "priceChart": "Preço 30d",
+    "buyMore": "Comprar Mais",
+    "sell": "Vender",
+    "share": "Compartilhar posição",
+    "view": "Ver"
+  },
+  "redeemDialog": {
+    "title": "Resgatar Posição",
+    "description": "Resgate sua posição",
+    "wrongNetwork": "Sua carteira está na rede errada. Os resgates requerem a Chiliz Mainnet (chain 88888).",
+    "switchToChiliz": "Mudar para Chiliz Mainnet",
+    "switching": "Mudando...",
+    "notDeployed": "Este índice ainda não foi implantado na Chiliz Mainnet.",
+    "positionComposition": "Composição da Posição",
+    "token": "Token",
+    "amount": "Quantidade",
+    "value": "Valor (CHZ)",
+    "redeeming": "Resgatando",
+    "redemptionAmount": "Valor do Resgate",
+    "redemptionMethod": "Escolha o Método de Resgate",
+    "convertToCHZ": "Converter para CHZ",
+    "convertDescription": "Vender fan tokens e receber CHZ (moeda nativa)",
+    "receiveTokens": "Receber Fan Tokens",
+    "tokensDescription": "Retirar fan tokens subjacentes diretamente para sua carteira",
+    "positionID": "ID da Posição",
+    "redemptionValue": "Valor do Resgate",
+    "exitFee": "Taxa de saída (0%)",
+    "youWillReceive": "Você receberá",
+    "warning": "Esta ação é irreversível. Seu NFT será queimado e você receberá ",
+    "warningEnd": " diretamente para sua carteira.",
+    "warningPartialEnd": " da sua posição. Você receberá ",
+    "info": "O valor do resgate é calculado com base nos preços de mercado atuais dos Fan Tokens subjacentes neste índice.",
+    "transactionFailed": "Transação falhou. Tente novamente.",
+    "cancel": "Cancelar",
+    "confirmRedemption": "Confirmar Resgate",
+    "redeem": "Resgatar",
+    "waitingForWallet": "Aguardando carteira...",
+    "confirmingOnChain": "Confirmando on-chain...",
+    "successTitle": "Resgate Concluído!",
+    "successTitlePartial": "Resgate Parcial Concluído!",
+    "successDescription": "da sua posição foi encerrada e o CHZ foi transferido",
+    "successDescriptionTokens": "da sua posição foi encerrada e os fan tokens foram transferidos",
+    "index": "Índice",
+    "percentageRedeemed": "Porcentagem Resgatada",
+    "redemptionType": "Tipo de Resgate",
+    "chzReceived": "CHZ Recebido",
+    "tokensReceived": "Fan Tokens Recebidos",
+    "viewTransaction": "Ver Transação no Chiliz Explorer",
+    "viewPortfolio": "Ver Portfólio",
+    "chzType": "Converter para CHZ",
+    "tokensType": "Receber Fan Tokens",
+    "chzReceiveType": "CHZ",
+    "tokensReceiveType": "Tokens Subjacentes",
+    "burnedNFT": "Seu NFT será queimado",
+    "remainingPosition": "o restante permanece em seu portfólio"
+  },
+  "shareCardModal": {
+    "title": "Compartilhar Card",
+    "customize": "Personalizar",
+    "price": "Preço",
+    "tokens": "Tokens",
+    "composition": "Composição",
+    "wallet": "Carteira",
+    "breakdown": "Detalhamento",
+    "copy": "Copiar",
+    "copied": "Copiado!",
+    "download": "Baixar",
+    "saved": "Salvo!",
+    "postOnX": "Publicar no X",
+    "generating": "Gerando imagem..."
+  },
+  "indexCard": {
+    "nav": "NAV",
+    "constituents": "Constituintes",
+    "invest": "Investir",
+    "weighted": "Ponderado",
+    "equalWeight": "Peso Igual",
+    "managed": "Gerenciado"
+  },
+  "portfolioView": {
+    "native": "Saldo nativo",
+    "position": "Posição",
+    "buy": "Comprar Índice",
+    "live": "Ao vivo",
+    "notConnected": "Conecte sua carteira para ver seu portfólio",
+    "connectTitle": "Conecte Sua Carteira",
+    "connectDescription": "Conecte sua carteira para ver seu portfólio, acompanhar suas posições e gerenciar seus investimentos em fan tokens.",
+    "totalValue": "Valor Total do Portfólio",
+    "share": "Compartilhar",
+    "chzBalance": "Saldo CHZ",
+    "nativeLabel": "Nativo",
+    "activeNFTs": "NFTs Ativos",
+    "positionsLabel": "Posições",
+    "chainStatus": "Status da Rede",
+    "chainId": "Chain ID 88888",
+    "myNFTPositions": "Minhas Posições NFT",
+    "readingChain": "Lendo da Chiliz Mainnet...",
+    "positionsOnChain_one": "1 posição on-chain",
+    "positionsOnChain_other": "{count} posições on-chain",
+    "refresh": "Atualizar",
+    "noPositionsTitle": "Ainda sem posições",
+    "noPositionsDescription": "Compre seu primeiro NFT FanIndex abaixo para começar a acompanhar seu portfólio on-chain.",
+    "fanTokens": "Fan Tokens",
+    "readingBalances": "Lendo saldos da Chiliz...",
+    "tokensInWallet_one": "1 token na carteira",
+    "tokensInWallet_other": "{count} tokens na carteira",
+    "noFanTokensTitle": "Ainda sem fan tokens",
+    "noFanTokensDescription": "Você não tem fan tokens na sua carteira. Visite a página de Fan Tokens para explorar os disponíveis.",
+    "availableIndices": "Índices Disponíveis",
+    "availableIndicesDescription": "Invista em índices on-chain ao vivo na rede Chiliz"
+  },
+  "gettingStarted": {
+    "title": "Primeiros Passos",
+    "description": "Tudo o que você precisa saber para começar sua jornada com o FanIndex.",
+    "items": {
+      "whatAreIndices": {
+        "title": "O que são Índices?",
+        "description": "Entenda a abordagem do FanIndex para investimentos cripto diversificados. Aprenda como os índices ponderados funcionam e por que são essenciais para a gestão de portfólio."
+      },
+      "understanding": {
+        "title": "Entendendo a Composição",
+        "description": "Aprenda como a composição do índice afeta os retornos. Aprofunde-se em rebalanceamento, esquemas de ponderação e restrições de liquidez."
+      },
+      "bestPractices": {
+        "title": "Boas Práticas de Portfólio",
+        "description": "Dicas para gerenciar um portfólio bem-sucedido. Gestão de risco, estratégias de diversificação e otimização de desempenho."
+      },
+      "startInvesting": {
+        "title": "Comece a Investir",
+        "description": "Invista em índices pré-construídos ou explore as opções disponíveis. Comece sua jornada com o FanIndex em poucos cliques."
+      }
+    }
+  },
+  "methodology": {
+    "title": "Metodologia de Índice",
+    "description": "Construção de índice de nível profissional inspirada na gestão tradicional de ativos.",
+    "pricingFormula": "Fórmula de Precificação",
+    "pricingDescription": "O Valor Patrimonial Líquido (NAV) de cada índice é calculado como a soma dos preços ponderados dos ativos:",
+    "formula": "NAV = Σ(wᵢ × Pᵢ)",
+    "formulaExplain": "Onde wᵢ é o peso do ativo i e Pᵢ é seu preço em CHZ",
+    "example": "Exemplo: Um índice com 60% CHZ (preço 0,50 CHZ) e 40% FAN (preço 0,75 CHZ) teria NAV = (0,6 × 0,50) + (0,4 × 0,75) = 0,60 CHZ",
+    "items": {
+      "weightAllocation": {
+        "title": "Alocação de Peso",
+        "description": "Esquemas de ponderação flexíveis que suportam capitalização de mercado, peso igual e estratégias personalizadas."
+      },
+      "monthlyRebalance": {
+        "title": "Rebalanceamento Mensal",
+        "description": "O rebalanceamento automatizado garante que os índices permaneçam fiéis às suas alocações-alvo."
+      },
+      "liquidityMethodology": {
+        "title": "Metodologia de Liquidez",
+        "description": "Os critérios de inclusão priorizam ativos líquidos e negociáveis com contrapartes de nível institucional."
+      }
+    }
+  },
+  "liveIndices": {
+    "title": "Índices Disponíveis",
+    "description": "Índices pré-construídos disponíveis para investimento. Selecione um índice e comece a diversificar seu portfólio hoje.",
+    "index": "Índice",
+    "type": "Tipo",
+    "nav": "NAV",
+    "assets": "Ativos",
+    "action": "Ação",
+    "invest": "Investir",
+    "chz": "CHZ",
+    "browseAll": "Ver Todos os Índices"
+  },
+  "fees": {
+    "title": "Taxas e Precificação",
+    "description": "Estrutura de taxas transparente e competitiva projetada para maximizar seus retornos.",
+    "entryFee": {
+      "title": "Taxa de Entrada",
+      "amount": "1%",
+      "description": "Taxa única ao comprar uma posição de índice.",
+      "details": "Cobre interações com contratos inteligentes e provisionamento de liquidez."
+    },
+    "exitFee": {
+      "title": "Taxa de Saída",
+      "amount": "0%",
+      "description": "Sem taxa ao sair ou vender sua posição.",
+      "details": "Queremos que seus resgates sejam simples e econômicos."
+    },
+    "managementFee": {
+      "title": "Taxa de Gestão",
+      "amount": "1-2%",
+      "description": "Taxa de gestão anual apenas para índices gerenciados.",
+      "details": "Índices ponderados e de peso igual: sem taxa de gestão · Índices gerenciados: 1-2% ao ano"
+    },
+    "performanceFee": {
+      "title": "Taxa de Desempenho",
+      "amount": "Variável",
+      "description": "Taxas opcionais baseadas em desempenho para índices gerenciados.",
+      "details": "20% dos ganhos acima do benchmark (quando aplicável)."
+    },
+    "feeCalculation": "Exemplo de Cálculo de Taxa",
+    "step1": "Invista 1000 CHZ em um índice ponderado",
+    "step2": "Taxa de entrada aplicada: 1% = 10 CHZ",
+    "step3": "Você recebe 990 CHZ em tokens de índice",
+    "step4": "Sem taxa de gestão anual (índices ponderados e de peso igual são sem taxa)",
+    "step5": "Saia a qualquer momento com zero taxa de saída",
+    "note": "Obs.: Índices gerenciados aplicam uma taxa de gestão anual adicional de 1-2%. Índices ponderados e de peso igual não têm taxas de gestão."
+  },
+  "nftPositions": {
+    "title": "Infraestrutura de Posições NFT",
+    "description": "Suas posições são representadas por NFTs na blockchain.",
+    "ownershipCertificate": {
+      "title": "Certificado de Propriedade",
+      "description": "Cada posição é respaldada por um NFT que representa a propriedade verificável on-chain."
+    },
+    "onChainTransparency": {
+      "title": "Transparência On-Chain",
+      "description": "Todos os metadados, eventos de rebalanceamento e holdings são permanentemente registrados na blockchain."
+    },
+    "redeemability": {
+      "title": "Resgatabilidade",
+      "description": "As posições podem ser resgatadas diretamente pelos ativos subjacentes, garantindo valor real."
+    },
+    "premiumFeatures": {
+      "title": "Recursos Premium",
+      "description": "Titulares de NFT desbloqueiam análises exclusivas, direitos de governança e insights de mercado."
+    }
+  },
+  "portfolioAnalytics": {
+    "title": "Portfólio e Análises",
+    "description": "Dashboard de análises de nível institucional para gestão profissional de portfólio.",
+    "pnlTracking": {
+      "title": "Rastreamento de PnL",
+      "description": "Cálculos de lucro e perda em tempo real com detalhamento de desempenho por ativo e período.",
+      "metric": "Tempo Real"
+    },
+    "portfolioAllocation": {
+      "title": "Alocação de Portfólio",
+      "description": "Divisão visual de seus holdings. Monitore o desvio de peso e oportunidades de rebalanceamento.",
+      "metric": "Atualizações ao Vivo"
+    },
+    "marketExposure": {
+      "title": "Exposição ao Mercado",
+      "description": "Entenda sua exposição a diferentes classes de ativos, setores e dinâmicas de mercado.",
+      "metric": "Monitoramento 24/7"
+    },
+    "fanTokenAnalytics": {
+      "title": "Análises de Fan Token",
+      "description": "Métricas avançadas sobre holdings de fan tokens, poder de voto e oportunidades exclusivas de governança.",
+      "metric": "Nível Institucional"
+    },
+    "dashboardComing": "Dashboard completo em breve com dados de mercado em tempo real, rastreamento de PnL e insights avançados de portfólio."
+  },
+  "transactionHistory": {
+    "title": "Histórico de Transações",
+    "liveLabel": "Ao vivo",
+    "txCount_one": "1 transação",
+    "txCount_other": "{count} transações",
+    "emptyDescription": "As transações aparecerão aqui após você comprar ou vender",
+    "noTransactions": "Ainda sem transações",
+    "noTransactionsHint": "Compre ou venda uma posição para ver seu histórico de transações",
+    "justNow": "Agora mesmo",
+    "block": "Bloco",
+    "confirming": "Confirmando...",
+    "view": "Ver"
+  },
+  "portfolioAllocationComponent": {
+    "title": "Alocação do Portfólio",
+    "assets_one": "1 ativo",
+    "assets_other": "{count} ativos",
+    "categories_one": "1 categoria",
+    "categories_other": "{count} categorias",
+    "nftPositions": "Posições NFT",
+    "chzBalance": "Saldo CHZ",
+    "fanTokens": "Fan Tokens",
+    "asset": "ativo",
+    "assets": "ativos",
+    "totalValue": "Valor Total"
+  },
+  "buyDialog": {
+    "buyTitle": "Comprar {indexName}",
+    "wrongNetworkWarning": "Sua carteira está conectada à rede errada. As transações requerem a Chiliz Mainnet (chain 88888).",
+    "switchToChiliz": "Mudar para Chiliz Mainnet",
+    "switching": "Mudando...",
+    "notDeployed": "Este índice ainda não foi implantado na Chiliz Mainnet.",
+    "indexComposition": "Composição do Índice",
+    "token": "Token",
+    "weight": "Peso",
+    "estCHZ": "CHZ Est.",
+    "investmentAmount": "Valor do Investimento",
+    "minimum": "Mínimo",
+    "tokens": "tokens",
+    "units": "unidades",
+    "pricePerUnit": "Preço por unidade",
+    "protocolFee": "Taxa do protocolo",
+    "netInvestment": "Investimento líquido",
+    "youSend": "Você envia",
+    "nftInfo": "Você receberá um NFT representando sua posição. Este NFT pode ser resgatado a qualquer momento para receber os Fan Tokens subjacentes.",
+    "belowMinimum": "O valor está abaixo do mínimo recomendado. A transação pode reverter se a liquidez por token for muito baixa.",
+    "transactionFailed": "Transação falhou. Tente novamente.",
+    "waitingWallet": "Aguardando carteira...",
+    "confirmingOnChain": "Confirmando on-chain...",
+    "completed": "Concluído",
+    "confirmPurchase": "Confirmar Compra",
+    "cancel": "Cancelar",
+    "purchaseSuccessful": "Compra Concluída!",
+    "nftMintedToWallet": "Seu NFT de posição foi emitido para sua carteira",
+    "index": "Índice",
+    "amountInvested": "Valor Investido",
+    "unitsReceived": "Unidades Recebidas",
+    "totalSent": "Total Enviado",
+    "viewTransaction": "Ver Transação no Chiliscan",
+    "viewPortfolio": "Ver Portfólio"
+  },
+  "indexDetail": {
+    "backToIndices": "Voltar aos Índices",
+    "investInIndex": "Investir no Índice",
+    "pricePerformance": "Desempenho de Preço",
+    "loadingChart": "Carregando dados do gráfico...",
+    "noDataAvailable": "Sem dados disponíveis",
+    "dataFrom": "Dados do CoinGecko",
+    "updatedEvery": "Atualizado a cada 5 min",
+    "marketCap": "Cap. de Mercado",
+    "combinedTokens": "Tokens combinados",
+    "return90d": "Retorno 90d",
+    "last90days": "Últimos 90 dias",
+    "volume24h": "Volume 24h",
+    "investors": "Investidores",
+    "volatility": "Volatilidade",
+    "annualized": "Anualizada (7d σ)",
+    "assetAllocation": "Alocação de Ativos",
+    "liveFromCoinGecko": "Ao vivo do CoinGecko",
+    "loading": "Carregando...",
+    "returns": "Retornos",
+    "live": "Ao vivo",
+    "indexDetails": "Detalhes do Índice",
+    "strategy": "Estratégia",
+    "assets": "Ativos",
+    "tokensLabel": "Tokens",
+    "entryFee": "Taxa de Entrada",
+    "exitFee": "Taxa de Saída",
+    "managementFee": "Taxa de Gestão",
+    "annually": "ao ano",
+    "rebalancing": "Rebalanceamento",
+    "monthly": "Mensal",
+    "period24h": "24h",
+    "period7d": "7d",
+    "period30d": "30d",
+    "period90d": "90d",
+    "return24h": "Retorno 24h",
+    "return7d": "Retorno 7d",
+    "return30d": "Retorno 30d",
+    "noReturn": "Sem dados"
+  },
+  "fanTokenDetail": {
+    "tokenNotFound": "Token Não Encontrado",
+    "tokenNotFoundDesc": "O fan token \"{symbol}\" não foi encontrado.",
+    "backToFanTokens": "Voltar aos Fan Tokens",
+    "currentPrice": "Preço Atual",
+    "marketCap": "Cap. de Mercado",
+    "volume24h": "Volume 24h",
+    "circulatingSupply": "Oferta Circulante",
+    "totalSupply": "Oferta Total",
+    "supplyDistribution": "Distribuição da Oferta",
+    "circulatingTotal": "Circulante / Oferta Total",
+    "ofCHZMarketCap": "% do Cap. de Mercado CHZ",
+    "contractAddresses": "Endereços dos Contratos",
+    "unwrappedToken": "Token Não Empacotado",
+    "wrappedToken": "Token Empacotado",
+    "externalLinks": "Links Externos"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "description": "Não encontrou o que procurava? Entre em contato com nossa equipe de suporte.",
+    "q1": "Como os índices funcionam no FanIndex?",
+    "a1": "Os índices FanIndex são coleções de criptoativos cuidadosamente selecionados com alocações ponderadas. Cada índice rastreia o valor combinado de seus constituintes e rebalanceia mensalmente para manter os pesos-alvo. As posições são respaldadas por NFTs que representam propriedade verificável.",
+    "q2": "Quais são as taxas?",
+    "a2": "Taxa de Entrada: 1% ao comprar. Taxa de Saída: 0%. Taxa de Gestão: Apenas para índices gerenciados (1-2% ao ano). Índices ponderados e de peso igual não têm taxas de gestão. Taxa de Desempenho: 20% dos ganhos acima do benchmark (apenas para índices gerenciados). Todas as taxas são transparentes e deduzidas automaticamente.",
+    "q3": "Com que frequência os índices são rebalanceados?",
+    "a3": "Os índices rebalanceiam mensalmente em um cronograma fixo. O rebalanceamento garante que as alocações permaneçam fiéis às metas e remove ativos com baixo desempenho. Você é notificado antes de cada rebalanceamento, e todas as transações são registradas on-chain.",
+    "q4": "O FanIndex é seguro?",
+    "a4": "Sim. Todos os contratos inteligentes são auditados de forma independente. Usamos carteiras com múltiplas assinaturas para gestão do tesouro e oráculos Chainlink para feeds de preços. Suas posições NFT representam propriedade real on-chain respaldada por ativos subjacentes.",
+    "q5": "Posso sacar a qualquer momento?",
+    "a5": "Sim, você pode sacar instantaneamente a qualquer momento sem taxas de saída. Resgate sua posição e receba CHZ ou fan tokens conforme sua preferência. Os saques são processados imediatamente on-chain. Sem período de bloqueio ou restrições.",
+    "q6": "Qual é o investimento mínimo?",
+    "a6": "O investimento mínimo é de 100 CHZ. Não há limite máximo. Você pode comprar posições fracionadas de qualquer índice.",
+    "q7": "Posso criar meu próprio índice personalizado?",
+    "a7": "Ainda não. A criação de índices personalizados está planejada para uma versão futura. Atualmente, você pode investir em índices pré-construídos criados pelo FanIndex. Estamos trabalhando para permitir índices criados pela comunidade.",
+    "q8": "Como os preços dos índices são determinados?",
+    "a8": "Os preços dos índices (NAV) são calculados usando a fórmula: NAV = Σ(wᵢ × Pᵢ), onde wᵢ é o peso do ativo i e Pᵢ é seu preço atual em CHZ. Os preços se atualizam em tempo real com dados de mercado."
+  },
+  "riskDisclosure": {
+    "title": "Divulgação de Riscos",
+    "description": "Informações importantes sobre os riscos de investimento. Leia com atenção antes de investir.",
+    "marketRisk": {
+      "title": "Risco de Mercado",
+      "description": "Os valores dos índices flutuam com os preços dos ativos subjacentes. Desempenho passado não garante resultados futuros. Os mercados cripto são voláteis e podem mover-se significativamente em curtos períodos."
+    },
+    "liquidityRisk": {
+      "title": "Risco de Liquidez",
+      "description": "Embora priorizemos ativos líquidos, a liquidez pode variar. Em momentos de estresse de mercado, os resgates podem ser processados com atrasos ou a preços subótimos."
+    },
+    "operationalRisk": {
+      "title": "Risco Operacional",
+      "description": "Vulnerabilidades em contratos inteligentes, falhas de oráculo ou interrupções de exchange podem impactar suas posições. Mantemos seguros e auditorias de segurança."
+    },
+    "regulatoryRisk": {
+      "title": "Risco Regulatório",
+      "description": "As regulamentações de criptomoedas estão evoluindo. Mudanças na regulamentação podem afetar as operações do índice, taxas ou elegibilidade de ativos."
+    },
+    "disclaimer": "Aviso Legal",
+    "disclaimerText": "O FanIndex é uma plataforma descentralizada para criação e gestão de índices de criptoativos. Os criptoativos são altamente voláteis e especulativos. O investimento em índices cripto carrega risco substancial de perda. Invista apenas valores que você pode perder completamente.",
+    "pastPerformance": "Desempenho passado não é indicativo de resultados futuros. Não somos consultores de investimento. Isso não é aconselhamento de investimento. Faça sua própria pesquisa e consulte um consultor financeiro antes de investir.",
+    "acknowledgement": "Ao usar o FanIndex, você reconhece que leu e entendeu esses riscos e concorda com os termos de serviço."
+  },
+  "roadmap": {
+    "title": "Roadmap",
+    "description": "Nossa visão para o futuro do FanIndex. Entregando inovação trimestralmente.",
+    "phase1": "Fase 1: Fundação",
+    "phase2": "Fase 2: Crescimento",
+    "phase3": "Fase 3: Escala",
+    "phase4": "Fase 4: Evolução",
+    "complete": "Concluído",
+    "inProgress": "Em Andamento",
+    "planned": "Planejado",
+    "items": {
+      "phase1": {
+        "0": "Criação dos índices principais",
+        "1": "Sistema de posições NFT",
+        "2": "Implantação de contratos inteligentes",
+        "3": "Rastreamento de portfólio"
+      },
+      "phase2": {
+        "0": "Dashboard de análises avançadas",
+        "1": "Lançamento do app mobile",
+        "2": "Configuração de governança DAO",
+        "3": "API para desenvolvedores"
+      },
+      "phase3": {
+        "0": "Negociação com margem de índices",
+        "1": "Suporte cross-chain",
+        "2": "Parcerias institucionais",
+        "3": "Expansão do tesouro"
+      },
+      "phase4": {
+        "0": "Recomendações de índices com IA",
+        "1": "Mercado de derivativos",
+        "2": "Expansão global",
+        "3": "Soluções empresariais"
+      }
+    }
+  },
+  "smartContracts": {
+    "title": "Contratos Inteligentes",
+    "description": "Infraestrutura auditada e transparente que protege seus investimentos on-chain.",
+    "etfVault": {
+      "title": "Contratos ETF Vault",
+      "description": "Contratos inteligentes principais que gerenciam posições de índice e custódia de ativos para cada índice.",
+      "chain": "Chiliz Chain"
+    },
+    "nftPosition": {
+      "title": "Contratos de Posição NFT",
+      "description": "Contratos inteligentes ERC-721 que representam propriedade de posição e metadados."
+    },
+    "batchBuyer": {
+      "title": "Comprador em Lote",
+      "description": "Contrato para compra eficiente em lote de posições de índice."
+    },
+    "secureInfrastructure": {
+      "title": "Infraestrutura Segura",
+      "description": "Arquitetura multi-contrato garantindo segurança e composabilidade."
+    },
+    "securityAudits": "Segurança e Auditorias",
+    "securityDescription": "Todos os contratos inteligentes foram auditados de forma independente por empresas líderes de segurança para garantir a proteção dos fundos dos usuários.",
+    "auditReport": "Relatório de Auditoria de Segurança",
+    "auditReportDesc": "Resultados completos da auditoria e rastreamento de remediação de vulnerabilidades.",
+    "viewReport": "Ver Relatório",
+    "contractVerification": "Verificação de Contratos",
+    "contractVerDesc": "Todos os contratos verificados on-chain com código-fonte e artefatos de build.",
+    "verify": "Verificar",
+    "indexContracts": "Endereços dos Contratos de Índice",
+    "indexName": "Índice",
+    "vaultContract": "Contrato Vault",
+    "nftContract": "Contrato NFT"
+  },
+  "whitepaperContent": {
+    "executiveSummary": {
+      "p1": "O FanIndex é uma plataforma descentralizada de infraestrutura SportFi construída na Chiliz Chain que transforma Fan Tokens em produtos financeiros estruturados e baseados em índices.",
+      "p2": "Em vez de comprar e gerenciar Fan Tokens individuais manualmente, os usuários podem obter exposição diversificada a segmentos inteiros do ecossistema por meio de índices estruturados profissionalmente.",
+      "p3": "O FanIndex apresenta:",
+      "ul3": ["Índices esportivos tokenizados", "Infraestrutura de portfólio on-chain", "Análises de Fan Token", "Posições de investimento baseadas em NFT", "Metodologias de índice transparentes"],
+      "p4": "Cada posição de índice é representada por um NFT único que certifica a propriedade da cesta de ativos subjacentes.",
+      "p5": "Quando os usuários investem em um índice:",
+      "ul5": ["CHZ é depositado no protocolo", "Contratos inteligentes executam compras proporcionais dos Fan Tokens subjacentes", "Os tokens são mantidos pelo tesouro do protocolo", "Um NFT representando a posição é emitido para o investidor"],
+      "p6": "Este modelo cria:",
+      "ul6": ["Exposição diversificada", "Investimento simplificado", "Atividade on-chain contínua", "Geração orgânica de liquidez em todo o ecossistema Chiliz"],
+      "p7": "O FanIndex é projetado para se tornar a camada de infraestrutura financeira para Fan Tokens."
+    },
+    "vision": {
+      "p1": "Os Fan Tokens introduziram propriedade digital e engajamento para comunidades esportivas.",
+      "p2": "O FanIndex expande esse modelo introduzindo infraestrutura financeira ao redor do ecossistema.",
+      "p3": "Nossa visão é criar:",
+      "ul3": ["Os índices benchmark do mercado de Fan Token", "A infraestrutura de portfólio para investidores SportFi", "A camada de análises para os mercados de capital de Fan Token", "O gateway entre o fandom esportivo e as finanças descentralizadas"],
+      "p4": "O FanIndex visa tornar os Fan Tokens investíveis, rastreáveis e estruturalmente acessíveis tanto para participantes de varejo quanto institucionais."
+    },
+    "marketContext": {
+      "h1": "3.1 A Ascensão dos Fan Tokens",
+      "p1": "Os Fan Tokens, pioneirizados pela Chiliz e Socios.com, criaram uma nova categoria de ativos esportivos baseados em blockchain.",
+      "p2": "Hoje:",
+      "ul2": ["Mais de 80 organizações lançaram Fan Tokens", "Bilhões em volume de negociação acumulado foram gerados", "Clubes globais, seleções nacionais, organizações de esports e marcas de esportes de combate participam do ecossistema"],
+      "p3": "Os Fan Tokens estabeleceram a base para o SportFi. No entanto, a infraestrutura financeira ao redor desses ativos ainda é extremamente limitada.",
+      "h2": "3.2 Limitações do Mercado",
+      "ul4": ["Exposição Fragmentada: Os investidores devem comprar e gerenciar manualmente vários Fan Tokens individuais.", "Falta de Produtos Estruturados: Atualmente não existem índices benchmark ou instrumentos financeiros diversificados para o ecossistema.", "Infraestrutura de Portfólio Limitada: A maioria das plataformas foca exclusivamente em negociação, e não em construção de portfólio e análises.", "Concentração de Volatilidade: A exposição a tokens únicos cria volatilidade e concentração de risco significativas.", "Mercados de Capital Subdesenvolvidos: Os Fan Tokens têm utilidade de engajamento, mas infraestrutura financeira limitada."],
+      "h3": "3.3 A Oportunidade",
+      "p4": "As finanças tradicionais evoluíram por meio de ETFs, índices, produtos de portfólio e exposição estruturada. O cripto adotou esses conceitos em DeFi, ecossistemas de Camada 1, tokens de IA e índices de meme.",
+      "p5": "Os Fan Tokens continuam sendo um dos últimos grandes verticais cripto sem infraestrutura de índice. O FanIndex preenche essa lacuna."
+    },
+    "platform": {
+      "h1": "4.1 O que é o FanIndex?",
+      "p1": "O FanIndex é uma plataforma descentralizada para:",
+      "ul1": ["Investir em índices de Fan Token", "Rastrear posições de portfólio", "Analisar o mercado de Fan Token", "Acessar exposição estruturada ao SportFi"],
+      "p2": "A plataforma combina produtos de índice, infraestrutura de portfólio em NFT, análises de mercado e transparência on-chain em um único ecossistema.",
+      "h2": "4.2 Recursos Principais da Plataforma",
+      "ul2": ["Índices Tokenizados: Cestas estruturadas de Fan Tokens agrupados por tema, geografia, categoria ou estratégia.", "Posições Baseadas em NFT: Cada posição de investimento é representada por um NFT.", "Rastreamento de Portfólio: Os usuários podem monitorar posições, alocações, exposição e desempenho diretamente on-chain.", "Análises de Fan Token: Dados de mercado em tempo real incluindo preço, cap. de mercado, volume, oferta circulante e métricas de desempenho para todo o ecossistema de Fan Token.", "Infraestrutura On-Chain: Todas as transações ocorrem de forma transparente na Chiliz Chain."]
+    },
+    "indexArchitecture": {
+      "p1": "Os índices FanIndex são projetados para fornecer exposição diversificada a segmentos específicos do mercado de Fan Token.",
+      "h1": "5.1 Índices Ponderados",
+      "p2": "Os índices ponderados alocam ativos proporcionalmente com base na relevância de mercado. Os fatores podem incluir capitalização de mercado, liquidez e importância no ecossistema. Esses produtos funcionam de forma similar aos índices tradicionais ponderados por capitalização de mercado.",
+      "p3": "Exemplo — FTLX (Fan Token Leaders Index): O índice benchmark do mercado de Fan Token, rastreando os Fan Tokens maiores e mais líquidos.",
+      "h2": "5.2 Índices de Peso Igual",
+      "p4": "Os índices de peso igual alocam a mesma exposição para cada constituinte. Essa abordagem reduz o risco de concentração, aumenta a diversificação e oferece representação igual entre as organizações.",
+      "p5": "Exemplos: FGMX (Fan Gaming Index), FFLX (Fan Fight Index).",
+      "h3": "5.3 Índices Gerenciados (Futuro)",
+      "p6": "Os índices gerenciados introduzem gestão ativa de portfólio. A equipe FanIndex pode rebalancear dinamicamente, rotacionar a exposição e gerenciar alocações estrategicamente. Os produtos gerenciados são projetados para investidores avançados que buscam exposição tática."
+    },
+    "currentSuite": {
+      "ul": [
+        "FTLX — Fan Token Leaders Index: O índice benchmark do mercado de Fan Token. Rastreia os Fan Tokens maiores e mais líquidos representando o ecossistema geral.",
+        "FGMX — Fan Gaming Index: Um índice de peso igual focado em organizações de esports com Fan Tokens.",
+        "FFLX — Fan Fight Index: Um índice de peso igual focado em organizações de esportes de combate.",
+        "FELX — Fan English League Index: Rastreia os principais clubes de futebol ingleses com Fan Tokens.",
+        "FSLX — Fan Spanish League Index: Rastreia os principais clubes de futebol espanhóis representados no ecossistema."
+      ]
+    },
+    "futureExpansion": {
+      "p1": "Índices futuros planejados incluem:",
+      "ul1": ["Índice Liga Italiana", "Índice Liga Turca", "Índice de Seleções Nacionais", "Índice Liga Brasileira", "Índice de Esportes Asiáticos"],
+      "p2": "A expansão de longo prazo pode incluir:",
+      "ul2": ["Automobilismo", "Basquete", "UFC / MMA", "Torneios globais", "Índices personalizados criados por usuários"]
+    },
+    "pricingMethodology": {
+      "p1": "O valor de cada índice é calculado usando um modelo de precificação ponderada aplicado a dados de mercado em tempo real.",
+      "p2": "Fórmula:",
+      "formula": "Índice = Σ(wᵢ × Pᵢ)   para i = 1 até n",
+      "p3": "Onde:",
+      "ul": ["wᵢ = peso do ativo", "Pᵢ = preço do token em tempo real", "n = número de ativos"],
+      "p4": "Os preços de mercado são obtidos usando provedores de dados de mercado ao vivo, como o CoinGecko."
+    },
+    "nftInfrastructure": {
+      "p1": "Cada posição de investimento é representada por um NFT. O NFT contém:",
+      "ul1": ["Tipo de índice", "Valor depositado", "Dados de alocação", "Timestamp", "Informações de propriedade"],
+      "p2": "O NFT funciona como:",
+      "ul2": ["Prova de propriedade", "Certificado de portfólio", "Direito resgatável sobre os ativos subjacentes"]
+    },
+    "buyRedeemFlow": {
+      "h1": "Fluxo de Compra",
+      "ol1": ["Usuário deposita CHZ", "Contrato inteligente executa compras proporcionais", "Fan Tokens subjacentes são adquiridos", "NFT de posição é emitido para o investidor"],
+      "h2": "Fluxo de Resgate",
+      "ol2": ["Usuário queima o NFT", "Portfólio subjacente é resgatado", "Ativos são vendidos ou redistribuídos", "CHZ é devolvido ao investidor"]
+    },
+    "rebalancing": {
+      "p1": "Os índices são periodicamente rebalanceados para manter as alocações-alvo. Os rebalanceamentos iniciais são executados manualmente pela equipe.",
+      "p2": "Versões futuras podem incluir:",
+      "ul1": ["Rebalanceamento automatizado por contrato inteligente", "Governança DAO", "Atualizações dinâmicas de metodologia"],
+      "p3": "O rebalanceamento visa:",
+      "ul2": ["Manter a integridade do índice", "Ajustar às mudanças de mercado", "Otimizar a diversificação"]
+    },
+    "technicalArchitecture": {
+      "h1": "12.1 Contratos Inteligentes",
+      "p1": "Os contratos inteligentes FanIndex gerenciam:",
+      "ul1": ["Criação de índices", "Alocação de tokens", "Emissão de NFT", "Contabilidade de portfólio", "Lógica de resgate"],
+      "p2": "Todos os contratos são implantados na Chiliz Chain.",
+      "h2": "12.2 Segurança",
+      "p3": "As medidas de segurança incluem:",
+      "ul2": ["Gestão de tesouro multisig", "Auditorias de terceiros", "Arquitetura de contratos modular", "Execução on-chain transparente"]
+    },
+    "feeStructure": {
+      "ul": [
+        "Taxa de Entrada: 1% de taxa de protocolo nas compras.",
+        "Taxa de Saída: 0% — sem taxa de saída.",
+        "Taxa de Índice Gerenciado: 1–2% ao ano para produtos gerenciados ativamente."
+      ]
+    },
+    "revenueAllocation": {
+      "p1": "A receita do protocolo pode ser alocada para:",
+      "ul": ["Desenvolvimento da plataforma", "Auditorias de segurança", "Incentivos do ecossistema", "Suporte de liquidez", "Crescimento do tesouro"]
+    },
+    "governance": {
+      "p1": "O FanIndex planeja mecanismos futuros de governança permitindo que a comunidade participe de:",
+      "ul": ["Propostas de índices", "Ajustes de metodologia", "Decisões de tesouraria", "Expansão do ecossistema"],
+      "p2": "A infraestrutura de governança pode evoluir para um modelo DAO."
+    },
+    "roadmap": {
+      "h1": "Fase 1 — Fundação",
+      "ul1": ["Lançamento na Mainnet", "Implantação dos índices principais", "Infraestrutura de portfólio", "Análises de Fan Token"],
+      "h2": "Fase 2 — Expansão",
+      "ul2": ["Índices regionais adicionais", "Rebalanceamento automatizado", "Integrações DeFi", "Análises aprimoradas"],
+      "h3": "Fase 3 — Infraestrutura Aberta",
+      "ul3": ["Índices criados por usuários", "Governança DAO", "Infraestrutura de API", "Ferramentas institucionais"]
+    },
+    "risks": {
+      "ul": [
+        "Volatilidade de Mercado: Os Fan Tokens continuam sendo ativos digitais voláteis. O valor das posições de índice pode flutuar substancialmente. Desempenho passado não é indicativo de resultados futuros.",
+        "Condições de Liquidez: Alguns Fan Tokens podem ter liquidez mais baixa, o que pode afetar a capacidade de rebalancear ou resgatar posições nos preços esperados.",
+        "Risco de Contrato Inteligente: Apesar das auditorias, a infraestrutura blockchain carrega riscos técnicos incluindo bugs, exploits e falhas de protocolo.",
+        "Evolução Regulatória: As regulamentações de ativos digitais continuam evoluindo globalmente. Mudanças nas leis aplicáveis podem impactar a disponibilidade dos serviços FanIndex em determinadas jurisdições."
+      ]
+    },
+    "conclusion": {
+      "p1": "O FanIndex apresenta a primeira infraestrutura de índice dedicada à economia de Fan Token.",
+      "p2": "Combinando:",
+      "ul": ["Exposição diversificada", "Propriedade baseada em NFT", "Transparência on-chain", "Análises de portfólio", "Produtos de investimento estruturados"],
+      "p3": "O FanIndex transforma Fan Tokens de ativos de engajamento isolados em um ecossistema financeiro escalável.",
+      "p4": "Os Fan Tokens desbloquearam o engajamento digital. O FanIndex desbloqueia a infraestrutura financeira."
+    }
+  }
+}
