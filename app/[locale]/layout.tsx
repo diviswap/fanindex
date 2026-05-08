@@ -3,7 +3,6 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
-import { Web3Provider } from "@/lib/web3/Web3Provider"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import { TickerTape } from "@/components/TickerTape"
@@ -136,11 +135,9 @@ export default async function LocaleLayout({
       <body className={`${inter.variable} font-sans`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <Web3Provider>
-              <Suspense fallback={null}>{children}</Suspense>
-              <Toaster />
-              <TickerTape />
-            </Web3Provider>
+            <Suspense fallback={null}>{children}</Suspense>
+            <Toaster />
+            <TickerTape />
           </ThemeProvider>
         </NextIntlClientProvider>
         <Analytics />

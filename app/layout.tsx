@@ -1,6 +1,8 @@
-// This root layout is intentionally minimal.
-// All actual layout logic (providers, fonts, metadata) lives in app/[locale]/layout.tsx
-// The middleware handles locale detection and redirects.
+import { Web3Provider } from "@/lib/web3/Web3Provider"
+
+// The Web3Provider lives here so it is never unmounted when the locale segment
+// changes. Wagmi config + QueryClient persist across locale navigations, which
+// keeps the wallet connected when the user switches language.
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return children
+  return <Web3Provider>{children}</Web3Provider>
 }
