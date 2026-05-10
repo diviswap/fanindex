@@ -946,6 +946,7 @@
     "investors": "Investors",
     "volatility": "Volatility",
     "annualized": "Annualised (7d σ)",
+  "nftPositions": "NFT positions",
     "assetAllocation": "Asset Allocation",
     "liveFromCoinGecko": "Live from CoinGecko",
     "loading": "Loading...",

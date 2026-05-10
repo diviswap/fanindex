@@ -7,7 +7,7 @@ import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import Link from "next/link"
 import type { IndexData } from "./IndexCard"
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts"
+import { IndexPriceChart } from "./IndexPriceChart"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useIndexNav } from "@/lib/hooks/use-index-nav"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
@@ -321,166 +321,122 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
       </div>
 
-      <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-6 mb-6 sm:mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
-          <div className="flex items-center justify-between sm:justify-start gap-2">
-            <h2 className="text-base sm:text-xl font-bold text-foreground">{t("pricePerformance")}</h2>
+      {/* ── Institutional chart card ─────────────────────────────────────────── */}
+      <Card className="border-border bg-card/60 backdrop-blur-sm mb-6 sm:mb-8 overflow-hidden">
+        {/* Top toolbar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-5 pt-4 sm:pt-5 pb-3 sm:pb-4 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-sm font-semibold text-foreground tracking-wide uppercase">{t("pricePerformance")}</h2>
             {historyLoading && (
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
             )}
+            {/* Live badge */}
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest bg-success/10 text-success border border-success/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+              Live
+            </span>
           </div>
-          <div className="flex gap-1 sm:gap-2">
+
+          {/* Period selector */}
+          <div className="flex items-center gap-0.5 bg-muted/40 rounded-lg p-1">
             {(["24h", "7d", "30d", "90d"] as const).map((period) => {
               const periodKey = `period${period}` as "period24h" | "period7d" | "period30d" | "period90d"
+              const isActive = timePeriod === period
               return (
-                <Button
+                <button
                   key={period}
-                  variant={timePeriod === period ? "default" : "ghost"}
-                  size="sm"
                   onClick={() => setTimePeriod(period)}
-                  className={
-                    timePeriod === period
-                      ? "bg-success text-black hover:bg-success/90 text-xs px-2 sm:px-4 h-8"
-                      : "text-muted-foreground hover:text-foreground text-xs px-2 sm:px-4 h-8"
-                  }
+                  className={`px-3 py-1 rounded-md text-xs font-semibold transition-all duration-150 ${
+                    isActive
+                      ? "bg-card text-foreground shadow-sm border border-border"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   {t(periodKey)}
-                </Button>
+                </button>
               )
             })}
           </div>
         </div>
 
-        <div className="h-[200px] sm:h-[280px] md:h-[350px] lg:h-[400px] w-full -ml-2 sm:ml-0">
-          {historyLoading && filteredData.length === 0 ? (
-            <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-8 w-8 animate-spin" />
-                <span className="text-sm">{t("loadingChart")}</span>
-              </div>
-            </div>
-          ) : filteredData.length === 0 ? (
-            <div className="h-full flex items-center justify-center ml-2 sm:ml-0">
-              <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                <Activity className="h-8 w-8" />
-                <span className="text-sm">{t("noDataAvailable")}</span>
-              </div>
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart 
-                data={filteredData}
-                margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id={`colorPrice-${index.id}-${isPositive ? "pos" : "neg"}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} vertical={false} />
-                <XAxis 
-                  dataKey="date" 
-                  stroke="hsl(var(--muted-foreground))" 
-                  fontSize={9} 
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                  interval="preserveStartEnd"
-                  minTickGap={40}
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={9}
-                  tickLine={false}
-                  axisLine={false}
-                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                  tickFormatter={(value) => value.toFixed(axisDecimals)}
-                  width={48}
-                  domain={['dataMin', 'dataMax']}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--card))',
-                    border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                  }}
-                  labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 600, marginBottom: '4px' }}
-                  itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number) => [`${value.toFixed(tooltipDecimals)} CHZ`, 'Price']}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="price"
-                  stroke={chartColor}
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill={`url(#colorPrice-${index.id}-${isPositive ? "pos" : "neg"})`}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          )}
+        {/* Chart area */}
+        <div className="h-[260px] sm:h-[360px] md:h-[420px] px-2 sm:px-3 pt-3 pb-2">
+          <IndexPriceChart
+            data={filteredData}
+            isLoading={historyLoading}
+            isPositive={isPositive}
+            indexId={index.id}
+            timePeriod={timePeriod}
+            axisDecimals={axisDecimals}
+            tooltipDecimals={tooltipDecimals}
+          />
         </div>
-        
-        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
-          <span>{t("dataFrom")}</span>
-          <span>{t("updatedEvery")}</span>
+
+        {/* Footer */}
+        <div className="px-4 sm:px-5 py-2.5 border-t border-border flex items-center justify-between">
+          <span className="text-[10px] text-muted-foreground font-medium">{t("dataFrom")}</span>
+          <span className="text-[10px] text-muted-foreground">{t("updatedEvery")}</span>
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12">
-        <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("marketCap")}</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-            {liveStats ? fmtUSD(liveStats.totalMarketCap) : index.totalValue}
-          </div>
-          {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">{t("combinedTokens")}</div>
-          )}
-        </Card>
-        <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("return90d")}</div>
-          {returns["90d"] === null ? (
-            <div className="text-lg sm:text-xl md:text-2xl font-bold text-muted-foreground">--</div>
-          ) : (
-            <div className={`flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold ${returns["90d"] >= 0 ? "text-success" : "text-destructive"}`}>
-              {returns["90d"] >= 0
-                ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-                : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-              }
-              {returns["90d"] >= 0 ? "+" : ""}{returns["90d"].toFixed(1)}%
+      {/* ── KPI metrics row (Token Terminal style) ──────────────────────────── */}
+      <Card className="border-border bg-card/60 backdrop-blur-sm mb-6 sm:mb-8 md:mb-12 overflow-hidden">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-y sm:divide-y-0 divide-border">
+          {/* Market Cap */}
+          <div className="p-4 sm:p-5">
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("marketCap")}</div>
+            <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+              {liveStats ? fmtUSD(liveStats.totalMarketCap) : index.totalValue}
             </div>
-          )}
-          <div className="text-xs text-muted-foreground mt-1">{t("last90days")}</div>
-        </Card>
-        <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("volume24h")}</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-            {liveStats ? fmtUSD(liveStats.totalVolume) : "--"}
+            <div className="text-[10px] text-muted-foreground mt-1">{t("combinedTokens")}</div>
           </div>
-          {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">{t("combinedTokens")}</div>
-          )}
-        </Card>
-        <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("investors")}</div>
-          <div className="flex items-center gap-1 text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-            <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 md:h-5 md:w-5" />
-            {index.holders}
+
+          {/* 90d Return */}
+          <div className="p-4 sm:p-5">
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("return90d")}</div>
+            {returns["90d"] === null ? (
+              <div className="text-xl sm:text-2xl font-bold text-muted-foreground">--</div>
+            ) : (
+              <div className={`flex items-center gap-1 text-xl sm:text-2xl font-bold tabular-nums ${returns["90d"] >= 0 ? "text-success" : "text-destructive"}`}>
+                {returns["90d"] >= 0
+                  ? <TrendingUp className="h-4 w-4 shrink-0" />
+                  : <TrendingDown className="h-4 w-4 shrink-0" />
+                }
+                {returns["90d"] >= 0 ? "+" : ""}{returns["90d"].toFixed(1)}%
+              </div>
+            )}
+            <div className="text-[10px] text-muted-foreground mt-1">{t("last90days")}</div>
           </div>
-        </Card>
-        <Card className="border-border bg-card/60 backdrop-blur-sm p-3 sm:p-4 md:p-6">
-          <div className="text-xs text-muted-foreground mb-1 sm:mb-2 font-medium">{t("volatility")}</div>
-          <div className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">
-            {liveStats ? `${liveStats.annualisedVol.toFixed(1)}%` : "--"}
+
+          {/* 24h Volume */}
+          <div className="p-4 sm:p-5">
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("volume24h")}</div>
+            <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+              {liveStats ? fmtUSD(liveStats.totalVolume) : "--"}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">{t("combinedTokens")}</div>
           </div>
-          {liveStats && (
-            <div className="text-xs text-muted-foreground mt-1">{t("annualized")}</div>
-          )}
-        </Card>
-      </div>
+
+          {/* Holders */}
+          <div className="p-4 sm:p-5">
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("investors")}</div>
+            <div className="flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+              <Users className="h-4 w-4 text-muted-foreground shrink-0" />
+              {index.holders}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">{t("nftPositions")}</div>
+          </div>
+
+          {/* Volatility */}
+          <div className="p-4 sm:p-5">
+            <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("volatility")}</div>
+            <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums">
+              {liveStats ? `${liveStats.annualisedVol.toFixed(1)}%` : "--"}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-1">{t("annualized")}</div>
+          </div>
+        </div>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="lg:col-span-2 border-border bg-card/60 backdrop-blur-sm p-4 sm:p-6">
