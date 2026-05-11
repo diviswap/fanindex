@@ -261,7 +261,7 @@ export function ConnectWallet() {
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-w-[calc(100vw-2rem)] sm:max-w-sm p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden"
+        className="max-w-[calc(100vw-2rem)] sm:max-w-md p-0 bg-background/95 backdrop-blur-xl border border-border/50 shadow-xl rounded-xl overflow-hidden"
         onInteractOutside={(e) => e.preventDefault()}
         onPointerDownOutside={() => setDialogOpen(false)}
       >
@@ -275,8 +275,8 @@ export function ConnectWallet() {
                 <Wallet className="h-4 w-4 text-success" />
               </div>
               <div>
-                <DialogTitle className="text-base font-bold">{t("title")}</DialogTitle>
-                <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
+                <DialogTitle className="text-base font-bold leading-tight">{t("title")}</DialogTitle>
+                <p className="text-xs text-muted-foreground text-pretty leading-snug">{t("subtitle")}</p>
               </div>
             </div>
           </DialogHeader>
@@ -319,17 +319,17 @@ export function ConnectWallet() {
                       </div>
 
                       <div className="flex-1 text-left min-w-0">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
                             {name}
                           </span>
                           {popular && (
-                            <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded shrink-0">
                               {t("popular")}
                             </span>
                           )}
                         </div>
-                        <span className="text-xs text-muted-foreground truncate block">{description}</span>
+                        <span className="text-xs text-muted-foreground block text-pretty leading-snug">{description}</span>
                       </div>
 
                       <div className="flex-shrink-0">
@@ -371,15 +371,15 @@ export function ConnectWallet() {
                     </div>
 
                     <div className="flex-1 text-left min-w-0">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-medium text-sm text-foreground group-hover:text-success transition-colors">
                           Socios.com
                         </span>
-                        <span className="hidden sm:inline px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded">
+                        <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase bg-success/10 text-success rounded shrink-0">
                           {t("popular")}
                         </span>
                       </div>
-                      <span className="text-xs text-muted-foreground truncate block">{t("connectSocios")}</span>
+                      <span className="text-xs text-muted-foreground block text-pretty leading-snug">{t("connectSocios")}</span>
                     </div>
 
                     <div className="flex-shrink-0">
