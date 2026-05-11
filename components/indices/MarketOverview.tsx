@@ -150,8 +150,11 @@ function useIndex24h(index: IndexData): PerIndexStats {
   const return24h = useMemo(() => {
     const all: { price: number; timestamp: number }[] = data?.data ?? []
     if (all.length < 2) return null
-    const cutoff = Date.now() - 2 * 24 * 60 * 60 * 1000
-    const slice = all.filter(d => d.timestamp >= cutoff)
+    // Mirror the exact index-based slice IndexCard uses for return24h:
+    // pointsToSkip = Math.min(2, all.length - 2), startIdx = all.length - pointsToSkip - 1
+    const pointsToSkip = Math.min(2, all.length - 2)
+    const startIdx = Math.max(0, all.length - pointsToSkip - 1)
+    const slice = all.slice(startIdx)
     if (slice.length < 2) return null
     const first = slice[0].price
     const last = slice[slice.length - 1].price
