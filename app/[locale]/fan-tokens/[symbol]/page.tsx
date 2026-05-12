@@ -100,6 +100,8 @@ export default function FanTokenDetailPage() {
   }
 
   const supplyPercentage = useMemo(() => {
+    if (!token) return "0.00"
+    
     const circulating = liveSupply?.circulating 
       ? Number.parseFloat(liveSupply.circulating.toString())
       : Number.parseFloat(token.circulatingSupply.toString())
@@ -110,7 +112,7 @@ export default function FanTokenDetailPage() {
 
     if (total <= 0) return "0.00"
     return ((circulating / total) * 100).toFixed(2)
-  }, [liveSupply, token.circulatingSupply, token.totalSupply])
+  }, [liveSupply, token?.circulatingSupply, token?.totalSupply, token])
 
   if (!token) {
     return (
