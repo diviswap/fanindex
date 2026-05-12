@@ -93,6 +93,12 @@ export default function FanTokenDetailPage() {
     return num.toFixed(2)
   }
 
+  const copyToClipboard = (address: string) => {
+    navigator.clipboard.writeText(address)
+    setCopiedAddress(address)
+    setTimeout(() => setCopiedAddress(null), 2000)
+  }
+
   if (!token) {
     return (
       <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
