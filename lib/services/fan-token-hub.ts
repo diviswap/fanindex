@@ -1,5 +1,6 @@
 /**
  * Fetch token supply data from fan-token-hub API
+ * API returns plain numbers as text, not JSON
  * Falls back to static data if API fails
  */
 export async function fetchTokenSupply(symbol: string) {
@@ -19,23 +20,25 @@ export async function fetchTokenSupply(symbol: string) {
     let circulating = 0
     let total = 0
 
-    // Parse circulating supply
+    // Parse circulating supply - API returns plain number as text
     if (circulatingRes.ok) {
       try {
-        const circulatingData = await circulatingRes.json()
-        circulating = circulatingData.circulating || circulatingData.circulatingSupply || 0
-      } catch {
-        console.warn(`[v0] Failed to parse circulating supply for ${symbol}`)
+        const circulatingText = await circulatingRes.text()
+        circulating = Number.parseFloat(circulatingText) || 0
+        if (isNaN(circulating)) circulating = 0
+      } catch (error) {
+        console.warn(`[v0] Failed to parse circulating supply for ${symbol}:`, error)
       }
     }
 
-    // Parse total supply
+    // Parse total supply - API returns plain number as text
     if (totalRes.ok) {
       try {
-        const totalData = await totalRes.json()
-        total = totalData.total || totalData.totalSupply || 0
-      } catch {
-        console.warn(`[v0] Failed to parse total supply for ${symbol}`)
+        const totalText = await totalRes.text()
+        total = Number.parseFloat(totalText) || 0
+        if (isNaN(total)) total = 0
+      } catch (error) {
+        console.warn(`[v0] Failed to parse total supply for ${symbol}:`, error)
       }
     }
 
