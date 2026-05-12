@@ -20,35 +20,58 @@ export interface TokenPriceData {
   volume24h: number
 }
 
+export interface CHZData {
+  price: number
+  marketCap: number
+  circulatingSupply: number
+}
+
 /**
- * Fetch CHZ price from CoinGecko (server-side only)
+ * Fetch CHZ price, market cap and circulating supply from CoinGecko (server-side only)
  */
-export async function fetchCHZPrice(): Promise<number> {
+export async function fetchCHZData(): Promise<CHZData> {
+  const FALLBACK: CHZData = { price: 0.02984, marketCap: 301_580_000, circulatingSupply: 10_106_836_844 }
   try {
     const url = `${COINGECKO_API_URL}/simple/price`
     const params = new URLSearchParams({
       ids: "chiliz",
       vs_currencies: "usd",
+      include_market_cap: "true",
+      include_circulating_supply: "true",
     })
 
     const response = await fetch(`${url}?${params}`, {
-      headers: {
-        "x-cg-demo-api-key": COINGECKO_API_KEY,
-      },
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      headers: { "x-cg-demo-api-key": COINGECKO_API_KEY },
+      next: { revalidate: 60 },
     })
 
     if (!response.ok) {
-      console.error("[v0] CoinGecko API error:", response.status, response.statusText)
-      return 0.02984 // Fallback price
+      console.error("[v0] CoinGecko CHZ data error:", response.status, response.statusText)
+      return FALLBACK
     }
 
     const data = await response.json()
-    return data.chiliz?.usd || 0.02984
+    const chz = data.chiliz
+    if (!chz) return FALLBACK
+
+    const price = chz.usd ?? FALLBACK.price
+    const marketCap = chz.usd_market_cap ?? FALLBACK.marketCap
+    // CoinGecko doesn't return circulating supply in simple/price; derive it from market cap and price.
+    const circulatingSupply = price > 0 ? marketCap / price : FALLBACK.circulatingSupply
+
+    return { price, marketCap, circulatingSupply }
   } catch (error) {
-    console.error("[v0] Error fetching CHZ price from CoinGecko:", error)
-    return 0.02984 // Fallback price
+    console.error("[v0] Error fetching CHZ data from CoinGecko:", error)
+    return FALLBACK
   }
+}
+
+/**
+ * Fetch CHZ price from CoinGecko (server-side only)
+ * @deprecated Use fetchCHZData() to also get market cap and circulating supply.
+ */
+export async function fetchCHZPrice(): Promise<number> {
+  return (await fetchCHZData()).price
 }
 
 /**

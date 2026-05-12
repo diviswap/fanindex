@@ -18,6 +18,8 @@ export interface TokenPrice {
 
 export interface PricesData {
   chzPrice: number
+  chzMarketCap: number
+  chzCirculatingSupply: number
   tokens: TokenPrice[]
 }
 

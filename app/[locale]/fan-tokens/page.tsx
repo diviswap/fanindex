@@ -17,10 +17,6 @@ import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 type SortField = "rank" | "name" | "price" | "change24h" | "change7d" | "marketCap" | "volume" | "percentOfSupply"
 type SortOrder = "asc" | "desc"
 
-const CHZ_MARKET_CAP = 301580000
-const CHZ_CIRCULATING_SUPPLY = 10106836844
-const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY
-
 export default function FanTokensPage() {
   const t = useTranslations("fanTokensPage")
   const [searchQuery, setSearchQuery] = useState("")
@@ -29,6 +25,11 @@ export default function FanTokensPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc")
 
   const { data: pricesData } = useCoinGeckoPrices()
+
+  // Live CHZ market data — no hardcoded constants
+  const chzPrice = pricesData?.chzPrice ?? 0
+  const chzMarketCap = pricesData?.chzMarketCap ?? 0
+  const chzCirculatingSupply = pricesData?.chzCirculatingSupply ?? 0
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -103,8 +104,9 @@ export default function FanTokensPage() {
   }, [searchQuery, categoryFilter, sortField, sortOrder, tokensWithLivePrices])
 
   const formatNumberInCHZ = (valueUSD: string | number) => {
+    if (!chzPrice) return "—"
     const numUSD = typeof valueUSD === "string" ? Number.parseFloat(valueUSD.replace(/,/g, "")) : valueUSD
-    const numCHZ = numUSD / CHZ_PRICE_USD
+    const numCHZ = numUSD / chzPrice
     if (numCHZ >= 1000000) return `${(numCHZ / 1000000).toFixed(2)}M`
     if (numCHZ >= 1000) return `${(numCHZ / 1000).toFixed(2)}K`
     return `${numCHZ.toFixed(2)}`
@@ -212,7 +214,7 @@ export default function FanTokensPage() {
           <div className="p-3 sm:p-4 lg:p-6 rounded-xl bg-card/50 border border-border backdrop-blur">
             <div className="text-[10px] sm:text-xs text-muted-foreground mb-1">{t("stats.percentSupply")}</div>
             <div className="text-lg sm:text-xl lg:text-2xl font-bold text-success">
-              {((totalFanTokenMcap / CHZ_MARKET_CAP) * 100).toFixed(2)}%
+              {chzMarketCap > 0 ? ((totalFanTokenMcap / chzMarketCap) * 100).toFixed(2) : "—"}%
             </div>
           </div>
         </div>
@@ -314,7 +316,7 @@ export default function FanTokensPage() {
                       <div className="text-xs sm:text-sm font-medium text-foreground whitespace-nowrap">
                         {"priceInCHZ" in token && token.priceInCHZ
                           ? token.priceInCHZ.toFixed(2)
-                          : (Number.parseFloat(token.price) / CHZ_PRICE_USD).toFixed(2)}
+                          : chzPrice > 0 ? (Number.parseFloat(token.price) / chzPrice).toFixed(2) : "—"}
                         <span className="text-[10px] sm:text-xs text-muted-foreground ml-1">CHZ</span>
                       </div>
                     </td>
@@ -344,7 +346,7 @@ export default function FanTokensPage() {
                     </td>
                     <td className="px-2 sm:px-4 py-3 sm:py-4 text-right">
                       <div className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-nowrap">
-                        {((Number.parseFloat(token.marketCap.replace(/,/g, "")) / CHZ_MARKET_CAP) * 100).toFixed(4)}%
+                        {chzMarketCap > 0 ? ((Number.parseFloat(token.marketCap.replace(/,/g, "")) / chzMarketCap) * 100).toFixed(4) : "—"}%
                       </div>
                     </td>
                     <td className="px-2 py-3 sm:py-4">

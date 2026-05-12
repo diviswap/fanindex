@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { fetchCHZPrice, fetchTokenPrices, fetchPricesByIds } from "@/lib/services/coingecko"
+import { fetchCHZData, fetchTokenPrices, fetchPricesByIds } from "@/lib/services/coingecko"
 import { FAN_TOKENS } from "@/lib/data/fan-tokens"
 
 export const dynamic = "force-dynamic"
@@ -10,8 +10,9 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const tokensParam = searchParams.get("tokens")
 
-    // Fetch CHZ price first
-    const chzPrice = await fetchCHZPrice()
+    // Fetch live CHZ data (price + market cap + circulating supply)
+    const chzData = await fetchCHZData()
+    const chzPrice = chzData.price
 
     // Prepare lists for fetching
     let tokensToFetch = FAN_TOKENS
@@ -63,6 +64,8 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       chzPrice,
+      chzMarketCap: chzData.marketCap,
+      chzCirculatingSupply: chzData.circulatingSupply,
       tokens: tokenPrices,
     })
   } catch (error) {
