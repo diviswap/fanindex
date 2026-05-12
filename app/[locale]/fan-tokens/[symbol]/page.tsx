@@ -340,7 +340,7 @@ export default function FanTokenDetailPage() {
                       asChild
                     >
                       <a 
-                        href={`https://chiliscan.com/address/${token.address}`}
+                        href={`https://chiliscan.com/token/${token.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -384,7 +384,7 @@ export default function FanTokenDetailPage() {
                             asChild
                           >
                             <a 
-                              href={`https://chiliscan.com/address/${token.unwrapped}`}
+                              href={`https://chiliscan.com/token/${token.unwrapped}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
@@ -422,7 +422,7 @@ export default function FanTokenDetailPage() {
                             asChild
                           >
                             <a 
-                              href={`https://chiliscan.com/address/${token.wrapped}`}
+                              href={`https://chiliscan.com/token/${token.wrapped}`}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
