@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { WebGLShader } from "@/components/ui/web-gl-shader"
 import { NavBar } from "@/components/ui/tubelight-navbar"
@@ -14,17 +14,14 @@ import {
   TrendingDown, 
   ExternalLink,
   Copy,
-  Check
+  Check,
+  Loader2
 } from "lucide-react"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
-import { useState } from "react"
+import { fetchTokenSupply, type TokenSupply } from "@/lib/services/fan-token-hub"
 import { useTranslations } from "next-intl"
-
-const CHZ_MARKET_CAP = 301580000
-const CHZ_CIRCULATING_SUPPLY = 10106836844
-const CHZ_PRICE_USD = CHZ_MARKET_CAP / CHZ_CIRCULATING_SUPPLY
 
 export default function FanTokenDetailPage() {
   const t = useTranslations("fanTokenDetail")
@@ -32,12 +29,20 @@ export default function FanTokenDetailPage() {
   const router = useRouter()
   const symbol = (params.symbol as string)?.toUpperCase()
   const [copiedAddress, setCopiedAddress] = useState<string | null>(null)
+  const [liveSupply, setLiveSupply] = useState<TokenSupply | null>(null)
+  const [supplyLoading, setSupplyLoading] = useState(false)
 
   const { data: pricesData } = useCoinGeckoPrices()
 
+  // Fetch live supply data from fan-token-hub
   useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+    if (!symbol) return
+    setSupplyLoading(true)
+    fetchTokenSupply(symbol)
+      .then(data => setLiveSupply(data))
+      .catch(() => setLiveSupply(null))
+      .finally(() => setSupplyLoading(false))
+  }, [symbol])
 
   const token = useMemo(() => {
     const staticToken = FAN_TOKENS.find(t => t.symbol.toUpperCase() === symbol)
@@ -47,7 +52,7 @@ export default function FanTokenDetailPage() {
     const livePrice = pricesData?.tokens?.find(
       (p) =>
         (staticToken.cgId && p.cgId === staticToken.cgId) ||
-        (staticToken.wrapped && p.address?.toLowerCase() === staticToken.wrapped?.toLowerCase()),
+        (staticToken.address && p.address?.toLowerCase() === staticToken.address?.toLowerCase()),
     )
 
     if (livePrice && livePrice.priceUSD > 0) {
@@ -65,15 +70,10 @@ export default function FanTokenDetailPage() {
     return staticToken
   }, [symbol, pricesData])
 
-  const copyToClipboard = (address: string) => {
-    navigator.clipboard.writeText(address)
-    setCopiedAddress(address)
-    setTimeout(() => setCopiedAddress(null), 2000)
-  }
-
   const formatNumberInCHZ = (valueUSD: string | number) => {
+    if (!pricesData?.chzPrice || pricesData.chzPrice === 0) return "—"
     const numUSD = typeof valueUSD === "string" ? Number.parseFloat(valueUSD.replace(/,/g, "")) : valueUSD
-    const numCHZ = numUSD / CHZ_PRICE_USD
+    const numCHZ = numUSD / pricesData.chzPrice
 
     if (numCHZ >= 1000000) {
       return `${(numCHZ / 1000000).toFixed(2)}M`
@@ -113,7 +113,7 @@ export default function FanTokenDetailPage() {
 
   const priceInCHZ = "priceInCHZ" in token && token.priceInCHZ
     ? token.priceInCHZ
-    : Number.parseFloat(token.price) / CHZ_PRICE_USD
+    : pricesData?.chzPrice && pricesData.chzPrice > 0 ? Number.parseFloat(token.price) / pricesData.chzPrice : 0
 
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
@@ -242,7 +242,11 @@ export default function FanTokenDetailPage() {
             <CardContent className="p-4">
               <div className="text-xs text-muted-foreground mb-1">{t("circulatingSupply")}</div>
               <div className="text-lg font-bold text-foreground">
-                {formatNumber(token.circulatingSupply)}
+                {supplyLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  formatNumber(liveSupply?.circulating || token.circulatingSupply)
+                )}
               </div>
               <div className="text-xs text-muted-foreground">
                 {token.symbol}
@@ -253,7 +257,11 @@ export default function FanTokenDetailPage() {
             <CardContent className="p-4">
               <div className="text-xs text-muted-foreground mb-1">{t("totalSupply")}</div>
               <div className="text-lg font-bold text-foreground">
-                {formatNumber(token.totalSupply)}
+                {supplyLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  formatNumber(liveSupply?.total || token.totalSupply)
+                )}
               </div>
               <div className="text-xs text-muted-foreground">
                 {token.symbol}
@@ -283,35 +291,37 @@ export default function FanTokenDetailPage() {
             <div className="flex justify-between text-sm pt-2 border-t border-border">
               <span className="text-muted-foreground">{t("ofCHZMarketCap")}</span>
               <span className="font-medium text-success">
-                {((Number.parseFloat(token.marketCap.replace(/,/g, "")) / CHZ_MARKET_CAP) * 100).toFixed(4)}%
+                {pricesData?.chzMarketCap && pricesData.chzMarketCap > 0 ? ((Number.parseFloat(token.marketCap.replace(/,/g, "")) / pricesData.chzMarketCap) * 100).toFixed(4) : "—"}%
               </span>
             </div>
           </CardContent>
         </Card>
 
         {/* Contract Addresses */}
-        {(token.unwrapped || token.wrapped) && (
+        {(token.address || token.unwrapped || token.wrapped) && (
           <Card className="mb-6 bg-card/50 backdrop-blur border-border">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">{t("contractAddresses")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {token.unwrapped && (
-                <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
+              {/* Primary Contract (18 decimals) */}
+              {token.address && (
+                <div className="flex items-center justify-between gap-2 p-4 bg-success/10 border border-success/20 rounded-lg ring-1 ring-success/10">
                   <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground mb-1">{t("unwrappedToken")}</div>
+                    <div className="text-xs text-success font-semibold mb-1 uppercase tracking-wider">{t("primaryContract")}</div>
                     <div className="text-sm font-mono text-foreground truncate">
-                      {token.unwrapped}
+                      {token.address}
                     </div>
+                    <div className="text-xs text-muted-foreground mt-1">18 decimals</div>
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
                     <Button
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8"
-                      onClick={() => copyToClipboard(token.unwrapped!)}
+                      onClick={() => copyToClipboard(token.address!)}
                     >
-                      {copiedAddress === token.unwrapped ? (
+                      {copiedAddress === token.address ? (
                         <Check className="h-4 w-4 text-success" />
                       ) : (
                         <Copy className="h-4 w-4" />
@@ -324,7 +334,7 @@ export default function FanTokenDetailPage() {
                       asChild
                     >
                       <a 
-                        href={`https://chiliscan.com/address/${token.unwrapped}`}
+                        href={`https://chiliscan.com/address/${token.address}`}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
@@ -334,41 +344,88 @@ export default function FanTokenDetailPage() {
                   </div>
                 </div>
               )}
-              {token.wrapped && (
-                <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
-                  <div className="min-w-0">
-                    <div className="text-xs text-muted-foreground mb-1">{t("wrappedToken")}</div>
-                    <div className="text-sm font-mono text-foreground truncate">
-                      {token.wrapped}
-                    </div>
-                  </div>
-                  <div className="flex gap-2 flex-shrink-0">
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      onClick={() => copyToClipboard(token.wrapped!)}
-                    >
-                      {copiedAddress === token.wrapped ? (
-                        <Check className="h-4 w-4 text-success" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      className="h-8 w-8"
-                      asChild
-                    >
-                      <a 
-                        href={`https://chiliscan.com/address/${token.wrapped}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    </Button>
+
+              {/* Legacy Contracts */}
+              {(token.unwrapped || token.wrapped) && (
+                <div className="pt-2 border-t border-border">
+                  <div className="text-xs text-muted-foreground font-semibold mb-3 uppercase tracking-wider">Legacy Contracts (Historical)</div>
+                  <div className="space-y-2">
+                    {token.unwrapped && (
+                      <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
+                        <div className="min-w-0">
+                          <div className="text-xs text-muted-foreground mb-1">{t("unwrappedToken")}</div>
+                          <div className="text-sm font-mono text-foreground truncate">
+                            {token.unwrapped}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => copyToClipboard(token.unwrapped!)}
+                          >
+                            {copiedAddress === token.unwrapped ? (
+                              <Check className="h-4 w-4 text-success" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            asChild
+                          >
+                            <a 
+                              href={`https://chiliscan.com/address/${token.unwrapped}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    {token.wrapped && (
+                      <div className="flex items-center justify-between gap-2 p-3 bg-muted/50 rounded-lg">
+                        <div className="min-w-0">
+                          <div className="text-xs text-muted-foreground mb-1">{t("wrappedToken")}</div>
+                          <div className="text-sm font-mono text-foreground truncate">
+                            {token.wrapped}
+                          </div>
+                        </div>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            onClick={() => copyToClipboard(token.wrapped!)}
+                          >
+                            {copiedAddress === token.wrapped ? (
+                              <Check className="h-4 w-4 text-success" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-8 w-8"
+                            asChild
+                          >
+                            <a 
+                              href={`https://chiliscan.com/address/${token.wrapped}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -395,10 +452,10 @@ export default function FanTokenDetailPage() {
                   </a>
                 </Button>
               )}
-              {token.wrapped && (
+              {token.address && (
                 <Button variant="outline" size="sm" asChild>
                   <a 
-                    href={`https://chiliscan.com/token/${token.wrapped}`}
+                    href={`https://chiliscan.com/token/${token.address}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >

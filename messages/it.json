@@ -816,6 +816,7 @@
     "circulatingTotal": "Circolante / Offerta Totale",
     "ofCHZMarketCap": "% del Cap. di Mercato CHZ",
     "contractAddresses": "Indirizzi dei Contratti",
+    "primaryContract": "Contratto Principale (18 decimali)",
     "unwrappedToken": "Token Non Wrapped",
     "wrappedToken": "Token Wrapped",
     "externalLinks": "Link Esterni"

@@ -816,6 +816,7 @@
     "circulatingTotal": "En Circulation / Offre Totale",
     "ofCHZMarketCap": "% de la Cap. Marché CHZ",
     "contractAddresses": "Adresses des Contrats",
+    "primaryContract": "Contrat Principal (18 décimales)",
     "unwrappedToken": "Token Non Enveloppé",
     "wrappedToken": "Token Enveloppé",
     "externalLinks": "Liens Externes"
@@ -975,7 +976,7 @@
       "ul2": ["Indices Tokenisés : Paniers structurés de Fan Tokens regroupés par thème, géographie, catégorie ou stratégie.", "Positions Basées sur des NFT : Chaque position d'investissement est représentée par un NFT.", "Suivi de Portefeuille : Les utilisateurs peuvent surveiller les positions, allocations, expositions et performances directement on-chain.", "Analyses des Fan Tokens : Données de marché en temps réel incluant le prix, la capitalisation boursière, le volume, l'offre en circulation et les métriques de performance pour l'ensemble de l'écosystème des Fan Tokens.", "Infrastructure On-Chain : Toutes les transactions se déroulent de manière transparente sur la Chiliz Chain."]
     },
     "indexArchitecture": {
-      "p1": "Les indices FanIndex sont conçus pour offrir une exposition diversifiée à des segments spécifiques du marché des Fan Tokens.",
+      "p1": "Les indices FanIndex sont conçus pour offrir une exposition diversifiée à des segments sp��cifiques du marché des Fan Tokens.",
       "h1": "5.1 Indices Pondérés",
       "p2": "Les indices pondérés allouent des actifs proportionnellement selon la pertinence du marché. Les facteurs peuvent inclure la capitalisation boursière, la liquidité et l'importance dans l'écosystème. Ces produits fonctionnent de manière similaire aux indices traditionnels pondérés par la capitalisation boursière.",
       "p3": "Exemple — FTLX (Fan Token Leaders Index) : L'indice de référence du marché des Fan Tokens, suivant les Fan Tokens les plus importants et les plus liquides.",

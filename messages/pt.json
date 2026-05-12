@@ -816,6 +816,7 @@
     "circulatingTotal": "Circulante / Oferta Total",
     "ofCHZMarketCap": "% do Cap. de Mercado CHZ",
     "contractAddresses": "Endereços dos Contratos",
+    "primaryContract": "Contrato Principal (18 decimais)",
     "unwrappedToken": "Token Não Empacotado",
     "wrappedToken": "Token Empacotado",
     "externalLinks": "Links Externos"
@@ -838,7 +839,7 @@
     "q7": "Posso criar meu próprio índice personalizado?",
     "a7": "Ainda não. A criação de índices personalizados está planejada para uma versão futura. Atualmente, você pode investir em índices pré-construídos criados pelo FanIndex. Estamos trabalhando para permitir índices criados pela comunidade.",
     "q8": "Como os preços dos índices são determinados?",
-    "a8": "Os preços dos índices (NAV) são calculados usando a fórmula: NAV = Σ(wᵢ × Pᵢ), onde wᵢ é o peso do ativo i e Pᵢ é seu preço atual em CHZ. Os preços se atualizam em tempo real com dados de mercado."
+    "a8": "Os preços dos índices (NAV) são calculados usando a fórmula: NAV = Σ(wᵢ × Pᵢ), onde wᵢ é o peso do ativo i e Pᵢ �� seu preço atual em CHZ. Os preços se atualizam em tempo real com dados de mercado."
   },
   "riskDisclosure": {
     "title": "Divulgação de Riscos",
