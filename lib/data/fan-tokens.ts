@@ -1537,3 +1537,14 @@ export function getTopTokens(limit = 10): FanToken[] {
 export function getTokenBySymbol(symbol: string): FanToken | undefined {
   return FAN_TOKENS.find((token) => token.symbol.toLowerCase() === symbol.toLowerCase())
 }
+
+// Helper function to get token by any of its known addresses (unwrapped, wrapped, or 18dec)
+export function getTokenByAddress(address: string): FanToken | undefined {
+  const lower = address.toLowerCase()
+  return FAN_TOKENS.find(
+    (token) =>
+      token.unwrapped?.toLowerCase() === lower ||
+      token.wrapped?.toLowerCase() === lower ||
+      token.address?.toLowerCase() === lower,
+  )
+}
