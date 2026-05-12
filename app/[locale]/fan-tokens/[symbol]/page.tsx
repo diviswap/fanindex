@@ -99,6 +99,19 @@ export default function FanTokenDetailPage() {
     setTimeout(() => setCopiedAddress(null), 2000)
   }
 
+  const supplyPercentage = useMemo(() => {
+    const circulating = liveSupply?.circulating 
+      ? Number.parseFloat(liveSupply.circulating.toString())
+      : Number.parseFloat(token.circulatingSupply.toString())
+    
+    const total = liveSupply?.total
+      ? Number.parseFloat(liveSupply.total.toString())
+      : Number.parseFloat(token.totalSupply.toString())
+
+    if (total <= 0) return "0.00"
+    return ((circulating / total) * 100).toFixed(2)
+  }, [liveSupply, token.circulatingSupply, token.totalSupply])
+
   if (!token) {
     return (
       <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-background min-h-screen">
@@ -285,12 +298,12 @@ export default function FanTokenDetailPage() {
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-muted-foreground">{t("circulatingTotal")}</span>
-                <span className="font-medium text-foreground">{token.percentOfSupply}%</span>
+                <span className="font-medium text-foreground">{supplyPercentage}%</span>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-success rounded-full transition-all duration-500"
-                  style={{ width: `${Math.min(Number.parseFloat(token.percentOfSupply), 100)}%` }}
+                  style={{ width: `${Math.min(Number.parseFloat(supplyPercentage), 100)}%` }}
                 />
               </div>
             </div>
