@@ -1505,7 +1505,7 @@ export const FAN_TOKENS: FanToken[] = [
   },
   {
     rank: 94,
-    name: "Sporting FC Portugal",
+    name: "Stade Français",
     symbol: "SFP",
     price: "0",
     change24h: "0.00",
@@ -1515,7 +1515,7 @@ export const FAN_TOKENS: FanToken[] = [
     circulatingSupply: "0",
     totalSupply: "0",
     percentOfSupply: "0.00",
-    category: "football",
+    category: "rugby",
     unwrapped: "0x2a89f8af25B01B837d67be3B1A162A663F77b26E",
     wrapped: "0x802B51D1Aa89C7222993463Ade8600cF08700DfF",
     address: "0x04aa2d5c46691f05D30b9E65a9E09C8ea383c7B0",
