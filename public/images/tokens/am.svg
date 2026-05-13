@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .circle { fill: none; stroke: white; stroke-width: 2; }
+      .text { fill: white; font-family: Arial, sans-serif; font-size: 60px; font-weight: bold; text-anchor: middle; dominant-baseline: middle; }
+      .bg { fill: #1a1a1a; }
+    </style>
+  </defs>
+  <rect class="bg" width="200" height="200" rx="100"/>
+  <circle class="circle" cx="100" cy="100" r="95"/>
+  <circle class="circle" cx="100" cy="100" r="85"/>
+  <text class="text" x="100" y="110">$AM</text>
+</svg>
