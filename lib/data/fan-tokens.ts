@@ -546,7 +546,7 @@ export const FAN_TOKENS: FanToken[] = [
     totalSupply: "3380000",
     percentOfSupply: "0.09",
     category: "football",
-    icon: "/images/tokens/tigres.svg",
+    icon: "/images/tokens/tigres.png",
     unwrapped: "0xf17b1E028537ABa705433f7ceBdca881B5c5B79E",
     wrapped: "0x2EA082e1053f05EfFEB8E28c350fa0ff8fe78538",
     address: "0x7308F4c7b4a9a0E180fD08C003255762DD139D54",

@@ -278,7 +278,7 @@ export default function FanTokensPage() {
               <tbody>
                 {filteredTokens.map((token, index) => (
                   <tr
-                    key={token.rank}
+                    key={`${token.symbol}-${index}`}
                     className={cn(
                       "border-b border-border hover:bg-muted/30 transition-colors active:bg-muted/50 cursor-pointer group",
                       index % 2 === 0 && "bg-muted/5",

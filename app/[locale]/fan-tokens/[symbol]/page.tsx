@@ -55,9 +55,24 @@ export default function FanTokenDetailPage() {
         (staticToken.address && p.address?.toLowerCase() === staticToken.address?.toLowerCase()),
     )
 
+    // Calculate dynamic rank based on marketcap
+    let dynamicRank = staticToken.rank
+    if (livePrice && livePrice.priceUSD > 0) {
+      const currentMarketCap = livePrice.marketCap
+      const rankByMarketCap = FAN_TOKENS.filter(t => {
+        const tPrice = pricesData?.tokens?.find(p => 
+          (t.cgId && p.cgId === t.cgId) || 
+          (t.address && p.address?.toLowerCase() === t.address?.toLowerCase())
+        )
+        return tPrice && tPrice.marketCap > currentMarketCap
+      }).length + 1
+      dynamicRank = rankByMarketCap
+    }
+
     if (livePrice && livePrice.priceUSD > 0) {
       return {
         ...staticToken,
+        rank: dynamicRank,
         price: livePrice.priceUSD.toFixed(6),
         priceInCHZ: livePrice.priceInCHZ,
         change24h: livePrice.change24h.toFixed(2),
