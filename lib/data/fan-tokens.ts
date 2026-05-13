@@ -546,7 +546,7 @@ export const FAN_TOKENS: FanToken[] = [
     totalSupply: "2770000",
     percentOfSupply: "0.11",
     category: "motorsport",
-    icon: "/images/tokens/am.svg",
+    icon: "/images/tokens/am.png",
     unwrapped: "0x3757951792eDFC2CE196E4C06CFfD04027e87403",
     wrapped: "0xE51a3c216afB6e7c9BeBb4968CD4A8d1E0E99F77",
     address: "0xf0D5De46729f4E2F28c27a98E15Ef18dF951Ec44",
