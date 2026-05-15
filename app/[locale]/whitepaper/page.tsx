@@ -132,7 +132,7 @@ export default function WhitepaperPage() {
   // Get section titles dynamically from translations
   const getSectionTitle = (sectionId: string) => {
     try {
-      return t(sectionId)
+      return t(`sections.${sectionId}`)
     } catch {
       return sectionId
     }
