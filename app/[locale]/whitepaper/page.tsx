@@ -129,26 +129,14 @@ export default function WhitepaperPage() {
     "conclusion",
   ]
 
-  const SECTION_TITLES = [
-    "1. Executive Summary",
-    "2. Vision",
-    "3. Market Context",
-    "4. The FanIndex Platform",
-    "5. Index Architecture",
-    "6. Current Index Suite",
-    "7. Future Index Expansion",
-    "8. Pricing Methodology",
-    "9. NFT Position Infrastructure",
-    "10. Buy & Redeem Flow",
-    "11. Rebalancing",
-    "12. Technical Architecture",
-    "13. Fee Structure",
-    "14. Revenue Allocation",
-    "15. Governance",
-    "16. Roadmap",
-    "17. Risks",
-    "18. Conclusion",
-  ]
+  // Get section titles dynamically from translations
+  const getSectionTitle = (sectionId: string) => {
+    try {
+      return t(sectionId)
+    } catch {
+      return sectionId
+    }
+  }
 
   // Helper to get nested translation object
   const getSectionContent = (sectionId: string) => {
@@ -212,13 +200,13 @@ export default function WhitepaperPage() {
                 {t("tableOfContents")}
               </div>
               <ol className="space-y-2">
-                {SECTION_IDS.map((id, idx) => (
+                {SECTION_IDS.map((id) => (
                   <li key={id}>
                     <a
                       href={`#${id}`}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {SECTION_TITLES[idx]}
+                      {getSectionTitle(id)}
                     </a>
                   </li>
                 ))}
@@ -227,7 +215,7 @@ export default function WhitepaperPage() {
 
             {/* Sections */}
             <div className="space-y-16">
-              {SECTION_IDS.map((sectionId, idx) => {
+              {SECTION_IDS.map((sectionId) => {
                 const sectionContent = getSectionContent(sectionId)
                 return (
                   <article
@@ -236,7 +224,7 @@ export default function WhitepaperPage() {
                     className="scroll-mt-28 border-b border-border/40 pb-16 last:border-0 last:pb-0"
                   >
                     <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-foreground mb-6">
-                      {SECTION_TITLES[idx]}
+                      {getSectionTitle(sectionId)}
                     </h2>
                     <div className="space-y-4 text-sm leading-relaxed text-muted-foreground [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-foreground [&_p]:text-muted-foreground [&_ul]:mt-3 [&_ul]:space-y-2 [&_ul]:pl-5 [&_ul]:list-disc [&_ol]:mt-3 [&_ol]:space-y-2 [&_ol]:pl-5 [&_ol]:list-decimal [&_strong]:text-foreground [&_strong]:font-semibold [&_a]:text-success [&_a:hover]:underline">
                       <ContentRenderer content={sectionContent} />
