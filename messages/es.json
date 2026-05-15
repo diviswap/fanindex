@@ -401,146 +401,131 @@
     "externalLinks": "Enlaces Externos"
   },
   "whitepaperContent": {
-    "executiveSummary": {
-      "p1": "FanIndex es una plataforma descentralizada de infraestructura SportFi construida en Chiliz Chain que transforma Fan Tokens en productos financieros estructurados basados en índices.",
-      "p2": "En lugar de comprar y gestionar manualmente tokens individuales de Fan, los usuarios pueden ganar exposición diversificada a segmentos completos del ecosistema a través de índices profesionalmente estructurados.",
-      "p3": "FanIndex introduce:",
-      "ul3": ["Índices de sports tokenizados", "Infraestructura de cartera on-chain", "Analítica de Fan Tokens", "Posiciones de inversión basadas en NFT", "Metodologías de índices transparentes"],
-      "p4": "Cada posición de índice se representa con un NFT único que certifica la propiedad de la canasta subyacente de activos.",
-      "p5": "Cuando los usuarios invierten en un índice:",
-      "ul5": ["CHZ se deposita en el protocolo", "Los contratos inteligentes ejecutan compras proporcionales de Fan Tokens subyacentes", "Los tokens se mantienen en el tesorería del protocolo", "Un NFT que representa la posición se acuña para el inversor"],
-      "p6": "Este modelo crea:",
-      "ul6": ["Exposición diversificada", "Inversión simplificada", "Actividad continua on-chain", "Generación orgánica de liquidez en el ecosistema Chiliz"],
-      "p7": "FanIndex está diseñado para convertirse en la capa de infraestructura financiera de Fan Tokens."
-    },
-    "vision": {
-      "p1": "Los Fan Tokens introdujeron propiedad digital y participación para comunidades deportivas.",
-      "p2": "FanIndex expande ese modelo al introducir infraestructura financiera alrededor del ecosistema.",
-      "p3": "Nuestra visión es crear:",
-      "ul3": ["Los índices de referencia del mercado de Fan Tokens", "La infraestructura de cartera para inversores de SportFi", "La capa de analítica para mercados de capital de Fan Tokens", "La puerta de enlace entre el fanatismo deportivo y las finanzas descentralizadas"],
-      "p4": "FanIndex tiene como objetivo hacer que los Fan Tokens sean invertibles, rastreables y estructuralmente accesibles para participantes minoristas e institucionales."
-    },
-    "marketContext": {
-      "h1": "3.1 La Ascensión de los Fan Tokens",
-      "p1": "Los Fan Tokens, pioneros de Chiliz y Socios.com, crearon una nueva categoría de activos deportivos basados en blockchain.",
-      "p2": "Hoy:",
-      "ul1": ["Más de 80 organizaciones han lanzado Fan Tokens", "Se han generado miles de millones en volumen comercial acumulado", "Clubes globales, equipos nacionales, organizaciones de esports y marcas de deportes de combate participan en el ecosistema"],
-      "p3": "Los Fan Tokens establecieron la base para SportFi. Sin embargo, la infraestructura financiera alrededor de estos activos sigue siendo extremadamente limitada.",
-      "h2": "3.2 Limitaciones del Mercado",
-      "ul2": ["Exposición Fragmentada: Los inversores deben comprar y gestionar manualmente múltiples tokens individuales.", "Falta de Productos Estructurados: Actualmente no hay índices de referencia ni instrumentos financieros diversificados para el ecosistema.", "Infraestructura de Cartera Limitada: La mayoría de las plataformas se enfocan exclusivamente en trading en lugar de construcción y análisis de carteras.", "Concentración de Volatilidad: La exposición a un solo token crea volatilidad significativa y concentración de riesgo.", "Mercados de Capital Subdesarrollados: Los Fan Tokens tienen utilidad de participación pero infraestructura financiera limitada."],
-      "h3": "3.3 La Oportunidad",
-      "p4": "Las finanzas tradicionales evolucionaron a través de ETFs, índices, productos de cartera y exposición estructurada. Cripto adoptó estos conceptos en DeFi, ecosistemas de Capa 1, tokens de IA e índices meme.",
-      "p5": "Los Fan Tokens siguen siendo uno de los últimos verticales de cripto sin infraestructura de índices. FanIndex llena esa brecha."
-    },
-    "platform": {
-      "h1": "4.1 ¿Qué es FanIndex?",
-      "p1": "FanIndex es una plataforma descentralizada para:",
-      "ul1": ["Invertir en índices de Fan Tokens", "Rastrear posiciones de cartera", "Analizar el mercado de Fan Tokens", "Acceder a exposición de SportFi estructurada"],
-      "p2": "La plataforma combina productos de índices, infraestructura de cartera NFT, analítica de mercado y transparencia on-chain en un único ecosistema.",
-      "h2": "4.2 Características Principales de la Plataforma",
-      "ul2": ["Índices Tokenizados: Canastas estructuradas de Fan Tokens agrupadas por tema, geografía, categoría o estrategia.", "Posiciones Basadas en NFT: Cada posición de inversión se representa con un NFT.", "Seguimiento de Cartera: Los usuarios pueden monitorear posiciones, asignaciones, exposición y rendimiento directamente on-chain.", "Analítica de Fan Tokens: Datos de mercado en tiempo real incluyendo precio, capitalización de mercado, volumen, suministro circulante y métricas de rendimiento para todo el ecosistema de Fan Tokens.", "Infraestructura On-Chain: Todas las transacciones ocurren de forma transparente en Chiliz Chain."]
-    },
-    "indexArchitecture": {
-      "p1": "Los índices de FanIndex están diseñados para proporcionar exposición diversificada a segmentos específicos del mercado de Fan Tokens.",
-      "h1": "5.1 Índices Ponderados",
-      "p2": "Los índices ponderados asignan activos proporcionalmente en función de la relevancia del mercado. Los factores pueden incluir capitalización de mercado, liquidez e importancia del ecosistema. Estos productos funcionan de manera similar a los índices ponderados por capitalización de mercado tradicionales.",
-      "p3": "Ejemplo — FTLX (Índice de Líderes de Fan Tokens): El índice de referencia del mercado de Fan Tokens, rastreando los Fan Tokens más grandes y líquidos.",
-      "h2": "5.2 Índices de Peso Igual",
-      "p4": "Los índices de peso igual asignan la misma exposición a cada componente. Este enfoque reduce el riesgo de concentración, aumenta la diversificación y proporciona igual representación en todas las organizaciones.",
-      "p5": "Ejemplos: FGMX (Índice de Gaming de Fans), FFLX (Índice de Lucha de Fans).",
-      "h3": "5.3 Índices Gestionados (Futuro)",
-      "p6": "Los índices gestionados introducen gestión de cartera activa. El equipo de FanIndex puede rebalancear dinámicamente, rotar exposición y gestionar asignaciones estratégicamente. Los productos gestionados están diseñados para inversores avanzados que buscan exposición táctica."
-    },
-    "indexSuite": {
-      "ul": [
-        "FTLX — Índice de Líderes de Fan Tokens: El índice de referencia del mercado de Fan Tokens. Rastrea los Fan Tokens más grandes y líquidos que representan el ecosistema general.",
-        "FGMX — Índice de Gaming de Fans: Un índice de peso igual enfocado en organizaciones de esports con Fan Tokens.",
-        "FFLX — Índice de Lucha de Fans: Un índice de peso igual enfocado en organizaciones de deportes de combate.",
-        "FELX — Índice de Liga Inglesa de Fans: Rastrea los principales clubes de fútbol ingleses con Fan Tokens.",
-        "FSLX — Índice de Liga Española de Fans: Rastrea los principales clubes de fútbol españoles representados en el ecosistema."
-      ]
-    },
-    "futureExpansion": {
-      "p1": "Los índices futuros planeados incluyen:",
-      "ul1": ["Índice de Liga Italiana", "Índice de Liga Turca", "Índice de Equipos Nacionales", "Índice de Liga de Brasil", "Índice de Deportes de Asia"],
-      "p2": "La expansión a largo plazo puede incluir:",
-      "ul2": ["Automovilismo", "Baloncesto", "UFC / MMA", "Torneos globales", "Índices generados por usuarios personalizados"]
-    },
-    "pricingMethodology": {
-      "p1": "El valor de cada índice se calcula usando un modelo de precios ponderado aplicado a datos de mercado en tiempo real.",
-      "p2": "Fórmula:",
-      "formula": "Index = Σ(wᵢ × Pᵢ)   para i = 1 a n",
-      "p3": "Donde:",
-      "ul": ["wᵢ = peso del activo", "Pᵢ = precio del token en tiempo real", "n = número de activos"],
-      "p4": "Los precios de mercado se obtienen usando proveedores de datos de mercado en vivo como CoinGecko."
-    },
-    "nftInfrastructure": {
-      "p1": "Cada posición de inversión se representa con un NFT. El NFT contiene:",
-      "ul1": ["Tipo de índice", "Valor depositado", "Datos de asignación", "Marca de tiempo", "Información de propiedad"],
-      "p2": "El NFT actúa como:",
-      "ul2": ["Prueba de propiedad", "Certificado de cartera", "Reclamación redimible sobre los activos subyacentes"]
-    },
-    "buyRedeem": {
-      "h1": "Flujo de Compra",
-      "ol1": ["El usuario deposita CHZ", "El contrato inteligente ejecuta compras proporcionales", "Se adquieren Fan Tokens subyacentes", "Un NFT de posición se acuña para el inversor"],
-      "h2": "Flujo de Rescate",
-      "ol2": ["El usuario quema el NFT", "La cartera subyacente se rescata", "Los activos se venden o redistribuyen", "CHZ se devuelve al inversor"]
-    },
-    "rebalancing": {
-      "p1": "Los índices se rebalanancean periódicamente para mantener asignaciones objetivo. Los rebalanances iniciales se ejecutan manualmente por el equipo.",
-      "p2": "Las versiones futuras pueden incluir:",
-      "ul1": ["Rebalanceo automático de contratos inteligentes", "Gobernanza DAO", "Actualizaciones dinámicas de metodología"],
-      "p3": "El rebalanceo tiene como objetivo:",
-      "ul2": ["Mantener la integridad del índice", "Ajustarse a cambios del mercado", "Optimizar la diversificación"]
-    },
-    "technicalArchitecture": {
-      "h1": "12.1 Contratos Inteligentes",
-      "p1": "Los contratos inteligentes de FanIndex gestionan:",
-      "ul1": ["Creación de índices", "Asignación de tokens", "Acuñación de NFT", "Contabilidad de cartera", "Lógica de rescate"],
-      "p2": "Todos los contratos se despliegan en Chiliz Chain.",
-      "h2": "12.2 Seguridad",
-      "p3": "Las medidas de seguridad incluyen:",
-      "ul2": ["Gestión de tesorería multifirma", "Auditorías de terceros", "Arquitectura modular de contratos", "Ejecución transparente on-chain"]
-    },
-    "feeStructure": {
-      "ul": [
-        "Tarifa de Entrada: Tarifa de protocolo del 1% en compras.",
-        "Tarifa de Salida: 0% — sin tarifa de salida.",
-        "Tarifa de Índice Gestionado: 1-2% anualizado para productos gestionados activamente."
-      ]
-    },
-    "revenue": {
-      "p1": "Los ingresos del protocolo pueden asignarse para:",
-      "ul": ["Desarrollo de plataforma", "Auditorías de seguridad", "Incentivos del ecosistema", "Soporte de liquidez", "Crecimiento de tesorería"]
-    },
-    "governance": {
-      "p1": "FanIndex planea mecanismos de gobernanza futuros que permitan a la comunidad participar en:",
-      "ul": ["Propuestas de índices", "Ajustes de metodología", "Decisiones de tesorería", "Expansión del ecosistema"],
-      "p2": "La infraestructura de gobernanza puede evolucionar hacia un modelo DAO."
-    },
-    "roadmap": {
-      "h1": "Fase 1 — Fundación",
-      "ul1": ["Lanzamiento de Mainnet", "Despliegue de índice central", "Infraestructura de cartera", "Analítica de Fan Tokens"],
-      "h2": "Fase 2 — Expansión",
-      "ul2": ["Índices regionales adicionales", "Rebalanceo automático", "Integraciones de DeFi", "Analítica mejorada"],
-      "h3": "Fase 3 — Infraestructura Abierta",
-      "ul3": ["Índices creados por usuarios", "Gobernanza DAO", "Infraestructura de API", "Herramientas institucionales"]
-    },
-    "risks": {
-      "ul": [
-        "Volatilidad del Mercado: Los Fan Tokens siguen siendo activos digitales volátiles. El valor de las posiciones de índices puede fluctuar sustancialmente. El rendimiento pasado no es indicativo de resultados futuros.",
-        "Condiciones de Liquidez: Algunos Fan Tokens pueden experimentar menor liquidez, lo que puede afectar la capacidad de rebalancear o rescatar posiciones a precios esperados.",
-        "Riesgo de Contrato Inteligente: A pesar de las auditorías, la infraestructura blockchain conlleva riesgos técnicos incluyendo bugs, exploits y fallos del protocolo.",
-        "Evolución Regulatoria: Las regulaciones de activos digitales continúan evolucionando globalmente. Los cambios en las leyes aplicables pueden impactar la disponibilidad de servicios de FanIndex en ciertas jurisdicciones."
-      ]
-    },
-    "conclusion": {
-      "p1": "FanIndex introduce la primera infraestructura de índices dedicada para la economía de Fan Tokens.",
-      "p2": "Al combinar:",
-      "ul": ["Exposición diversificada", "Propiedad basada en NFT", "Transparencia on-chain", "Analítica de cartera", "Productos de inversión estructurados"],
-      "p3": "FanIndex transforma los Fan Tokens de activos de participación aislados en un ecosistema financiero escalable.",
-      "p4": "Los Fan Tokens desbloquearon participación digital. FanIndex desbloquea infraestructura financiera."
-    }
+    "executiveSummary": [
+      {"type":"p","text":"FanIndex es una plataforma descentralizada de infraestructura SportFi construida en Chiliz Chain que transforma Fan Tokens en productos financieros estructurados basados en índices."},
+      {"type":"p","text":"En lugar de comprar y gestionar manualmente tokens individuales de Fan, los usuarios pueden ganar exposición diversificada a segmentos completos del ecosistema a través de índices profesionalmente estructurados."},
+      {"type":"p","text":"FanIndex introduce:"},
+      {"type":"ul","items":["Índices de sports tokenizados","Infraestructura de cartera on-chain","Analítica de Fan Tokens","Posiciones de inversión basadas en NFT","Metodologías de índices transparentes"]},
+      {"type":"p","text":"Cada posición de índice se representa con un NFT único que certifica la propiedad de la canasta subyacente de activos."},
+      {"type":"p","text":"Cuando los usuarios invierten en un índice:"},
+      {"type":"ul","items":["CHZ se deposita en el protocolo","Los contratos inteligentes ejecutan compras proporcionales de Fan Tokens subyacentes","Los tokens se mantienen en el tesorería del protocolo","Un NFT que representa la posición se acuña para el inversor"]},
+      {"type":"p","text":"Este modelo crea:"},
+      {"type":"ul","items":["Exposición diversificada","Inversión simplificada","Actividad continua on-chain","Generación orgánica de liquidez en el ecosistema Chiliz"]},
+      {"type":"p","text":"FanIndex está diseñado para convertirse en la capa de infraestructura financiera de Fan Tokens."}
+    ],
+    "vision": [
+      {"type":"p","text":"Los Fan Tokens introdujeron propiedad digital y participación para comunidades deportivas."},
+      {"type":"p","text":"FanIndex expande ese modelo al introducir infraestructura financiera alrededor del ecosistema."},
+      {"type":"p","text":"Nuestra visión es crear:"},
+      {"type":"ul","items":["Los índices de referencia del mercado de Fan Tokens","La infraestructura de cartera para inversores de SportFi","La capa de analítica para mercados de capital de Fan Tokens","La puerta de enlace entre el fanatismo deportivo y las finanzas descentralizadas"]},
+      {"type":"p","text":"FanIndex tiene como objetivo hacer que los Fan Tokens sean invertibles, rastreables y estructuralmente accesibles para participantes minoristas e institucionales."}
+    ],
+    "marketContext": [
+      {"type":"h","level":1,"text":"3.1 La Ascensión de los Fan Tokens"},
+      {"type":"p","text":"Los Fan Tokens, pioneros de Chiliz y Socios.com, crearon una nueva categoría de activos deportivos basados en blockchain."},
+      {"type":"p","text":"Hoy:"},
+      {"type":"ul","items":["Más de 80 organizaciones han lanzado Fan Tokens","Se han generado miles de millones en volumen comercial acumulado","Clubes globales, equipos nacionales, organizaciones de esports y marcas de deportes de combate participan en el ecosistema"]},
+      {"type":"p","text":"Los Fan Tokens establecieron la base para SportFi. Sin embargo, la infraestructura financiera alrededor de estos activos sigue siendo extremadamente limitada."},
+      {"type":"h","level":2,"text":"3.2 Limitaciones del Mercado"},
+      {"type":"ul","items":["Exposición Fragmentada: Los inversores deben comprar y gestionar manualmente múltiples tokens individuales.","Falta de Productos Estructurados: Actualmente no hay índices de referencia ni instrumentos financieros diversificados para el ecosistema.","Infraestructura de Cartera Limitada: La mayoría de las plataformas se enfocan exclusivamente en trading en lugar de construcción y análisis de carteras.","Concentración de Volatilidad: La exposición a un solo token crea volatilidad significativa y concentración de riesgo.","Mercados de Capital Subdesarrollados: Los Fan Tokens tienen utilidad de participación pero infraestructura financiera limitada."]},
+      {"type":"h","level":3,"text":"3.3 La Oportunidad"},
+      {"type":"p","text":"Las finanzas tradicionales evolucionaron a través de ETFs, índices, productos de cartera y exposición estructurada. Cripto adoptó estos conceptos en DeFi, ecosistemas de Capa 1, tokens de IA e índices meme."},
+      {"type":"p","text":"Los Fan Tokens siguen siendo uno de los últimos verticales de cripto sin infraestructura de índices. FanIndex llena esa brecha."}
+    ],
+    "platform": [
+      {"type":"h","level":1,"text":"4.1 ¿Qué es FanIndex?"},
+      {"type":"p","text":"FanIndex es una plataforma descentralizada para:"},
+      {"type":"ul","items":["Invertir en índices de Fan Tokens","Rastrear posiciones de cartera","Analizar el mercado de Fan Tokens","Acceder a exposición de SportFi estructurada"]},
+      {"type":"p","text":"La plataforma combina productos de índices, infraestructura de cartera NFT, analítica de mercado y transparencia on-chain en un único ecosistema."},
+      {"type":"h","level":2,"text":"4.2 Características Principales de la Plataforma"},
+      {"type":"ul","items":["Índices Tokenizados: Canastas estructuradas de Fan Tokens agrupadas por tema, geografía, categoría o estrategia.","Posiciones Basadas en NFT: Cada posición de inversión se representa con un NFT.","Seguimiento de Cartera: Los usuarios pueden monitorear posiciones, asignaciones, exposición y rendimiento directamente on-chain.","Analítica de Fan Tokens: Datos de mercado en tiempo real incluyendo precio, capitalización de mercado, volumen, suministro circulante y métricas de rendimiento para todo el ecosistema de Fan Tokens.","Infraestructura On-Chain: Todas las transacciones ocurren de forma transparente en Chiliz Chain."]}
+    ],
+    "indexArchitecture": [
+      {"type":"p","text":"Los índices de FanIndex están diseñados para proporcionar exposición diversificada a segmentos específicos del mercado de Fan Tokens."},
+      {"type":"h","level":1,"text":"5.1 Índices Ponderados"},
+      {"type":"p","text":"Los índices ponderados asignan activos proporcionalmente en función de la relevancia del mercado. Los factores pueden incluir capitalización de mercado, liquidez e importancia del ecosistema. Estos productos funcionan de manera similar a los índices ponderados por capitalización de mercado tradicionales."},
+      {"type":"p","text":"Ejemplo — FTLX (Índice de Líderes de Fan Tokens): El índice de referencia del mercado de Fan Tokens, rastreando los Fan Tokens más grandes y líquidos."},
+      {"type":"h","level":2,"text":"5.2 Índices de Peso Igual"},
+      {"type":"p","text":"Los índices de peso igual asignan la misma exposición a cada componente. Este enfoque reduce el riesgo de concentración, aumenta la diversificación y proporciona igual representación en todas las organizaciones."},
+      {"type":"p","text":"Ejemplos: FGMX (Índice de Gaming de Fans), FFLX (Índice de Lucha de Fans)."},
+      {"type":"h","level":3,"text":"5.3 Índices Gestionados (Futuro)"},
+      {"type":"p","text":"Los índices gestionados introducen gestión de cartera activa. El equipo de FanIndex puede rebalancear dinámicamente, rotar exposición y gestionar asignaciones estratégicamente. Los productos gestionados están diseñados para inversores avanzados que buscan exposición táctica."}
+    ],
+    "indexSuite": [
+      {"type":"ul","items":["FTLX — Índice de Líderes de Fan Tokens: El índice de referencia del mercado de Fan Tokens. Rastrea los Fan Tokens más grandes y líquidos que representan el ecosistema general.","FGMX — Índice de Gaming de Fans: Un índice de peso igual enfocado en organizaciones de esports con Fan Tokens.","FFLX — Índice de Lucha de Fans: Un índice de peso igual enfocado en organizaciones de deportes de combate.","FELX — Índice de Liga Inglesa de Fans: Rastrea los principales clubes de fútbol ingleses con Fan Tokens.","FSLX — Índice de Liga Española de Fans: Rastrea los principales clubes de fútbol españoles representados en el ecosistema."]}
+    ],
+    "futureExpansion": [
+      {"type":"p","text":"Los índices futuros planeados incluyen:"},
+      {"type":"ul","items":["Índice de Liga Italiana","Índice de Liga Turca","Índice de Equipos Nacionales","Índice de Liga de Brasil","Índice de Deportes de Asia"]},
+      {"type":"p","text":"La expansión a largo plazo puede incluir:"},
+      {"type":"ul","items":["Automovilismo","Baloncesto","UFC / MMA","Torneos globales","Índices generados por usuarios personalizados"]}
+    ],
+    "pricingMethodology": [
+      {"type":"p","text":"El valor de cada índice se calcula usando un modelo de precios ponderado aplicado a datos de mercado en tiempo real."},
+      {"type":"p","text":"Fórmula:"},
+      {"type":"formula","text":"Index = Σ(wᵢ × Pᵢ)   para i = 1 a n"},
+      {"type":"p","text":"Donde:"},
+      {"type":"ul","items":["wᵢ = peso del activo","Pᵢ = precio del token en tiempo real","n = número de activos"]},
+      {"type":"p","text":"Los precios de mercado se obtienen usando proveedores de datos de mercado en vivo como CoinGecko."}
+    ],
+    "nftInfrastructure": [
+      {"type":"p","text":"Cada posición de inversión se representa con un NFT. El NFT contiene:"},
+      {"type":"ul","items":["Tipo de índice","Valor depositado","Datos de asignación","Marca de tiempo","Información de propiedad"]},
+      {"type":"p","text":"El NFT actúa como:"},
+      {"type":"ul","items":["Prueba de propiedad","Certificado de cartera","Reclamación redimible sobre los activos subyacentes"]}
+    ],
+    "buyRedeem": [
+      {"type":"h","level":1,"text":"Flujo de Compra"},
+      {"type":"ol","items":["El usuario deposita CHZ","El contrato inteligente ejecuta compras proporcionales","Se adquieren Fan Tokens subyacentes","Un NFT de posición se acuña para el inversor"]},
+      {"type":"h","level":2,"text":"Flujo de Rescate"},
+      {"type":"ol","items":["El usuario quema el NFT","La cartera subyacente se rescata","Los activos se venden o redistribuyen","CHZ se devuelve al inversor"]}
+    ],
+    "rebalancing": [
+      {"type":"p","text":"Los índices se rebalancean periódicamente para mantener asignaciones objetivo. Los rebalances iniciales se ejecutan manualmente por el equipo."},
+      {"type":"p","text":"Las versiones futuras pueden incluir:"},
+      {"type":"ul","items":["Rebalanceo automático de contratos inteligentes","Gobernanza DAO","Actualizaciones dinámicas de metodología"]},
+      {"type":"p","text":"El rebalanceo tiene como objetivo:"},
+      {"type":"ul","items":["Mantener la integridad del índice","Ajustarse a cambios del mercado","Optimizar la diversificación"]}
+    ],
+    "technicalArchitecture": [
+      {"type":"h","level":1,"text":"12.1 Contratos Inteligentes"},
+      {"type":"p","text":"Los contratos inteligentes de FanIndex gestionan:"},
+      {"type":"ul","items":["Creación de índices","Asignación de tokens","Acuñación de NFT","Contabilidad de cartera","Lógica de rescate"]},
+      {"type":"p","text":"Todos los contratos se despliegan en Chiliz Chain."},
+      {"type":"h","level":2,"text":"12.2 Seguridad"},
+      {"type":"p","text":"Las medidas de seguridad incluyen:"},
+      {"type":"ul","items":["Gestión de tesorería multifirma","Auditorías de terceros","Arquitectura modular de contratos","Ejecución transparente on-chain"]}
+    ],
+    "feeStructure": [
+      {"type":"ul","items":["Tarifa de Entrada: Tarifa de protocolo del 1% en compras.","Tarifa de Salida: 0% — sin tarifa de salida.","Tarifa de Índice Gestionado: 1-2% anualizado para productos gestionados activamente."]}
+    ],
+    "revenue": [
+      {"type":"p","text":"Los ingresos del protocolo pueden asignarse para:"},
+      {"type":"ul","items":["Desarrollo de plataforma","Auditorías de seguridad","Incentivos del ecosistema","Soporte de liquidez","Crecimiento de tesorería"]}
+    ],
+    "governance": [
+      {"type":"p","text":"FanIndex planea mecanismos de gobernanza futuros que permitan a la comunidad participar en:"},
+      {"type":"ul","items":["Propuestas de índices","Ajustes de metodología","Decisiones de tesorería","Expansión del ecosistema"]},
+      {"type":"p","text":"La infraestructura de gobernanza puede evolucionar hacia un modelo DAO."}
+    ],
+    "roadmap": [
+      {"type":"h","level":1,"text":"Fase 1 — Fundación"},
+      {"type":"ul","items":["Lanzamiento de Mainnet","Despliegue de índice central","Infraestructura de cartera","Analítica de Fan Tokens"]},
+      {"type":"h","level":2,"text":"Fase 2 — Expansión"},
+      {"type":"ul","items":["Índices regionales adicionales","Rebalanceo automático","Integraciones de DeFi","Analítica mejorada"]},
+      {"type":"h","level":3,"text":"Fase 3 — Infraestructura Abierta"},
+      {"type":"ul","items":["Índices creados por usuarios","Gobernanza DAO","Infraestructura de API","Herramientas institucionales"]}
+    ],
+    "risks": [
+      {"type":"ul","items":["Volatilidad del Mercado: Los Fan Tokens siguen siendo activos digitales volátiles. El valor de las posiciones de índices puede fluctuar sustancialmente. El rendimiento pasado no es indicativo de resultados futuros.","Condiciones de Liquidez: Algunos Fan Tokens pueden experimentar menor liquidez, lo que puede afectar la capacidad de rebalancear o rescatar posiciones a precios esperados.","Riesgo de Contrato Inteligente: A pesar de las auditorías, la infraestructura blockchain conlleva riesgos técnicos incluyendo bugs, exploits y fallos del protocolo.","Evolución Regulatoria: Las regulaciones de activos digitales continúan evolucionando globalmente. Los cambios en las leyes aplicables pueden impactar la disponibilidad de servicios de FanIndex en ciertas jurisdicciones."]}
+    ],
+    "conclusion": [
+      {"type":"p","text":"FanIndex introduce la primera infraestructura de índices dedicada para la economía de Fan Tokens."},
+      {"type":"p","text":"Al combinar:"},
+      {"type":"ul","items":["Exposición diversificada","Propiedad basada en NFT","Transparencia on-chain","Analítica de cartera","Productos de inversión estructurados"]},
+      {"type":"p","text":"FanIndex transforma los Fan Tokens de activos de participación aislados en un ecosistema financiero escalable."},
+      {"type":"p","text":"Los Fan Tokens desbloquearon participación digital. FanIndex desbloquea infraestructura financiera."}
+    ]
   },
   "privacyPage": {
     "back": "Volver al inicio",

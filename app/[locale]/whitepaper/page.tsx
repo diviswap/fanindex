@@ -10,100 +10,66 @@ export const metadata = {
     "FanIndex Whitepaper v2 — The Index Layer for Fan Tokens. Decentralized SportFi infrastructure built on the Chiliz Chain.",
 }
 
-// Extract the numeric suffix from a key for stable ordering (e.g. "p2" → 2, "ul" → 0)
-function keyOrder(key: string): number {
-  const match = key.match(/(\d+)$/)
-  return match ? parseInt(match[1]) : 0
-}
+// Render a single block from the section "blocks" array
+function BlockRenderer({ block, idx }: { block: any; idx: number }) {
+  if (!block || !block.type) return null
 
-// Component to render content from translation strings
-function ContentRenderer({ content }: { content: any }) {
-  if (typeof content === "string") {
-    return <p>{content}</p>
+  if (block.type === "p") {
+    return <p key={idx}>{block.text}</p>
   }
 
-  if (Array.isArray(content)) {
+  if (block.type === "h") {
+    const cls = "mt-6 mb-2 text-base font-semibold text-foreground"
+    const level = block.level ?? 1
+    if (level === 1) return <h3 key={idx} className={cls}>{block.text}</h3>
+    if (level === 2) return <h4 key={idx} className={cls}>{block.text}</h4>
+    return <h5 key={idx} className={cls}>{block.text}</h5>
+  }
+
+  if (block.type === "ul" && Array.isArray(block.items)) {
     return (
-      <ul className="list-disc space-y-2 pl-5">
-        {content.map((item: string, idx: number) => (
-          <li key={idx}>{item}</li>
-        ))}
+      <ul key={idx} className="list-disc space-y-1.5 pl-5">
+        {block.items.map((item: string, i: number) => <li key={i}>{item}</li>)}
       </ul>
     )
   }
 
-  if (typeof content === "object" && content !== null) {
-    // Sort by numeric suffix only — preserves interleaving of h/p/ul with the same number
-    const entries = Object.entries(content).sort(([keyA], [keyB]) => {
-      const numA = keyOrder(keyA)
-      const numB = keyOrder(keyB)
-      if (numA !== numB) return numA - numB
-      // Same number: headings first, then paragraphs, then lists, then formula
-      const rank = (k: string) => {
-        if (k.startsWith("h")) return 0
-        if (k.startsWith("p")) return 1
-        if (k.startsWith("ul") || k.startsWith("ol")) return 2
-        if (k === "formula") return 3
-        return 4
-      }
-      return rank(keyA) - rank(keyB)
-    })
-
+  if (block.type === "ol" && Array.isArray(block.items)) {
     return (
-      <div className="space-y-4">
-        {entries.map(([key, value]: [string, any]) => {
-          // Paragraphs
-          if (key.startsWith("p") && typeof value === "string") {
-            return <p key={key}>{value}</p>
-          }
+      <ol key={idx} className="list-decimal space-y-1.5 pl-5">
+        {block.items.map((item: string, i: number) => <li key={i}>{item}</li>)}
+      </ol>
+    )
+  }
 
-          // Headings — h1 = h3, h2 = h4, h3+ = h5
-          if (key.startsWith("h") && typeof value === "string") {
-            const level = parseInt(key.replace("h", "")) || 1
-            const cls = "mt-6 mb-2 text-base font-semibold text-foreground"
-            if (level === 1) return <h3 key={key} className={cls}>{value}</h3>
-            if (level === 2) return <h4 key={key} className={cls}>{value}</h4>
-            return <h5 key={key} className={cls}>{value}</h5>
-          }
-
-          // Unordered lists
-          if (key.startsWith("ul") && Array.isArray(value)) {
-            return (
-              <ul key={key} className="list-disc space-y-1.5 pl-5">
-                {value.map((item: string, idx: number) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            )
-          }
-
-          // Ordered lists
-          if (key.startsWith("ol") && Array.isArray(value)) {
-            return (
-              <ol key={key} className="list-decimal space-y-1.5 pl-5">
-                {value.map((item: string, idx: number) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ol>
-            )
-          }
-
-          // Formula
-          if (key === "formula" && typeof value === "string") {
-            return (
-              <div
-                key={key}
-                className="my-4 rounded-lg border border-border/40 bg-card/40 px-5 py-4 font-mono text-sm text-foreground tracking-wide"
-              >
-                {value}
-              </div>
-            )
-          }
-
-          return null
-        })}
+  if (block.type === "formula") {
+    return (
+      <div key={idx} className="rounded-lg border border-border/40 bg-card/40 px-5 py-4 font-mono text-sm text-foreground tracking-wide">
+        {block.text}
       </div>
     )
+  }
+
+  return null
+}
+
+// Render section content — expects an array of typed blocks
+function ContentRenderer({ content }: { content: any }) {
+  if (!content) return null
+
+  if (Array.isArray(content)) {
+    return (
+      <div className="space-y-4">
+        {content.map((block: any, idx: number) => (
+          <BlockRenderer key={idx} block={block} idx={idx} />
+        ))}
+      </div>
+    )
+  }
+
+  // Fallback for plain string
+  if (typeof content === "string") {
+    return <p>{content}</p>
   }
 
   return null
