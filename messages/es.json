@@ -451,7 +451,7 @@
       "h3": "5.3 Índices Gestionados (Futuro)",
       "p6": "Los índices gestionados introducen gestión de cartera activa. El equipo de FanIndex puede rebalancear dinámicamente, rotar exposición y gestionar asignaciones estratégicamente. Los productos gestionados están diseñados para inversores avanzados que buscan exposición táctica."
     },
-    "currentSuite": {
+    "indexSuite": {
       "ul": [
         "FTLX — Índice de Líderes de Fan Tokens: El índice de referencia del mercado de Fan Tokens. Rastrea los Fan Tokens más grandes y líquidos que representan el ecosistema general.",
         "FGMX — Índice de Gaming de Fans: Un índice de peso igual enfocado en organizaciones de esports con Fan Tokens.",
@@ -480,7 +480,7 @@
       "p2": "El NFT actúa como:",
       "ul2": ["Prueba de propiedad", "Certificado de cartera", "Reclamación redimible sobre los activos subyacentes"]
     },
-    "buyRedeemFlow": {
+    "buyRedeem": {
       "h1": "Flujo de Compra",
       "ol1": ["El usuario deposita CHZ", "El contrato inteligente ejecuta compras proporcionales", "Se adquieren Fan Tokens subyacentes", "Un NFT de posición se acuña para el inversor"],
       "h2": "Flujo de Rescate",
@@ -509,7 +509,7 @@
         "Tarifa de Índice Gestionado: 1-2% anualizado para productos gestionados activamente."
       ]
     },
-    "revenueAllocation": {
+    "revenue": {
       "p1": "Los ingresos del protocolo pueden asignarse para:",
       "ul": ["Desarrollo de plataforma", "Auditorías de seguridad", "Incentivos del ecosistema", "Soporte de liquidez", "Crecimiento de tesorería"]
     },
@@ -692,7 +692,7 @@
       "marketContext": "3. Contexto de Mercado",
       "platform": "4. La Plataforma FanIndex",
       "indexArchitecture": "5. Arquitectura de Índices",
-      "currentSuite": "6. Suite de Índices Actual",
+      "indexSuite": "6. Suite de Índices Actual",
       "futureExpansion": "7. Expansión Futura",
       "pricingMethodology": "8. Metodología de Precios",
       "nftInfrastructure": "9. Infraestructura de Posiciones NFT",
@@ -700,7 +700,7 @@
       "rebalancing": "11. Rebalanceo",
       "technicalArchitecture": "12. Arquitectura Técnica",
       "feeStructure": "13. Estructura de Comisiones",
-      "revenueAllocation": "14. Asignación de Ingresos",
+      "revenue": "14. Asignación de Ingresos",
       "governance": "15. Gobernanza",
       "roadmap": "16. Hoja de Ruta",
       "risks": "17. Riesgos",

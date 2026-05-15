@@ -1040,7 +1040,7 @@
       "h3": "5.3 Managed Indices (Future)",
       "p6": "Managed indices introduce active portfolio management. The FanIndex team may rebalance dynamically, rotate exposure, and manage allocations strategically. Managed products are designed for advanced investors seeking tactical exposure."
     },
-    "currentSuite": {
+    "indexSuite": {
       "ul": [
         "FTLX — Fan Token Leaders Index: The benchmark index of the Fan Token market. Tracks the largest and most liquid Fan Tokens representing the overall ecosystem.",
         "FGMX — Fan Gaming Index: An equal-weight index focused on esports organizations with Fan Tokens.",
@@ -1069,7 +1069,7 @@
       "p2": "The NFT acts as:",
       "ul2": ["Proof of ownership", "Portfolio certificate", "Redeemable claim on the underlying assets"]
     },
-    "buyRedeemFlow": {
+    "buyRedeem": {
       "h1": "Buy Flow",
       "ol1": ["User deposits CHZ", "Smart contract executes proportional purchases", "Underlying Fan Tokens are acquired", "Position NFT is minted to the investor"],
       "h2": "Redeem Flow",
@@ -1098,7 +1098,7 @@
         "Managed Index Fee: 1–2% annualized for actively managed products."
       ]
     },
-    "revenueAllocation": {
+    "revenue": {
       "p1": "Protocol revenue may be allocated toward:",
       "ul": ["Platform development", "Security audits", "Ecosystem incentives", "Liquidity support", "Treasury growth"]
     },

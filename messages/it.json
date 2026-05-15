@@ -986,7 +986,7 @@
       "h3": "5.3 Indici Gestiti (Futuro)",
       "p6": "Gli indici gestiti introducono la gestione attiva del portafoglio. Il team FanIndex può ribilanciare dinamicamente, ruotare l'esposizione e gestire le allocazioni in modo strategico. I prodotti gestiti sono progettati per investitori avanzati che cercano un'esposizione tattica."
     },
-    "currentSuite": {
+    "indexSuite": {
       "ul": [
         "FTLX — Fan Token Leaders Index: Il benchmark del mercato dei Fan Token. Traccia i Fan Token più grandi e liquidi che rappresentano l'ecosistema complessivo.",
         "FGMX — Fan Gaming Index: Un indice a peso uguale focalizzato sulle organizzazioni esports con Fan Token.",
@@ -1015,7 +1015,7 @@
       "p2": "L'NFT funziona come:",
       "ul2": ["Prova di proprietà", "Certificato di portafoglio", "Diritto riscattabile sugli asset sottostanti"]
     },
-    "buyRedeemFlow": {
+    "buyRedeem": {
       "h1": "Flusso di Acquisto",
       "ol1": ["L'utente deposita CHZ", "Lo smart contract esegue acquisti proporzionali", "I Fan Token sottostanti vengono acquisiti", "L'NFT di posizione viene emesso all'investitore"],
       "h2": "Flusso di Riscatto",
@@ -1044,7 +1044,7 @@
         "Commissione dell'Indice Gestito: 1–2% annuo per i prodotti gestiti attivamente."
       ]
     },
-    "revenueAllocation": {
+    "revenue": {
       "p1": "I ricavi del protocollo possono essere allocati per:",
       "ul": ["Sviluppo della piattaforma", "Audit di sicurezza", "Incentivi all'ecosistema", "Supporto alla liquidità", "Crescita del treasury"]
     },

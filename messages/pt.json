@@ -986,7 +986,7 @@
       "h3": "5.3 Índices Gerenciados (Futuro)",
       "p6": "Os índices gerenciados introduzem gestão ativa de portfólio. A equipe FanIndex pode rebalancear dinamicamente, rotacionar a exposição e gerenciar alocações estrategicamente. Os produtos gerenciados são projetados para investidores avançados que buscam exposição tática."
     },
-    "currentSuite": {
+    "indexSuite": {
       "ul": [
         "FTLX — Fan Token Leaders Index: O índice benchmark do mercado de Fan Token. Rastreia os Fan Tokens maiores e mais líquidos representando o ecossistema geral.",
         "FGMX — Fan Gaming Index: Um índice de peso igual focado em organizações de esports com Fan Tokens.",
@@ -1015,7 +1015,7 @@
       "p2": "O NFT funciona como:",
       "ul2": ["Prova de propriedade", "Certificado de portfólio", "Direito resgatável sobre os ativos subjacentes"]
     },
-    "buyRedeemFlow": {
+    "buyRedeem": {
       "h1": "Fluxo de Compra",
       "ol1": ["Usuário deposita CHZ", "Contrato inteligente executa compras proporcionais", "Fan Tokens subjacentes são adquiridos", "NFT de posição é emitido para o investidor"],
       "h2": "Fluxo de Resgate",
@@ -1044,7 +1044,7 @@
         "Taxa de Índice Gerenciado: 1–2% ao ano para produtos gerenciados ativamente."
       ]
     },
-    "revenueAllocation": {
+    "revenue": {
       "p1": "A receita do protocolo pode ser alocada para:",
       "ul": ["Desenvolvimento da plataforma", "Auditorias de segurança", "Incentivos do ecossistema", "Suporte de liquidez", "Crescimento do tesouro"]
     },
