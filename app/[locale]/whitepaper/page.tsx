@@ -53,7 +53,7 @@ function ContentRenderer({ content }: { content: any }) {
 
 export default function WhitepaperPage() {
   const t = useTranslations("whitepaperPage")
-  const content = useTranslations("whitepaperContent")
+  const tContent = useTranslations("whitepaperContent")
   
   // Define section structure based on English whitepaper structure
   const SECTION_IDS = [
@@ -97,6 +97,16 @@ export default function WhitepaperPage() {
     "17. Risks",
     "18. Conclusion",
   ]
+
+  // Helper to get nested translation object
+  const getSectionContent = (sectionId: string) => {
+    try {
+      // Using the getRawFallback API to get the raw object
+      return tContent.raw(sectionId)
+    } catch {
+      return {}
+    }
+  }
 
   return (
     <div className="relative flex w-full flex-col min-h-screen bg-background">
@@ -166,7 +176,7 @@ export default function WhitepaperPage() {
             {/* Sections */}
             <div className="space-y-16">
               {SECTION_IDS.map((sectionId, idx) => {
-                const sectionContent = content(sectionId)
+                const sectionContent = getSectionContent(sectionId)
                 return (
                   <article
                     key={sectionId}
