@@ -29,21 +29,73 @@ function ContentRenderer({ content }: { content: any }) {
   if (typeof content === "object") {
     return (
       <div className="space-y-4">
-        {Object.entries(content).map(([key, value]: [string, any]) => (
-          <div key={key}>
-            {key.startsWith("p") && typeof value === "string" && <p>{value}</p>}
-            {key.startsWith("h") && typeof value === "string" && (
-              <h3 className="mt-6 mb-3 text-base font-semibold text-foreground">{value}</h3>
-            )}
-            {key.startsWith("ul") && Array.isArray(value) && (
-              <ul className="list-disc space-y-2 pl-5">
-                {value.map((item: string, idx: number) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        ))}
+        {Object.entries(content)
+          .sort(([keyA], [keyB]) => {
+            // Sort to ensure p1, p2... then h1, h2... then ul/ol/formula
+            const orderMap: { [key: string]: number } = {
+              p: 0,
+              h: 1,
+              ul: 2,
+              ol: 2,
+              formula: 3,
+            }
+            const getOrder = (key: string) =>
+              orderMap[key.charAt(0)] !== undefined ? orderMap[key.charAt(0)] : 4
+            return getOrder(keyA) - getOrder(keyB)
+          })
+          .map(([key, value]: [string, any]) => {
+            // Paragraphs
+            if (key.startsWith("p") && typeof value === "string") {
+              return <p key={key}>{value}</p>
+            }
+
+            // Headings
+            if (key.startsWith("h") && typeof value === "string") {
+              const level = parseInt(key.charAt(1))
+              const HeadingTag = (level === 1 ? "h3" : level === 2 ? "h4" : "h5") as any
+              return (
+                <HeadingTag key={key} className="mt-6 mb-3 text-base font-semibold text-foreground">
+                  {value}
+                </HeadingTag>
+              )
+            }
+
+            // Unordered lists
+            if (key.startsWith("ul") && Array.isArray(value)) {
+              return (
+                <ul key={key} className="list-disc space-y-2 pl-5">
+                  {value.map((item: string, idx: number) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              )
+            }
+
+            // Ordered lists
+            if (key.startsWith("ol") && Array.isArray(value)) {
+              return (
+                <ol key={key} className="list-decimal space-y-2 pl-5">
+                  {value.map((item: string, idx: number) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ol>
+              )
+            }
+
+            // Formula (mathematical notation)
+            if (key === "formula" && typeof value === "string") {
+              return (
+                <div
+                  key={key}
+                  className="my-4 rounded-lg border border-border/40 bg-card/40 p-4 font-mono text-sm text-foreground"
+                >
+                  {value}
+                </div>
+              )
+            }
+
+            return null
+          })}
       </div>
     )
   }
