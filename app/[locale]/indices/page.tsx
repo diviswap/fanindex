@@ -18,7 +18,7 @@ export default function IndicesPage() {
   }, [])
 
   const deployedIndices = INDICES.filter((index) =>
-    ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"].includes(index.id),
+    ["FTLX", "FGMX", "FFLX", "FELX", "FSLX", "FNTX"].includes(index.id),
   )
 
   const strategies = [

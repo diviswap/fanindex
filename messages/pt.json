@@ -69,6 +69,11 @@
         "title": "Índice Liga Espanhola",
         "tagline": "La Liga",
         "description": "Exposição ponderada aos principais clubes de futebol espanhóis."
+      },
+      "FNTX": {
+        "title": "Índice Seleções Nacionais",
+        "tagline": "Internacional",
+        "description": "Exposição equi-ponderada aos fan tokens de federações nacionais de futebol de todo o mundo."
       }
     }
   },

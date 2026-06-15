@@ -69,6 +69,11 @@
         "title": "Indice Liga Española",
         "tagline": "La Liga",
         "description": "Esposizione ponderata ai principali club di calcio spagnoli."
+      },
+      "FNTX": {
+        "title": "Indice Nazionali di Calcio",
+        "tagline": "Internazionale",
+        "description": "Esposizione equi-ponderata ai fan token delle federazioni calcistiche nazionali di tutto il mondo."
       }
     }
   },

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowUpRight, Trophy, Gamepad2, Swords, Flag, MapPin } from "lucide-react"
+import { ArrowUpRight, Trophy, Gamepad2, Swords, Flag, MapPin, Globe } from "lucide-react"
 import { useMemo } from "react"
 import { useCoinGeckoPrices } from "@/lib/hooks/use-coingecko-prices"
 import { INDICES, calculateIndexPrice } from "@/lib/data/indices"
@@ -15,6 +15,7 @@ const FAMILY_META = [
   { ticker: "FFLX", icon: Swords, accent: "text-rose-400", accentBg: "bg-rose-400/10 border-rose-400/25" },
   { ticker: "FELX", icon: Flag, accent: "text-blue-400", accentBg: "bg-blue-400/10 border-blue-400/25" },
   { ticker: "FSLX", icon: MapPin, accent: "text-orange-400", accentBg: "bg-orange-400/10 border-orange-400/25" },
+  { ticker: "FNTX", icon: Globe, accent: "text-emerald-400", accentBg: "bg-emerald-400/10 border-emerald-400/25" },
 ] as const
 
 export function IndexFamily() {

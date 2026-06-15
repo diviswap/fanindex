@@ -69,6 +69,11 @@
         "title": "Fan Spanish League Index",
         "tagline": "La Liga",
         "description": "Weighted exposure to top Spanish football clubs."
+      },
+      "FNTX": {
+        "title": "Fan National Teams Index",
+        "tagline": "International",
+        "description": "Equal-weight exposure to national football federation fan tokens from around the world."
       }
     }
   },

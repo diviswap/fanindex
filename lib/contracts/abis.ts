@@ -53,6 +53,15 @@ export const ETF_CONTRACTS = {
     name: "FSLX — Fan Spanish League Index",
     tokens: 4,
   },
+  // FNTX — Fan National Teams Index (equal weight, 6 tokens)
+  // Composition: ARG, POR, ITA, SAFA, SFA, BELG
+  FNTX: {
+    vault: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    nft: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    batchBuyer: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+    name: "FNTX — Fan National Teams Index",
+    tokens: 6,
+  },
 } as const
 
 // Backwards-compat alias — some components still reference MAINNET_CONTRACTS
