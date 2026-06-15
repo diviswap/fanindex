@@ -720,6 +720,7 @@ export function PortfolioView() {
                 key={h.tokenId.toString()}
                 holding={h}
                 tokenPrices={tokenPrices}
+                priceMap={priceMap}
                 onSell={handleSell}
                 onBuy={handleBuyMore}
                 walletAddress={address}

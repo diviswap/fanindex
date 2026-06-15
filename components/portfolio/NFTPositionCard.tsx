@@ -16,6 +16,8 @@ import { ShareCardModal } from "@/components/share/ShareCardModal"
 interface NFTPositionCardProps {
   holding: NFTHolding
   tokenPrices: TokenPrice[]
+  /** Combined price map (on-chain + CoinGecko) keyed by lowercase address */
+  priceMap?: Map<string, number>
   onSell: (holding: NFTHolding) => void
   onBuy?: (holding: NFTHolding) => void
   walletAddress?: string
@@ -24,19 +26,20 @@ interface NFTPositionCardProps {
 const VIDEO_URL =
   "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/dec77d7d-abd9-4ebc-9a9c-3b387c3f1a98-card.MP4.MP4"
 
-export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAddress }: NFTPositionCardProps) {
+export function NFTPositionCard({ holding, tokenPrices, priceMap, onSell, onBuy, walletAddress }: NFTPositionCardProps) {
   const t = useTranslations("nftPositionCard")
   const { tokenId, indexName, tokenAddresses, tokenAmounts } = holding
   const [showShareModal, setShowShareModal] = useState(false)
 
-  // Build per-token rows with live CHZ prices
+  // Build per-token rows with live CHZ prices.
+  // Prefer priceMap (which merges on-chain router + CoinGecko prices) when
+  // available; fall back to the raw tokenPrices array otherwise.
   const tokenRows = tokenAddresses.map((addr, i) => {
     const token = getTokenByAddress(addr)
     const amount = tokenAmounts[i] ? Number(formatUnits(tokenAmounts[i], 18)) : 0
-    const priceData = tokenPrices.find(
-      (tp) => tp.address.toLowerCase() === addr.toLowerCase()
-    )
-    const priceInCHZ = priceData?.priceInCHZ ?? 0
+    const priceInCHZ = priceMap
+      ? (priceMap.get(addr.toLowerCase()) ?? 0)
+      : (tokenPrices.find((tp) => tp.address.toLowerCase() === addr.toLowerCase())?.priceInCHZ ?? 0)
     const valueInCHZ = amount * priceInCHZ
 
     return {
