@@ -12,37 +12,38 @@ export interface TokenPrice {
   error: boolean
 }
 
+// Keys must be lowercase for reliable lookup
 const FALLBACK_PRICES: Record<string, number> = {
   // AC Milan
-  '0xF9C0F80a6c67b1B39bdDF00ecD57f2533ef5b688': 2.45,
+  '0xf9c0f80a6c67b1b39bddf00ecd57f2533ef5b688': 2.45,
   // Arsenal FC
-  '0x1d4343d35f0E0e14C14115876D01dEAa4792550b': 3.45,
+  '0x1d4343d35f0e0e14c14115876d01deaa4792550b': 3.45,
   // AS Roma
-  '0xa6610b3361c4c0D206Aa3364cd985016c2d89386': 1.92,
+  '0xa6610b3361c4c0d206aa3364cd985016c2d89386': 1.92,
   // Aston Villa
-  '0x095726841DC9Bf395114Ac83f8fd42B176cFAd10': 1.23,
+  '0x095726841dc9bf395114ac83f8fd42b176cfad10': 1.23,
   // Atlético Madrid
-  '0xe9506F70be469d2369803Ccf41823713BAFe8154': 1.85,
+  '0xe9506f70be469d2369803ccf41823713bafe8154': 1.85,
   // Atlético Mineiro
-  '0xe5274Eb169E0e3A60B9dC343F02BA940958e8683': 1.42,
+  '0xe5274eb169e0e3a60b9dc343f02ba940958e8683': 1.42,
   // FC Barcelona
-  '0xF3C00e2c9D57E5425Ec2eAFB04e14Db1Fd4f2aC6': 3.12,
+  '0xf3c00e2c9d57e5425ec2eafb04e14db1fd4f2ac6': 3.12,
   // Galatasaray
-  '0xc50dc08BdF1e47C336e1DC370e4a0961F7F99A25': 2.78,
+  '0xc50dc08bdf1e47c336e1dc370e4a0961f7f99a25': 2.78,
   // Inter Milan
-  '0x1eE8a0bb23F6c6C67D77cd2e14068B0F68A1dA2f': 2.34,
+  '0x1ee8a0bb23f6c6c67d77cd2e14068b0f68a1da2f': 2.34,
   // Juventus
-  '0xf1BB546Bc6a06eff5F2DfC1a6e7A07E0EDB0C4C1': 2.78,
+  '0xf1bb546bc6a06eff5f2dfc1a6e7a07e0edb0c4c1': 2.78,
   // Manchester City
-  '0xE64Df98eAc68c6e05835ef5A992Ace4EEF47B082': 4.12,
+  '0xe64df98eac68c6e05835ef5a992ace4eef47b082': 4.12,
   // SSC Napoli
-  '0x8Bc9e59ED7dD9b7c5F8bcE6C3c40D5a48CD2DaD7': 1.65,
+  '0x8bc9e59ed7dd9b7c5f8bce6c3c40d5a48cd2dad7': 1.65,
   // OG Esports
-  '0x4dF29Be05e2F56B5bB4ceaFb77cC6e4Acd69a6E8': 3.25,
+  '0x4df29be05e2f56b5bb4ceafb77cc6e4acd69a6e8': 3.25,
   // Paris Saint-Germain
-  '0xA3093d4FCBC0843Cfe0ffbB3D16fF58c8c1C49fF': 5.45,
+  '0xa3093d4fcbc0843cfe0ffbbb3d16ff58c8c1c49ff': 5.45,
   // Tottenham Hotspur
-  '0x44F6b9b539fDc5D10169Fd8059e45252F3a12D1E': 2.34,
+  '0x44f6b9b539fdc5d10169fd8059e45252f3a12d1e': 2.34,
 }
 
 export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
@@ -86,10 +87,7 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     const result = data?.[index]
     
     if (!result || result.status === "failure") {
-      const price =
-        (unwrapped ? FALLBACK_PRICES[unwrapped.toLowerCase()] : 0) ||
-        (unwrapped ? FALLBACK_PRICES[unwrapped] : 0) ||
-        0
+      const price = (unwrapped ? FALLBACK_PRICES[unwrapped.toLowerCase()] : 0) ?? 0
       return {
         address: original,
         priceInCHZ: price,
