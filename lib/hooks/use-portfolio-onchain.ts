@@ -50,7 +50,7 @@ export function usePortfolioOnchain(
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return {
         address: c.nft as `0x${string}`,
-        abi: SimplePositionsNFTABI,
+        abi: SimplePositionsNFTABI.abi as readonly unknown[],
         functionName: "tokensOf" as const,
         args: [address] as const,
       }
@@ -84,7 +84,7 @@ export function usePortfolioOnchain(
       const c = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
       return tokenIds.map((tokenId) => ({
         address: c.vault as `0x${string}`,
-        abi: EtfVaultABI,
+        abi: EtfVaultABI.abi as readonly unknown[],
         functionName: "getAllHoldings" as const,
         args: [tokenId] as const,
       }))

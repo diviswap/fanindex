@@ -1,13 +1,7 @@
-import EtfVaultJSON from "./EtfVault.json"
-import SimplePositionsNFTJSON from "./SimplePositionsNFT.json"
-import FeeManagerJSON from "./FeeManager.json"
+import EtfVaultABI from "./EtfVault.json"
+import SimplePositionsNFTABI from "./SimplePositionsNFT.json"
 
-// Export the raw ABI arrays directly — wagmi/viem need the literal array,
-// NOT the wrapped Hardhat artifact object. Every call site must use these
-// exports directly (not .abi on top of them).
-export const EtfVaultABI = EtfVaultJSON.abi
-export const SimplePositionsNFTABI = SimplePositionsNFTJSON.abi
-export const FeeManagerABI = FeeManagerJSON.abi
+export { EtfVaultABI, SimplePositionsNFTABI }
 
 // Mainnet Contract Addresses (Chiliz Chain)
 // Indices registered here are keyed by their ticker (FTLX, FGMX, FFLX…).

@@ -97,7 +97,7 @@ export function IndexCard({ index }: IndexCardProps) {
 
   const { data: etfInfo } = useReadContract({
     address: contracts?.vault,
-    abi: EtfVaultABI,
+    abi: EtfVaultABI.abi,
     functionName: "getEtfInfo",
     query: {
       enabled: hasContracts && !!contracts,

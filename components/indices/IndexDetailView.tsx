@@ -66,7 +66,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   const contracts = getContractAddresses(index.id)
   const { data: feeBpsRaw } = useReadContract({
     address: contracts?.vault,
-    abi: EtfVaultABI,
+    abi: EtfVaultABI.abi,
     functionName: "buyFeeBps",
     query: {
       enabled: hasDeployedContracts(index.id),
@@ -380,7 +380,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
       </Card>
 
-      {/* ── KPI metrics row (Token Terminal style) ───���──────────────────────── */}
+      {/* ── KPI metrics row (Token Terminal style) ──────────────────────────── */}
       <Card className="border-border bg-card/60 backdrop-blur-sm mb-6 sm:mb-8 md:mb-12 overflow-hidden">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-y sm:divide-y-0 divide-border">
           {/* Market Cap */}

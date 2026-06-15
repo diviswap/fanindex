@@ -117,14 +117,14 @@ export function RedeemDialog({
       if (redemptionType === "chz") {
         writeContract({
           address: contracts.vault,
-          abi: EtfVaultABI,
+          abi: EtfVaultABI.abi,
           functionName: "redeemAllToCHZNative",
           args: [BigInt(nftId), redemptionPercentage, minOutCHZ],
         })
       } else {
         writeContract({
           address: contracts.vault,
-          abi: EtfVaultABI,
+          abi: EtfVaultABI.abi,
           functionName: "withdrawTokens",
           args: [BigInt(nftId), address, redemptionPercentage],
         })

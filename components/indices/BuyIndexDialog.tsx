@@ -65,22 +65,22 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       ? [
           {
             address: contracts.vault,
-            abi: EtfVaultABI,
+            abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "buyFeeBps",
           },
           {
             address: contracts.vault,
-            abi: EtfVaultABI,
+            abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "minInvestment",
           },
           {
             address: contracts.vault,
-            abi: EtfVaultABI,
+            abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "getEtfInfo",
           },
           {
             address: contracts.vault,
-            abi: EtfVaultABI,
+            abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "WCHZ",
           },
         ]
@@ -241,7 +241,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
       writeContract({
         address: contracts.vault,
-        abi: EtfVaultABI,
+        abi: EtfVaultABI.abi,
         functionName: "buyNative",
         args: [address, minOuts],
         value: parseEther(amount),
