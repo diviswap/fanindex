@@ -806,7 +806,8 @@
     "return24h": "Rendement 24h",
     "return7d": "Rendement 7j",
     "return30d": "Rendement 30j",
-    "noReturn": "Aucune donnée"
+    "noReturn": "Aucune donnée",
+    "rebalanceHistory": "Historique de Rééquilibrage"
   },
   "fanTokenDetail": {
     "tokenNotFound": "Token Introuvable",

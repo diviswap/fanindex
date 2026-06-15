@@ -974,7 +974,8 @@
     "return24h": "24h Return",
     "return7d": "7d Return",
     "return30d": "30d Return",
-    "noReturn": "No data"
+    "noReturn": "No data",
+    "rebalanceHistory": "Rebalance History"
   },
   "fanTokenDetail": {
     "tokenNotFound": "Token Not Found",

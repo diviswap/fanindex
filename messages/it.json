@@ -806,7 +806,8 @@
     "return24h": "Rendimento 24h",
     "return7d": "Rendimento 7g",
     "return30d": "Rendimento 30g",
-    "noReturn": "Nessun dato"
+    "noReturn": "Nessun dato",
+    "rebalanceHistory": "Storico Ribilanciamenti"
   },
   "fanTokenDetail": {
     "tokenNotFound": "Token Non Trovato",

@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { TrendingUp, TrendingDown, Users, BarChart3, ArrowLeft, PieChart, Activity, Loader2 } from 'lucide-react'
+import { TrendingUp, TrendingDown, Users, BarChart3, ArrowLeft, PieChart, Activity, Loader2, Clock } from 'lucide-react'
 import { useState, useMemo } from "react"
 import { BuyIndexDialog } from "./BuyIndexDialog"
 import Link from "next/link"
@@ -14,6 +14,7 @@ import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/c
 import { useReadContract } from "wagmi"
 import useSWR from "swr"
 import { useTranslations } from "next-intl"
+import { REBALANCE_HISTORY } from "@/lib/data/rebalance-history"
 
 interface IndexDetailViewProps {
   index: IndexData
@@ -549,6 +550,53 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
           </Card>
         </div>
       </div>
+
+      {/* ── Rebalance History ────────────────────────────────────────────────── */}
+      {(() => {
+        const rebalanceEvents = REBALANCE_HISTORY.filter(event => event.index === index.id)
+        if (rebalanceEvents.length === 0) return null
+
+        return (
+          <Card className="border-border bg-card/60 backdrop-blur-sm mb-6 sm:mb-8 p-4 sm:p-6">
+            <div className="flex items-center gap-2 mb-4 sm:mb-6">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">{t("rebalanceHistory")}</h2>
+            </div>
+
+            <div className="space-y-4 sm:space-y-5">
+              {rebalanceEvents.map((event, idx) => (
+                <div key={idx} className="pb-4 sm:pb-5 border-b border-border last:border-b-0 last:pb-0">
+                  <div className="flex items-start justify-between mb-2 sm:mb-3 gap-3">
+                    <div className="flex-1">
+                      <div className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-1">
+                        {new Date(event.date).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </div>
+                      <p className="text-sm text-foreground">{event.change}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                    {event.tokens.map((token) => (
+                      <div
+                        key={token.symbol}
+                        className="flex flex-col items-center p-2 rounded-lg bg-muted/20 border border-border/50"
+                      >
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase mb-1">
+                          {token.symbol}
+                        </span>
+                        <span className="text-sm font-bold text-foreground">{token.weight.toFixed(2)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )
+      })()}
 
         <BuyIndexDialog index={index} open={showBuyDialog} onOpenChange={setShowBuyDialog} livePrice={displayPrice} />
     </>
