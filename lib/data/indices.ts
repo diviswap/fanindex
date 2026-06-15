@@ -171,6 +171,9 @@ const FELX_WEIGHTS = [46, 36, 9, 6, 3] as const
 const FSLX_TOKENS = ["BAR", "ATM", "SEVILLA", "VCF"] as const
 const FSLX_WEIGHTS = [53, 41, 3, 3] as const
 
+// FNTX — Fan National Teams Index (equal weight, 6 tokens)
+const FNTX_TOKENS = ["ARG", "POR", "ITA", "SAFA", "SFA", "BELG"] as const
+
 export const INDICES: IndexData[] = [
   {
     id: "FTLX",
@@ -237,6 +240,19 @@ export const INDICES: IndexData[] = [
     weights: [...FSLX_WEIGHTS],
     price: calculateIndexPrice([...FSLX_TOKENS], undefined, [...FSLX_WEIGHTS]).toFixed(2),
     apy: "13.6%",
+    totalValue: "—",
+    holders: 0,
+  },
+  {
+    id: "FNTX",
+    name: "FNTX — Fan National Teams Index",
+    symbol: "FNTX",
+    description:
+      "Equal-weight exposure to national football federation fan tokens from around the world, representing the pinnacle of international football.",
+    type: "equal",
+    tokens: [...FNTX_TOKENS],
+    price: calculateIndexPrice([...FNTX_TOKENS]).toFixed(2),
+    apy: "11.5%",
     totalValue: "—",
     holders: 0,
   },
