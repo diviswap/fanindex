@@ -45,13 +45,22 @@ export const ETF_CONTRACTS = {
     tokens: 5,
   },
   // FSLX — Fan Spanish League Index (weighted, 4 tokens)
-  // Composition: BAR 53%, ATM 41%, SEVILLA 3%, VCF 3%
+  // Composition: ATM 53%, BAR 42%, SEVILLA 2%, VCF 2%
   FSLX: {
     vault: "0x6A0D2B19C7fbd10778d31A063869771F96D538f1" as `0x${string}`,
     nft: "0x6598F5D9C8B30aa79A9c1F7eC6bae892296aa9D7" as `0x${string}`,
     batchBuyer: "0xcdb46296B007ccE24AB19e6c5E16EB02b5Ea1ED0" as `0x${string}`,
     name: "FSLX — Fan Spanish League Index",
     tokens: 4,
+  },
+  // FNTX — Fan National Teams Index (equal weight, 5 tokens)
+  // Composition: BELG 20%, SAFA 20%, SFA 20%, POR 20%, ARG 20%
+  FNTX: {
+    vault: "0x594ccf220989ffdFd647A4BE221e8F27e2eEb7aa" as `0x${string}`,
+    nft: "0x506A729c424AB32F592bf328735E26033601D534" as `0x${string}`,
+    batchBuyer: "0x3Fa76aac2C0579afdE2A26Aa8D2795bfcA75FD6c" as `0x${string}`,
+    name: "FNTX — Fan National Teams Index",
+    tokens: 5,
   },
 } as const
 
