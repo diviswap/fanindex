@@ -50,7 +50,10 @@ export async function GET(request: Request) {
 
       return {
         symbol: token.symbol,
-        address: token.wrapped,
+        // Use the canonical 18-decimal address so the portfolio priceMap
+        // can match against the addresses returned by getAllHoldings on-chain.
+        // Fall back to wrapped if the new address is not set yet.
+        address: token.address ?? token.wrapped,
         cgId: token.cgId,
         icon: token.icon ?? null,
         priceUSD: priceData?.usd || Number.parseFloat(token.price),
