@@ -282,7 +282,7 @@ export const FAN_TOKENS: FanToken[] = [
     category: "football",
     icon: "/images/tokens/safa.svg",
     address: "0xf81Aa505Df80278Fc4cF2B050086f678D48bDdCE",
-    cgId: undefined,
+    cgId: "south-africa-fan-token",
   },
   {
     rank: 20,
@@ -299,7 +299,7 @@ export const FAN_TOKENS: FanToken[] = [
     category: "football",
     icon: "/images/tokens/sfa.svg",
     address: "0xfaB24366503Eb0fa8CB8FB7d1311159FD4283657",
-    cgId: undefined,
+    cgId: "scotland-fan-token",
   },
   {
     rank: 21,
@@ -316,7 +316,7 @@ export const FAN_TOKENS: FanToken[] = [
     category: "football",
     icon: "/images/tokens/belg.webp",
     address: "0x6c4C9DFE8C940b51B68d00C6D76dE756B252f328",
-    cgId: undefined,
+    cgId: "belgium-fan-token",
   },
   {
     rank: 22,

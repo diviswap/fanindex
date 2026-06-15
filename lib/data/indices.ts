@@ -154,8 +154,9 @@ export function getIndexAPY(
 // and the lookup key in ETF_CONTRACTS. Keep the key and the ticker in sync.
 
 // FTLX — Fan Token Leaders Index (weighted)
-const FTLX_TOKENS = ["GAL", "ARG", "OG", "PSG", "BAR", "ASR", "CITY", "ATM", "POR", "JUV"] as const
-const FTLX_WEIGHTS = [16.42, 12.73, 11.94, 10.45, 9.83, 9.13, 8.25, 7.55, 7.11, 6.49] as const
+// FTLX — Fan Token Leaders Index (weighted, 10 tokens)
+const FTLX_TOKENS = ["OG", "ASR", "ATM", "PSG", "BAR", "GAL", "ARG", "JUV", "CITY", "ACM"] as const
+const FTLX_WEIGHTS = [17.02, 12.52, 12.20, 11.84, 9.68, 8.95, 7.64, 7.40, 7.24, 5.51] as const
 
 // FGMX — Fan Gaming Index (equal weight, 5 tokens)
 const FGMX_TOKENS = ["OG", "TH", "ALL", "MIBR", "DOJO"] as const
@@ -163,16 +164,16 @@ const FGMX_TOKENS = ["OG", "TH", "ALL", "MIBR", "DOJO"] as const
 // FFLX — Fan Fight Index (equal weight, combat sports)
 const FFLX_TOKENS = ["UFC", "PFL"] as const
 
-// FELX — Fan English League Index (weighted)
+// FELX — Fan English League Index (weighted, 5 tokens)
 const FELX_TOKENS = ["CITY", "AFC", "SPURS", "AVL", "EFC"] as const
-const FELX_WEIGHTS = [46, 36, 9, 6, 3] as const
+const FELX_WEIGHTS = [47.07, 32.35, 12.72, 4.36, 3.52] as const
 
-// FSLX — Fan Spanish League Index (weighted)
-const FSLX_TOKENS = ["BAR", "ATM", "SEVILLA", "VCF"] as const
-const FSLX_WEIGHTS = [53, 41, 3, 3] as const
+// FSLX — Fan Spanish League Index (weighted, 4 tokens)
+const FSLX_TOKENS = ["ATM", "BAR", "SEVILLA", "VCF"] as const
+const FSLX_WEIGHTS = [53.21, 42.37, 2.36, 2.07] as const
 
-// FNTX — Fan National Teams Index (equal weight, 6 tokens)
-const FNTX_TOKENS = ["ARG", "POR", "ITA", "SAFA", "SFA", "BELG"] as const
+// FNTX — Fan National Teams Index (equal weight, 5 tokens)
+const FNTX_TOKENS = ["BELG", "SAFA", "SFA", "POR", "ARG"] as const
 
 export const INDICES: IndexData[] = [
   {
