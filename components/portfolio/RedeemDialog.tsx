@@ -11,7 +11,7 @@ import {
   useSwitchChain,
 } from "wagmi"
 import { chiliz } from "wagmi/chains"
-import { parseEther } from "viem"
+
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
 import { XCircle, ArrowDownToLine, AlertTriangle, Info, ExternalLink, Coins, Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
@@ -100,19 +100,12 @@ export function RedeemDialog({
     reset()
 
     try {
-      // Calculate minOut with 2% slippage protection for redemptions.
-      // For redeemAllToCHZNative: minOut = totalValueCHZ * (redemptionPercentage/100) * 0.98
-      // For withdrawTokens: no output amount parameter, so no slippage protection possible
-      let minOutCHZ = BigInt(0)
-      if (redemptionType === "chz" && totalValueCHZ > 0) {
-        const redemptionValue = (totalValueCHZ * redemptionPercentage) / 100
-        const minOutWithSlippage = redemptionValue * 0.98 // 2% slippage
-        try {
-          minOutCHZ = parseEther(minOutWithSlippage.toFixed(18))
-        } catch {
-          minOutCHZ = BigInt(0)
-        }
-      }
+      // Pass 0n as minOutCHZ — the same pattern used in buyNative.
+      // Our totalValueCHZ is an approximate off-chain estimate; using it as
+      // a hard minimum triggers OutputInsufficient (0x554e5029) whenever the
+      // live swap returns slightly less than our stale estimate.
+      // The wallet's built-in slippage warning acts as the user's guard.
+      const minOutCHZ = BigInt(0)
 
       if (redemptionType === "chz") {
         writeContract({
