@@ -16,6 +16,7 @@ import {
 import { parseEther, formatEther } from "viem"
 import { chiliz } from "wagmi/chains"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts, ETF_CONTRACTS } from "@/lib/contracts/abis"
+import { FanXRouterABI, FANX_CONTRACTS } from "@/lib/contracts/fanx-router-abi"
 import type { IndexData } from "./IndexCard"
 import { Loader2, CheckCircle2, XCircle, TrendingUp, Wallet, Info, ExternalLink, Trophy, Coins, AlertTriangle } from "lucide-react"
 import { useRouter } from "next/navigation"
@@ -92,7 +93,7 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   // working purchase script, the `minOuts` array we pass to buyNative must
   // have ONE entry per token that is actually swapped — i.e. weight > 0
   // and address != WCHZ (WCHZ is skipped because CHZ is the input asset).
-  const { buyableCount } = useMemo(() => {
+  const { buyableCount, buyableTokens, tokenWeights, wchzAddress } = useMemo(() => {
     const info = vaultConfigData?.[2]
     const wchzRes = vaultConfigData?.[3]
     if (
@@ -100,7 +101,12 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
       !Array.isArray(info.result) ||
       wchzRes?.status !== "success"
     ) {
-      return { buyableCount: undefined as number | undefined }
+      return {
+        buyableCount: undefined as number | undefined,
+        buyableTokens: [] as string[],
+        tokenWeights: [] as bigint[],
+        wchzAddress: "",
+      }
     }
     const [tokensArr, weightsArr] = info.result as unknown as [
       readonly string[],
@@ -108,15 +114,24 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     ]
     const wchz = String(wchzRes.result ?? "").toLowerCase()
     if (!Array.isArray(tokensArr) || !Array.isArray(weightsArr)) {
-      return { buyableCount: undefined }
+      return { buyableCount: undefined, buyableTokens: [], tokenWeights: [], wchzAddress: wchz }
     }
-    let count = 0
+    const bTokens: string[] = []
+    const bWeights: bigint[] = []
     for (let i = 0; i < tokensArr.length; i++) {
       const addr = String(tokensArr[i] ?? "").toLowerCase()
       const w = weightsArr[i] ?? 0n
-      if (w > 0n && addr !== wchz) count++
+      if (w > 0n && addr !== wchz) {
+        bTokens.push(tokensArr[i] as string)
+        bWeights.push(w)
+      }
     }
-    return { buyableCount: count }
+    return {
+      buyableCount: bTokens.length,
+      buyableTokens: bTokens,
+      tokenWeights: bWeights,
+      wchzAddress: wchz,
+    }
   }, [vaultConfigData])
 
   const feeBps = useMemo(() => {
@@ -127,6 +142,54 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
   }, [vaultConfigData])
 
   const feePct = feeBps / 10000 // e.g. 0.01 for 1%
+
+  // ── Query real token amounts via getAmountsOut ─────────────────────────
+  // The minOuts passed to buyNative must be in TOKEN units (not CHZ units).
+  // We call getAmountsOut(chzAllocation, [WCHZ, tokenAddr]) for each token
+  // to get how many tokens we'd receive, then apply 5% slippage tolerance.
+  const amountNum = Number.parseFloat(amount || "0")
+  const netForQuery = amountNum * (1 - feePct)
+
+  const amountsOutContracts = useMemo(() => {
+    if (
+      !open ||
+      !hasContracts ||
+      buyableTokens.length === 0 ||
+      netForQuery <= 0 ||
+      tokenWeights.length === 0
+    )
+      return []
+
+    const totalWeight = tokenWeights.reduce((s, w) => s + w, 0n)
+    if (totalWeight === 0n) return []
+
+    return buyableTokens.map((tokenAddr, i) => {
+      const w = tokenWeights[i] ?? 0n
+      const weightFraction = Number(w) / Number(totalWeight)
+      const chzAllocation = netForQuery * weightFraction
+      // Query: how many tokens do we get for chzAllocation CHZ?
+      // Path: WCHZ → tokenAddr (batchBuyer wraps native CHZ to WCHZ internally)
+      const amountIn = parseEther(chzAllocation.toFixed(18))
+      return {
+        // Use MASTER_ROUTER_V2 — same router the batchBuyer uses for swaps
+        address: FANX_CONTRACTS.MASTER_ROUTER_V2 as `0x${string}`,
+        abi: FanXRouterABI as readonly unknown[],
+        functionName: "getAmountsOut" as const,
+        args: [amountIn, [FANX_CONTRACTS.WCHZ, tokenAddr]] as const,
+      }
+    })
+  }, [open, hasContracts, buyableTokens, tokenWeights, netForQuery])
+
+  const { data: amountsOutData } = useReadContracts({
+    contracts: amountsOutContracts as any,
+    query: {
+      enabled: amountsOutContracts.length > 0,
+      // Re-fetch whenever the amount input changes (debounced by wagmi's staleTime)
+      staleTime: 5_000,
+    },
+  })
+
+
   const feePctLabel = (feePct * 100).toFixed(feeBps % 10 === 0 ? 1 : 2) // "1.0" or "1.25"
 
   // On-chain enforced minimum (in CHZ). May be 0 if unset.
@@ -184,59 +247,49 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
 
     try {
       const contractConfig = ETF_CONTRACTS[index.id as keyof typeof ETF_CONTRACTS]
+      const buyTokenCount = buyableCount ?? contractConfig?.tokens ?? index.tokens.length
 
-      // Dynamic minOuts with 2% slippage protection against MEV.
-      // Each minOut entry is 98% of the pro-rata share of the net investment
-      // (after fees) allocated to that token position.
-      const buyTokenCount =
-        buyableCount ?? contractConfig?.tokens ?? index.tokens.length
-      const amountNum = Number.parseFloat(amount)
-      const netInvestmentAfterFee = amountNum * (1 - feePct)
-
-      // Read token weights from on-chain data to calculate per-token allocation
-      const info = vaultConfigData?.[2]
-      const wchzRes = vaultConfigData?.[3]
+      // Build minOuts in TOKEN units using on-chain getAmountsOut data.
+      //
+      // Critical: minOuts[i] must be in units of the i-th output TOKEN,
+      // not in CHZ. The old code was passing CHZ-denominated allocations
+      // directly, which triggered InsufficientOutputAmount (0x42301c23)
+      // whenever a token's price was not 1 CHZ.
+      //
+      // Strategy:
+      //   - If amountsOutData is available: use the router's quoted output
+      //     amounts with 5% slippage applied (5% covers Chiliz DEX spread).
+      //   - Fallback (no price data yet): pass 0n for every token.
+      //     The contract accepts any output when minOut = 0; the wallet's
+      //     built-in slippage warning then becomes the user's last guard.
       let minOuts: bigint[] = []
 
-      if (
-        info?.status === "success" &&
-        Array.isArray(info.result) &&
-        wchzRes?.status === "success"
-      ) {
-        const [tokensArr, weightsArr] = info.result as unknown as [
-          readonly string[],
-          readonly bigint[],
-        ]
-        const wchz = String(wchzRes.result ?? "").toLowerCase()
-
-        // Calculate minOut for each token: (netInvestment * weight% * 98%)
-        const minOutsArray: bigint[] = []
-        let totalWeight = 0n
-        for (let i = 0; i < tokensArr.length; i++) {
-          const addr = String(tokensArr[i] ?? "").toLowerCase()
-          const w = weightsArr[i] ?? 0n
-          if (addr !== wchz) totalWeight += w
-        }
-
-        for (let i = 0; i < tokensArr.length; i++) {
-          const addr = String(tokensArr[i] ?? "").toLowerCase()
-          const w = weightsArr[i] ?? 0n
-          if (w > 0n && addr !== wchz && totalWeight > 0n) {
-            const weightFraction = Number(w) / Number(totalWeight)
-            const tokenAllocation = netInvestmentAfterFee * weightFraction
-            // Apply 2% slippage: minOut = allocation * 0.98
-            const minOut = tokenAllocation * 0.98
-            minOutsArray.push(parseEther(minOut.toFixed(18)))
+      if (amountsOutData && amountsOutData.length === amountsOutContracts.length) {
+        const resolvedMins: bigint[] = []
+        let allResolved = true
+        for (const result of amountsOutData) {
+          if (result?.status === "success") {
+            const amounts = result.result as bigint[]
+            // amounts[1] is the output token amount for amounts[0] CHZ in
+            const rawOut = amounts?.[1] ?? 0n
+            // Apply 5% slippage: minOut = rawOut * 95 / 100
+            resolvedMins.push((rawOut * 95n) / 100n)
+          } else {
+            allResolved = false
+            resolvedMins.push(0n)
           }
         }
-        minOuts = minOutsArray
+        if (allResolved) {
+          minOuts = resolvedMins
+        } else {
+          // Partial failure — zero out all to avoid partial revert
+          minOuts = Array(amountsOutData.length).fill(0n)
+        }
       }
 
-      // Fallback: equal-weight minOuts with 2% slippage if on-chain data unavailable
+      // Safety fallback: if we couldn't query the router, use zeros
       if (minOuts.length === 0) {
-        const perTokenAmount = netInvestmentAfterFee / buyTokenCount
-        const perTokenMinOut = perTokenAmount * 0.98 // 2% slippage
-        minOuts = Array(buyTokenCount).fill(parseEther(perTokenMinOut.toFixed(18)))
+        minOuts = Array(buyTokenCount).fill(0n)
       }
 
       writeContract({
@@ -287,7 +340,6 @@ export function BuyIndexDialog({ index, open, onOpenChange, onSuccess, livePrice
     }
   })
 
-  const amountNum = Number.parseFloat(amount || "0")
   const belowMinimum = amountNum > 0 && amountNum < effectiveMinCHZ
 
   return (

@@ -63,7 +63,10 @@ export function useTokenPrices(tokenAddresses: `0x${string}`[]): TokenPrice[] {
     })
 
   const contracts = addressMap.map(({ unwrapped }) => ({
-    address: FANX_CONTRACTS.ROUTER as `0x${string}`,
+    // Use MASTER_ROUTER_V2 — this is the router the batchBuyer uses internally
+    // for all swaps. Using the original ROUTER would query a different liquidity
+    // source and produce prices that don't match actual swap outputs.
+    address: FANX_CONTRACTS.MASTER_ROUTER_V2 as `0x${string}`,
     abi: FanXRouterABI as readonly unknown[],
     functionName: "getAmountsOut" as const,
     args: [parseUnits("100", 18), [unwrapped, FANX_CONTRACTS.WCHZ]] as const,
