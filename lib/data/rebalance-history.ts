@@ -8,9 +8,9 @@ export interface RebalanceEvent {
 export const REBALANCE_HISTORY: RebalanceEvent[] = [
   // FTLX — Fan Token Leaders Index
   {
-    date: "2024-06-15",
+    date: "2026-05-01",
     index: "FTLX",
-    change: "Quarterly rebalancing: Updated token weights to reflect market leadership",
+    change: "Initial launch: Market-cap weighted composition of the 10 largest and most liquid fan tokens",
     tokens: [
       { symbol: "OG", weight: 17.02 },
       { symbol: "ASR", weight: 12.52 },
@@ -25,11 +25,36 @@ export const REBALANCE_HISTORY: RebalanceEvent[] = [
     ],
   },
 
+  // FGMX — Fan Gaming Index
+  {
+    date: "2026-05-01",
+    index: "FGMX",
+    change: "Initial launch: Equal-weight exposure to the top esports organizations on Chiliz",
+    tokens: [
+      { symbol: "OG", weight: 20.0 },
+      { symbol: "TH", weight: 20.0 },
+      { symbol: "ALL", weight: 20.0 },
+      { symbol: "MIBR", weight: 20.0 },
+      { symbol: "DOJO", weight: 20.0 },
+    ],
+  },
+
+  // FFLX — Fan Fight Index
+  {
+    date: "2026-05-01",
+    index: "FFLX",
+    change: "Initial launch: Equal-weight index tracking the leading combat sports organizations",
+    tokens: [
+      { symbol: "UFC", weight: 50.0 },
+      { symbol: "PFL", weight: 50.0 },
+    ],
+  },
+
   // FELX — Fan English League Index
   {
-    date: "2024-06-15",
+    date: "2026-05-01",
     index: "FELX",
-    change: "Quarterly rebalancing: Updated weights to reflect current market conditions",
+    change: "Initial launch: Market-cap weighted index of English Premier League fan tokens",
     tokens: [
       { symbol: "CITY", weight: 47.07 },
       { symbol: "AFC", weight: 32.35 },
@@ -41,9 +66,9 @@ export const REBALANCE_HISTORY: RebalanceEvent[] = [
 
   // FSLX — Fan Spanish League Index
   {
-    date: "2024-06-15",
+    date: "2026-05-01",
     index: "FSLX",
-    change: "Quarterly rebalancing: Adjusted La Liga club weights",
+    change: "Initial launch: Market-cap weighted index of La Liga fan tokens",
     tokens: [
       { symbol: "ATM", weight: 53.21 },
       { symbol: "BAR", weight: 42.37 },
@@ -54,9 +79,9 @@ export const REBALANCE_HISTORY: RebalanceEvent[] = [
 
   // FNTX — Fan National Teams Index
   {
-    date: "2024-06-15",
+    date: "2026-05-01",
     index: "FNTX",
-    change: "Initial launch: Equal-weight composition of national team federation tokens",
+    change: "Initial launch: Equal-weight composition of national football federation tokens",
     tokens: [
       { symbol: "BELG", weight: 20.0 },
       { symbol: "SAFA", weight: 20.0 },
