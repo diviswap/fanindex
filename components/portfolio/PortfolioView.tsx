@@ -33,10 +33,9 @@ import useSWR from "swr"
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-// Indices that have contracts deployed on Chiliz Mainnet.
-// Keep this list in sync with ETF_CONTRACTS (lib/contracts/abis.ts) and
-// DEPLOYED_INDICES in lib/hooks/use-portfolio-onchain.ts.
-const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX"]
+// Indices shown in the Available Indices section.
+// ETF_CONTRACTS (lib/contracts/abis.ts) controls which ones support on-chain buy/redeem.
+const DEPLOYED_INDICES = ["FTLX", "FGMX", "FFLX", "FELX", "FSLX", "FNTX"]
 
 const typeColors: Record<string, string> = {
   weighted: "text-blue-400",
