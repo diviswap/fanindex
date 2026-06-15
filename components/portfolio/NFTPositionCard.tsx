@@ -12,6 +12,7 @@ import { getTokenByAddress, getTokenBySymbol } from "@/lib/data/fan-tokens"
 import type { NFTHolding } from "@/lib/hooks/use-portfolio-onchain"
 import type { TokenPrice } from "@/lib/hooks/use-token-prices"
 import { ShareCardModal } from "@/components/share/ShareCardModal"
+import { ETF_CONTRACTS } from "@/lib/contracts/abis"
 
 interface NFTPositionCardProps {
   holding: NFTHolding
@@ -88,7 +89,10 @@ export function NFTPositionCard({ holding, tokenPrices, onSell, onBuy, walletAdd
     return all.slice(-30)
   }, [history90d])
 
-  const chiliscanUrl = `https://chiliscan.com/token/0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9?a=${tokenId.toString()}`
+  const nftAddress =
+    ETF_CONTRACTS[holding.indexId as keyof typeof ETF_CONTRACTS]?.nft ??
+    "0x1cd2309fFdbc9A3a8819ED8b9E7979d1D725B9d9"
+  const chiliscanUrl = `https://chiliscan.com/token/${nftAddress}?a=${tokenId.toString()}`
 
   return (
     <>
