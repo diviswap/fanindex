@@ -122,7 +122,7 @@
   "rebalance": {
     "label": "Motor de Rebalanceo",
     "title": "Infraestructura Rebalanceada Mensualmente",
-    "description": "FanIndex mantiene sus índices a través de un proceso de rebalanceo transparente y basado en reglas — la misma disciplina operativa esperada de la infraestructura ETF tradicional.",
+    "description": "FanIndex mantiene sus índices a través de un proceso de rebalanceo transparente y basado en reglas — la misma disciplina operativa esperada de la infraestructura de índices tradicional.",
     "principles": {
       "monthly": {
         "title": "Cadencia Mensual",
@@ -158,7 +158,7 @@
     "readWhitepaper": "Leer Whitepaper"
   },
   "footer": {
-    "description": "La primera plataforma tipo ETF para Fan Tokens. Diversificá tu portafolio entre ligas y equipos en Chiliz Chain.",
+    "description": "La primera plataforma de índices para Fan Tokens. Diversificá tu portafolio entre ligas y equipos en Chiliz Chain.",
     "copyright": "Todos los derechos reservados.",
     "sections": {
       "product": {
@@ -435,7 +435,7 @@
       {"type":"h","level":2,"text":"3.2 Limitaciones del Mercado"},
       {"type":"ul","items":["Exposición Fragmentada: Los inversores deben comprar y gestionar manualmente múltiples tokens individuales.","Falta de Productos Estructurados: Actualmente no hay índices de referencia ni instrumentos financieros diversificados para el ecosistema.","Infraestructura de Cartera Limitada: La mayoría de las plataformas se enfocan exclusivamente en trading en lugar de construcción y análisis de carteras.","Concentración de Volatilidad: La exposición a un solo token crea volatilidad significativa y concentración de riesgo.","Mercados de Capital Subdesarrollados: Los Fan Tokens tienen utilidad de participación pero infraestructura financiera limitada."]},
       {"type":"h","level":3,"text":"3.3 La Oportunidad"},
-      {"type":"p","text":"Las finanzas tradicionales evolucionaron a través de ETFs, índices, productos de cartera y exposición estructurada. Cripto adoptó estos conceptos en DeFi, ecosistemas de Capa 1, tokens de IA e índices meme."},
+      {"type":"p","text":"Las finanzas tradicionales evolucionaron a través de índices, productos de cartera y exposición estructurada. Cripto adoptó estos conceptos en DeFi, ecosistemas de Capa 1, tokens de IA e índices meme."},
       {"type":"p","text":"Los Fan Tokens siguen siendo uno de los últimos verticales de cripto sin infraestructura de índices. FanIndex llena esa brecha."}
     ],
     "platform": [
@@ -443,7 +443,7 @@
       {"type":"p","text":"FanIndex es una plataforma descentralizada para:"},
       {"type":"ul","items":["Invertir en índices de Fan Tokens","Rastrear posiciones de cartera","Analizar el mercado de Fan Tokens","Acceder a exposición de SportFi estructurada"]},
       {"type":"p","text":"La plataforma combina productos de índices, infraestructura de cartera NFT, analítica de mercado y transparencia on-chain en un único ecosistema."},
-      {"type":"h","level":2,"text":"4.2 Características Principales de la Plataforma"},
+      {"type":"h","level":2,"text":"4.2 Caracter��sticas Principales de la Plataforma"},
       {"type":"ul","items":["Índices Tokenizados: Canastas estructuradas de Fan Tokens agrupadas por tema, geografía, categoría o estrategia.","Posiciones Basadas en NFT: Cada posición de inversión se representa con un NFT.","Seguimiento de Cartera: Los usuarios pueden monitorear posiciones, asignaciones, exposición y rendimiento directamente on-chain.","Analítica de Fan Tokens: Datos de mercado en tiempo real incluyendo precio, capitalización de mercado, volumen, suministro circulante y métricas de rendimiento para todo el ecosistema de Fan Tokens.","Infraestructura On-Chain: Todas las transacciones ocurren de forma transparente en Chiliz Chain."]}
     ],
     "indexArchitecture": [
@@ -921,7 +921,7 @@
     "title": "Contratos Inteligentes",
     "description": "Infraestructura auditada y transparente que asegura tus inversiones on-chain.",
     "etfVault": {
-      "title": "Contratos de Bóveda ETF",
+      "title": "Contratos de Bóveda de Índices",
       "description": "Contratos inteligentes principales que gestionan posiciones de índice y custodia de activos para cada índice.",
       "chain": "Chiliz Chain"
     },

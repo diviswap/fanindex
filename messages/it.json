@@ -122,7 +122,7 @@
   "rebalance": {
     "label": "Motore di Ribilanciamento",
     "title": "Infrastruttura Ribilanciata Mensilmente",
-    "description": "FanIndex mantiene i suoi indici attraverso un processo di ribilanciamento trasparente e basato su regole — la stessa disciplina operativa attesa dalle tradizionali infrastrutture ETF.",
+    "description": "FanIndex mantiene i suoi indici attraverso un processo di ribilanciamento trasparente e basato su regole — la stessa disciplina operativa attesa dalle tradizionali infrastrutture di indici.",
     "principles": {
       "monthly": {
         "title": "Cadenza Mensile",
@@ -158,7 +158,7 @@
     "readWhitepaper": "Leggi il Whitepaper"
   },
   "footer": {
-    "description": "La prima piattaforma di tipo ETF per i Fan Token. Diversifica il tuo portafoglio tra leghe e squadre su Chiliz Chain.",
+    "description": "La prima piattaforma di indici per i Fan Token. Diversifica il tuo portafoglio tra leghe e squadre su Chiliz Chain.",
     "copyright": "Tutti i diritti riservati.",
     "sections": {
       "product": {
@@ -912,7 +912,7 @@
     "title": "Smart Contract",
     "description": "Infrastruttura verificata e trasparente che protegge i tuoi investimenti on-chain.",
     "etfVault": {
-      "title": "Contratti ETF Vault",
+      "title": "Contratti Index Vault",
       "description": "Smart contract principali che gestiscono le posizioni degli indici e la custodia degli asset per ogni indice.",
       "chain": "Chiliz Chain"
     },
@@ -970,7 +970,7 @@
       {"type":"h","level":2,"text":"3.2 Limitazioni del Mercato"},
       {"type":"ul","items":["Esposizione Frammentata: Gli investitori devono acquistare e gestire manualmente più Fan Token singoli.","Mancanza di Prodotti Strutturati: Attualmente non esistono indici benchmark o strumenti finanziari diversificati per l'ecosistema.","Infrastruttura di Portafoglio Limitata: La maggior parte delle piattaforme si concentra esclusivamente sul trading, non sulla costruzione del portafoglio e sull'analisi.","Concentrazione della Volatilità: L'esposizione a singoli token crea volatilità e concentrazione del rischio significative.","Mercati dei Capitali Sottosviluppati: I Fan Token hanno utilità di coinvolgimento ma infrastruttura finanziaria limitata."]},
       {"type":"h","level":3,"text":"3.3 L'Opportunità"},
-      {"type":"p","text":"La finanza tradizionale si è evoluta attraverso ETF, indici, prodotti di portafoglio ed esposizione strutturata. La cripto ha adottato questi concetti in DeFi, ecosistemi Layer 1, token AI e indici meme."},
+      {"type":"p","text":"La finanza tradizionale si è evoluta attraverso indici, prodotti di portafoglio ed esposizione strutturata. La cripto ha adottato questi concetti in DeFi, ecosistemi Layer 1, token AI e indici meme."},
       {"type":"p","text":"I Fan Token rimangono uno degli ultimi grandi verticali cripto senza infrastruttura di indici. FanIndex colma questo divario."}
     ],
     "platform": [

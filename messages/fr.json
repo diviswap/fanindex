@@ -122,7 +122,7 @@
   "rebalance": {
     "label": "Moteur de Rééquilibrage",
     "title": "Infrastructure Rééquilibrée Mensuellement",
-    "description": "FanIndex maintient ses indices grâce à un processus de rééquilibrage transparent et basé sur des règles — la même discipline opérationnelle attendue des infrastructures ETF traditionnelles.",
+    "description": "FanIndex maintient ses indices grâce à un processus de rééquilibrage transparent et basé sur des règles — la même discipline opérationnelle attendue des infrastructures d'indices traditionnelles.",
     "principles": {
       "monthly": {
         "title": "Cadence Mensuelle",
@@ -158,7 +158,7 @@
     "readWhitepaper": "Lire le Livre Blanc"
   },
   "footer": {
-    "description": "La première plateforme de type ETF pour les Fan Tokens. Diversifiez votre portefeuille entre ligues et équipes sur la Chiliz Chain.",
+    "description": "La première plateforme d'indices pour les Fan Tokens. Diversifiez votre portefeuille entre ligues et équipes sur la Chiliz Chain.",
     "copyright": "Tous droits réservés.",
     "sections": {
       "product": {
@@ -912,7 +912,7 @@
     "title": "Contrats Intelligents",
     "description": "Infrastructure auditée et transparente sécurisant vos investissements on-chain.",
     "etfVault": {
-      "title": "Contrats ETF Vault",
+      "title": "Contrats Index Vault",
       "description": "Contrats intelligents principaux gérant les positions d'indice et la garde des actifs pour chaque indice.",
       "chain": "Chiliz Chain"
     },
@@ -970,7 +970,7 @@
       {"type":"h","level":2,"text":"3.2 Limites du Marché"},
       {"type":"ul","items":["Exposition Fragmentée : Les investisseurs doivent acheter et gérer manuellement plusieurs Fan Tokens individuels.","Manque de Produits Structurés : Il n'existe actuellement pas d'indices de référence ni d'instruments financiers diversifiés pour l'écosystème.","Infrastructure de Portefeuille Limitée : La plupart des plateformes se concentrent exclusivement sur le trading plutôt que sur la construction de portefeuille et les analyses.","Concentration de la Volatilité : L'exposition à un seul token crée une volatilité et une concentration de risque significatives.","Marchés de Capitaux Sous-développés : Les Fan Tokens ont une utilité d'engagement mais une infrastructure financière limitée."]},
       {"type":"h","level":3,"text":"3.3 L'Opportunité"},
-      {"type":"p","text":"La finance traditionnelle a évolué grâce aux ETF, aux indices, aux produits de portefeuille et à l'exposition structurée. La crypto a adopté ces concepts dans la DeFi, les écosystèmes de Couche 1, les tokens d'IA et les indices de mèmes."},
+      {"type":"p","text":"La finance traditionnelle a évolué grâce aux indices, aux produits de portefeuille et à l'exposition structurée. La crypto a adopté ces concepts dans la DeFi, les écosystèmes de Couche 1, les tokens d'IA et les indices de mèmes."},
       {"type":"p","text":"Les Fan Tokens restent l'un des derniers grands verticaux crypto sans infrastructure d'indice. FanIndex comble cette lacune."}
     ],
     "platform": [
@@ -993,7 +993,7 @@
       {"type":"p","text":"Les indices gérés introduisent une gestion active du portefeuille. L'équipe FanIndex peut rééquilibrer dynamiquement, faire pivoter l'exposition et gérer les allocations stratégiquement. Les produits gérés sont conçus pour les investisseurs avancés recherchant une exposition tactique."}
     ],
     "indexSuite": [
-      {"type":"ul","items":["FTLX — Fan Token Leaders Index : L'indice de référence du marché des Fan Tokens. Suit les Fan Tokens les plus importants et les plus liquides représentant l'ensemble de l'écosystème.","FGMX — Fan Gaming Index : Un indice équipondéré axé sur les organisations d'esports avec des Fan Tokens.","FFLX — Fan Fight Index : Un indice équipondéré axé sur les organisations de sports de combat.","FELX — Fan English League Index : Suit les principaux clubs de football anglais avec des Fan Tokens.","FSLX — Fan Spanish League Index : Suit les principaux clubs de football espagnols représentés dans l'écosystème."]}
+      {"type":"ul","items":["FTLX �� Fan Token Leaders Index : L'indice de référence du marché des Fan Tokens. Suit les Fan Tokens les plus importants et les plus liquides représentant l'ensemble de l'écosystème.","FGMX — Fan Gaming Index : Un indice équipondéré axé sur les organisations d'esports avec des Fan Tokens.","FFLX — Fan Fight Index : Un indice équipondéré axé sur les organisations de sports de combat.","FELX — Fan English League Index : Suit les principaux clubs de football anglais avec des Fan Tokens.","FSLX — Fan Spanish League Index : Suit les principaux clubs de football espagnols représentés dans l'écosystème."]}
     ],
     "futureExpansion": [
       {"type":"p","text":"Les futurs indices planifiés incluent :"},
