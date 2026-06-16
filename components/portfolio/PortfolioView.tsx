@@ -343,12 +343,17 @@ export function PortfolioView() {
   // ── Token prices ──────────────────────────────────────────────────────────
   const allTokenAddresses = useMemo(() => {
     const addrs = new Set<`0x${string}`>()
+    // NFT position addresses
     holdings.forEach((h) =>
       h.tokenAddresses.forEach((a) => {
         if (a && typeof a === "string" && a !== "0x0000000000000000000000000000000000000000")
           addrs.add(a)
       })
     )
+    // All listed fan tokens (new canonical address) — needed to price wallet balances
+    FAN_TOKENS.forEach((t) => {
+      if (t.address) addrs.add(t.address)
+    })
     return Array.from(addrs)
   }, [holdings])
 
@@ -370,21 +375,22 @@ export function PortfolioView() {
   }, [tokenPrices, liveTokenPrices])
 
   // ── Fan Token balances (read on-chain ERC20 balances) ────────────────────────
-  // Get tokens with valid contract addresses
+  // Only tokens that have the new canonical 18-decimal address listed on /fan-tokens
   const tokensWithAddresses = useMemo(() => {
-    return FAN_TOKENS.filter((t) => !!t.unwrapped)
+    return FAN_TOKENS.filter((t) => !!t.address)
   }, [])
 
-  // Read all fan token balances in a single multicall
+  // Read all fan token balances in a single multicall using the new address
   const { data: fanTokenBalances, isLoading: isLoadingFanTokens } = useReadContracts({
     contracts: tokensWithAddresses.map((token) => ({
-      address: token.unwrapped as `0x${string}`,
+      address: token.address as `0x${string}`,
       abi: erc20Abi,
       functionName: "balanceOf",
       args: [address as `0x${string}`],
     })),
     query: {
       enabled: isConnected && !!address && tokensWithAddresses.length > 0,
+      refetchInterval: 30000,
     },
   })
 
@@ -407,15 +413,19 @@ export function PortfolioView() {
       if (result?.status === "success" && result.result) {
         const balance = Number(formatUnits(result.result as bigint, 18))
         if (balance > 0) {
-          const livePrice = liveTokenPrices?.find(
-            (lp) => lp.symbol.toLowerCase() === token.symbol.toLowerCase()
-          )
-          const priceInCHZ = livePrice?.priceInCHZ ?? parseFloat(token.price) / 0.07
+          // Resolve price from priceMap (on-chain router + CoinGecko merged)
+          // keyed by the new canonical address, falling back to symbol lookup
+          const priceInCHZ =
+            priceMap.get(token.address!.toLowerCase()) ??
+            liveTokenPrices?.find(
+              (lp) => lp.symbol.toLowerCase() === token.symbol.toLowerCase()
+            )?.priceInCHZ ??
+            0
           tokensWithBalance.push({
             symbol: token.symbol,
             name: token.name,
             icon: token.icon,
-            address: token.unwrapped!,
+            address: token.address!,
             balance,
             priceInCHZ,
             valueInCHZ: balance * priceInCHZ,
@@ -424,8 +434,9 @@ export function PortfolioView() {
       }
     })
 
-    return tokensWithBalance
-  }, [fanTokenBalances, tokensWithAddresses, liveTokenPrices])
+    // Sort by value descending
+    return tokensWithBalance.sort((a, b) => b.valueInCHZ - a.valueInCHZ)
+  }, [fanTokenBalances, tokensWithAddresses, priceMap, liveTokenPrices])
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   const portfolioStats = useMemo(() => {
