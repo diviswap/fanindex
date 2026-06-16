@@ -679,10 +679,9 @@
     "premiumOwnership": "Proprietà di Indice Premium",
     "premiumDescription": "Ogni posizione FanIndex è rappresentata da un NFT che certifica la tua proprietà e fornisce accesso a vantaggi esclusivi."
   },
-    "premiumFeatures": {
-      "title": "Funzionalità Premium",
-      "description": "I titolari di NFT sbloccano analisi esclusive, diritti di governance e approfondimenti di mercato."
-    }
+  "premiumFeatures": {
+    "title": "Funzionalità Premium",
+    "description": "I titolari di NFT sbloccano analisi esclusive, diritti di governance e approfondimenti di mercato."
   },
   "portfolioAnalytics": {
     "title": "Portafoglio e Analisi",
