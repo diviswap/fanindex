@@ -815,7 +815,9 @@
     "premiumFeatures": {
       "title": "Premium Features",
       "description": "NFT holders unlock exclusive analytics, governance rights, and market insights."
-    }
+    },
+    "premiumOwnership": "Index Ownership Premium",
+    "premiumDescription": "Each FanIndex position is represented by an NFT that certifies your ownership and provides access to exclusive benefits."
   },
   "portfolioAnalytics": {
     "title": "Portfolio & Analytics",
