@@ -676,6 +676,9 @@
       "title": "Rachetabilité",
       "description": "Les positions peuvent être rachetées directement pour les actifs sous-jacents, garantissant une valeur réelle."
     },
+    "premiumOwnership": "Propriété d'Indice Premium",
+    "premiumDescription": "Chaque position FanIndex est représentée par un NFT qui certifie votre propriété et donne accès à des avantages exclusifs."
+  },
     "premiumFeatures": {
       "title": "Fonctionnalités Premium",
       "description": "Les détenteurs de NFT débloquent des analyses exclusives, des droits de gouvernance et des insights de marché."

@@ -595,7 +595,7 @@
     "title": "Metodologia de Índice",
     "description": "Construção de índice de nível profissional inspirada na gestão tradicional de ativos.",
     "pricingFormula": "Fórmula de Precificação",
-    "pricingDescription": "O Valor Patrimonial Líquido (NAV) de cada índice é calculado como a soma dos preços ponderados dos ativos:",
+    "pricingDescription": "O Valor Patrimonial Líquido (NAV) de cada índice �� calculado como a soma dos preços ponderados dos ativos:",
     "formula": "NAV = Σ(wᵢ × Pᵢ)",
     "formulaExplain": "Onde wᵢ é o peso do ativo i e Pᵢ é seu preço em CHZ",
     "example": "Exemplo: Um índice com 60% CHZ (preço 0,50 CHZ) e 40% FAN (preço 0,75 CHZ) teria NAV = (0,6 × 0,50) + (0,4 × 0,75) = 0,60 CHZ",
@@ -676,6 +676,9 @@
       "title": "Resgatabilidade",
       "description": "As posições podem ser resgatadas diretamente pelos ativos subjacentes, garantindo valor real."
     },
+    "premiumOwnership": "Propriedade de Índice Premium",
+    "premiumDescription": "Cada posição FanIndex é representada por um NFT que certifica sua propriedade e fornece acesso a benefícios exclusivos."
+  },
     "premiumFeatures": {
       "title": "Recursos Premium",
       "description": "Titulares de NFT desbloqueiam análises exclusivas, direitos de governança e insights de mercado."
