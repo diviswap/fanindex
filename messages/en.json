@@ -702,7 +702,15 @@
     "indexContracts": "Index Contract Addresses",
     "indexName": "Index",
     "vaultContract": "Vault Contract",
-    "nftContract": "NFT Contract"
+    "nftContract": "NFT Contract",
+    "smartContracts": {
+      "nftPosition": {
+        "title": "NFT Position Contracts"
+      },
+      "batchBuyer": {
+        "title": "Batch Buyer"
+      }
+    }
   },
   "faq": {
     "title": "Frequently Asked Questions",

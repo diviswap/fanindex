@@ -939,7 +939,15 @@
     "indexContracts": "Endereços dos Contratos de Índice",
     "indexName": "Índice",
     "vaultContract": "Contrato Vault",
-    "nftContract": "Contrato NFT"
+    "nftContract": "Contrato NFT",
+    "smartContracts": {
+      "nftPosition": {
+        "title": "Contratos de Posição NFT"
+      },
+      "batchBuyer": {
+        "title": "Comprador em Lote"
+      }
+    }
   },
   "whitepaperContent": {
     "executiveSummary": [

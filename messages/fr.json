@@ -938,8 +938,16 @@
     "verify": "Vérifier",
     "indexContracts": "Adresses des Contrats d'Indice",
     "indexName": "Indice",
-    "vaultContract": "Contrat Vault",
-    "nftContract": "Contrat NFT"
+    "vaultContract": "Contrat de Coffre-fort",
+    "nftContract": "Contrat NFT",
+    "smartContracts": {
+      "nftPosition": {
+        "title": "Contrats de Position NFT"
+      },
+      "batchBuyer": {
+        "title": "Acheteur en Batch"
+      }
+    }
   },
   "whitepaperContent": {
     "executiveSummary": [
@@ -993,7 +1001,7 @@
       {"type":"p","text":"Les indices gérés introduisent une gestion active du portefeuille. L'équipe FanIndex peut rééquilibrer dynamiquement, faire pivoter l'exposition et gérer les allocations stratégiquement. Les produits gérés sont conçus pour les investisseurs avancés recherchant une exposition tactique."}
     ],
     "indexSuite": [
-      {"type":"ul","items":["FTLX �� Fan Token Leaders Index : L'indice de référence du marché des Fan Tokens. Suit les Fan Tokens les plus importants et les plus liquides représentant l'ensemble de l'écosystème.","FGMX — Fan Gaming Index : Un indice équipondéré axé sur les organisations d'esports avec des Fan Tokens.","FFLX — Fan Fight Index : Un indice équipondéré axé sur les organisations de sports de combat.","FELX — Fan English League Index : Suit les principaux clubs de football anglais avec des Fan Tokens.","FSLX — Fan Spanish League Index : Suit les principaux clubs de football espagnols représentés dans l'écosystème."]}
+      {"type":"ul","items":["FTLX ��� Fan Token Leaders Index : L'indice de référence du marché des Fan Tokens. Suit les Fan Tokens les plus importants et les plus liquides représentant l'ensemble de l'écosystème.","FGMX — Fan Gaming Index : Un indice équipondéré axé sur les organisations d'esports avec des Fan Tokens.","FFLX — Fan Fight Index : Un indice équipondéré axé sur les organisations de sports de combat.","FELX — Fan English League Index : Suit les principaux clubs de football anglais avec des Fan Tokens.","FSLX — Fan Spanish League Index : Suit les principaux clubs de football espagnols représentés dans l'écosystème."]}
     ],
     "futureExpansion": [
       {"type":"p","text":"Les futurs indices planifiés incluent :"},

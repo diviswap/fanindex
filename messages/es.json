@@ -948,7 +948,15 @@
     "indexContracts": "Direcciones de Contrato de Índices",
     "indexName": "Índice",
     "vaultContract": "Contrato de Bóveda",
-    "nftContract": "Contrato NFT"
+    "nftContract": "Contrato NFT",
+    "smartContracts": {
+      "nftPosition": {
+        "title": "Contratos de Posición NFT"
+      },
+      "batchBuyer": {
+        "title": "Comprador Batch"
+      }
+    }
   },
   "faq": {
     "title": "Preguntas Frecuentes",
