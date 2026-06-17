@@ -11,6 +11,7 @@ import { IndexPriceChart } from "./IndexPriceChart"
 import { getTokenBySymbol } from "@/lib/data/fan-tokens"
 import { useIndexNav } from "@/lib/hooks/use-index-nav"
 import { EtfVaultABI, getContractAddresses, hasDeployedContracts } from "@/lib/contracts/abis"
+import { useActivePositionsForIndex } from "@/lib/hooks/use-active-positions"
 import { useReadContract } from "wagmi"
 import useSWR from "swr"
 import { useTranslations } from "next-intl"
@@ -61,6 +62,9 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
   // Canonical NAV (shared with the cards on /indices and the home portfolio
   // panel) — this is the single source of truth for the displayed price.
   const { navPrice, displayPrice, livePrices: liveTokenPrices } = useIndexNav(index)
+
+  // ── On-chain investors (activePositions) ──────────────────────────────
+  const activePositions = useActivePositionsForIndex(index.id)
 
   // ── Dynamic fee from the on-chain vault ────────────────────────────────
   const contracts = getContractAddresses(index.id)
@@ -380,7 +384,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
         </div>
       </Card>
 
-      {/* ── KPI metrics row (Token Terminal style) ──────────────────────────── */}
+      {/* ── KPI metrics row (Token Terminal style) ───���──────────────────────── */}
       <Card className="border-border bg-card/60 backdrop-blur-sm mb-6 sm:mb-8 md:mb-12 overflow-hidden">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 divide-x divide-y sm:divide-y-0 divide-border">
           {/* Market Cap */}
@@ -423,7 +427,7 @@ export function IndexDetailView({ index }: IndexDetailViewProps) {
             <div className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">{t("investors")}</div>
             <div className="flex items-center gap-1.5 text-xl sm:text-2xl font-bold text-foreground tabular-nums">
               <Users className="h-4 w-4 text-muted-foreground shrink-0" />
-              {index.holders}
+              {activePositions !== null ? activePositions : "--"}
             </div>
             <div className="text-[10px] text-muted-foreground mt-1">{t("nftPositions")}</div>
           </div>
