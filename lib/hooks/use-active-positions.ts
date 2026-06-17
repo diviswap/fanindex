@@ -13,9 +13,9 @@ export function useActivePositions(): Map<string, number> {
   const { data } = useReadContracts({
     contracts: entries.map(([, cfg]) => ({
       address: cfg.vault,
-      abi: EtfVaultABI.abi,
+      abi: EtfVaultABI.abi as readonly unknown[],
       functionName: "activePositions" as const,
-    })),
+    })) as any,
     query: {
       refetchInterval: 30000,
     },
@@ -38,15 +38,15 @@ export function useActivePositionsForIndex(indexId: string): number | null {
   const contracts = ETF_CONTRACTS[indexId as keyof typeof ETF_CONTRACTS]
 
   const { data } = useReadContracts({
-    contracts: contracts
+    contracts: (contracts
       ? [
           {
             address: contracts.vault,
-            abi: EtfVaultABI.abi,
+            abi: EtfVaultABI.abi as readonly unknown[],
             functionName: "activePositions" as const,
           },
         ]
-      : [],
+      : []) as any,
     query: {
       enabled: !!contracts,
       refetchInterval: 30000,
